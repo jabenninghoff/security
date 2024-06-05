@@ -2,9 +2,9 @@
 title: "Constraints vs Performance"
 author: "John Benninghoff"
 date: '2024-04-30'
-date-modified: '2024-05-10'
-categories: notes
-order: 107
+date-modified: '2024-06-05'
+categories: security differently
+order: 101
 output:
   html_notebook:
     theme:
@@ -19,10 +19,6 @@ output:
 ---
 
 Visualizations exploring the use of constraints vs performance improvements in risk management.
-
-# Questions/TODO
-
-- [ ] Questions/TODO list here
 
 ```{r setup, message = FALSE, warning = FALSE}
 library(ggplot2)
