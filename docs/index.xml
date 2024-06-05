@@ -1,0 +1,963 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss  xmlns:atom="http://www.w3.org/2005/Atom" 
+      xmlns:media="http://search.yahoo.com/mrss/" 
+      xmlns:content="http://purl.org/rss/1.0/modules/content/" 
+      xmlns:dc="http://purl.org/dc/elements/1.1/" 
+      version="2.0">
+<channel>
+<title>security</title>
+<link>https://jabenninghoff.github.io/security/</link>
+<atom:link href="https://jabenninghoff.github.io/security/index.xml" rel="self" type="application/rss+xml"/>
+<description>A collection of notebooks for analyzing security differently.</description>
+<language>en-us</language>
+<generator>quarto-1.4.555</generator>
+<lastBuildDate>Tue, 30 Apr 2024 05:00:00 GMT</lastBuildDate>
+<item>
+  <title>Constraints vs Performance</title>
+  <dc:creator>John Benninghoff</dc:creator>
+  <link>https://jabenninghoff.github.io/security/analysis/constraints.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<p>Visualizations exploring the use of constraints vs performance improvements in risk management.</p>
+<section id="questionstodo" class="level2">
+<h2 class="anchored" data-anchor-id="questionstodo">Questions/TODO</h2>
+<ul class="task-list">
+<li><label><input type="checkbox">Questions/TODO list here</label></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(ggplot2)</span>
+<span id="cb1-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(jbplot)</span>
+<span id="cb1-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(fs)</span>
+<span id="cb1-4"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(tibble)</span>
+<span id="cb1-5"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(dplyr)</span></code></pre></div>
+</div>
+</section>
+<section id="normal-performance" class="level2">
+<h2 class="anchored" data-anchor-id="normal-performance">Normal Performance</h2>
+<p>Replicate a version of Figure 9 from the <a href="https://www.england.nhs.uk/signuptosafety/wp-content/uploads/sites/16/2015/10/safety-1-safety-2-whte-papr.pdf">Safety-II White Paper</a>, with help from <a href="https://ggplot2tutor.com/tutorials/sampling_distributions" class="uri">https://ggplot2tutor.com/tutorials/sampling_distributions</a>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1">xmin <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span></span>
+<span id="cb2-2">xmax <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span></span>
+<span id="cb2-3"></span>
+<span id="cb2-4">save_png <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(filename) {</span>
+<span id="cb2-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggsave</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">filename =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">path</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rendered"</span>, filename), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">width =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">16</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.6</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">height =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.6</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">bg =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"white"</span>)</span>
+<span id="cb2-6">}</span>
+<span id="cb2-7"></span>
+<span id="cb2-8">background <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(xmin, xmax)), <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(x)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb2-9">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_x_continuous</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">breaks =</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">minor_breaks =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb2-10">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb2-11">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_quo</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">minor.y =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">FALSE</span>)</span>
+<span id="cb2-12"></span>
+<span id="cb2-13">baseline <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">stat_function</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fun =</span> dnorm, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">geom =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"line"</span>)</span>
+<span id="cb2-14">bad <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">stat_function</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fun =</span> dnorm, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">geom =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"area"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fill =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"red"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">xlim =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(xmin, <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>))</span>
+<span id="cb2-15"></span>
+<span id="cb2-16">background <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> bad <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> baseline</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://jabenninghoff.github.io/security/analysis/constraints_files/figure-html/background-1.png" class="img-fluid figure-img" width="816"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">save_png</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"01-baseline-bad.png"</span>)</span></code></pre></div>
+</div>
+<p>The plot above shows “bad” outcomes in red. Let’s add in “good” outcomes (&gt;1) in green:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1">good <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">stat_function</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fun =</span> dnorm, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">geom =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"area"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fill =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"green"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">xlim =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, xmax))</span>
+<span id="cb4-2"></span>
+<span id="cb4-3">background <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> bad <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> good <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> baseline</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://jabenninghoff.github.io/security/analysis/constraints_files/figure-html/good-1.png" class="img-fluid figure-img" width="816"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">save_png</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"02-baseline-bad-good.png"</span>)</span></code></pre></div>
+</div>
+</section>
+<section id="constrained-performance" class="level2">
+<h2 class="anchored" data-anchor-id="constrained-performance">Constrained Performance</h2>
+<p>One way of reducing “bad” outcomes is by constraining performance - reducing the standard deviation.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1">constrained <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">stat_function</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fun =</span> dnorm, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">args =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">sd =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.7</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">geom =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"line"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"blue"</span>)</span>
+<span id="cb6-2">taller <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_y_continuous</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">limits =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.6</span>))</span>
+<span id="cb6-3"></span>
+<span id="cb6-4">background <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb6-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">stat_function</span>(</span>
+<span id="cb6-6">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fun =</span> dnorm, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">args =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">sd =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.7</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">geom =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"area"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fill =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"red"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">xlim =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(xmin, <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb6-7">  ) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb6-8">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">stat_function</span>(</span>
+<span id="cb6-9">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fun =</span> dnorm, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">args =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">sd =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.7</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">geom =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"area"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fill =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"green"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">xlim =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, xmax)</span>
+<span id="cb6-10">  ) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb6-11">  constrained <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb6-12">  taller</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://jabenninghoff.github.io/security/analysis/constraints_files/figure-html/constrained-1.png" class="img-fluid figure-img" width="816"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">save_png</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"03-constrained.png"</span>)</span></code></pre></div>
+</div>
+<p>Plotting both on the same grid shows the reduction in both “bad” and “good” outcomes:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1">background <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb8-2">  bad <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb8-3">  good <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb8-4">  baseline <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb8-5">  constrained <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb8-6">  taller</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://jabenninghoff.github.io/security/analysis/constraints_files/figure-html/overlay-1.png" class="img-fluid figure-img" width="816"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">save_png</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"04-baseline-constrained.png"</span>)</span></code></pre></div>
+</div>
+</section>
+<section id="improved-performance" class="level2">
+<h2 class="anchored" data-anchor-id="improved-performance">Improved Performance</h2>
+<p>Another way of reducing bad outcomes is by improving performance - shifting the mean.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1">performance <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">stat_function</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fun =</span> dnorm, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">args =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mean =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">geom =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"line"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"blue"</span>)</span>
+<span id="cb10-2">improved <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">stat_function</span>(</span>
+<span id="cb10-3">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fun =</span> dnorm, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">args =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mean =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">geom =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"area"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fill =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"green"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">xlim =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, xmax)</span>
+<span id="cb10-4">)</span>
+<span id="cb10-5"></span>
+<span id="cb10-6">background <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb10-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">stat_function</span>(</span>
+<span id="cb10-8">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fun =</span> dnorm, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">args =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mean =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">geom =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"area"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fill =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"red"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">xlim =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(xmin, <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb10-9">  ) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb10-10">  improved <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb10-11">  performance</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://jabenninghoff.github.io/security/analysis/constraints_files/figure-html/performance-1.png" class="img-fluid figure-img" width="816"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">save_png</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"05-improved.png"</span>)</span></code></pre></div>
+</div>
+<p>Plotting both together shows a reduction in “bad” and an increase in “good” outcomes:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1">background <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb12-2">  bad <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb12-3">  improved <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb12-4">  baseline <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb12-5">  performance</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://jabenninghoff.github.io/security/analysis/constraints_files/figure-html/overlay_perf-1.png" class="img-fluid figure-img" width="816"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">save_png</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"06-baseline-improved.png"</span>)</span></code></pre></div>
+</div>
+<p>Comparing all three:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1">background <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb14-2">  bad <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb14-3">  improved <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb14-4">  baseline <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb14-5">  constrained <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb14-6">  performance <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb14-7">  taller</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://jabenninghoff.github.io/security/analysis/constraints_files/figure-html/overlay_all-1.png" class="img-fluid figure-img" width="816"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">save_png</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"07-baseline-constrained-improved.png"</span>)</span></code></pre></div>
+</div>
+</section>
+<section id="growth-of-controls" class="level2">
+<h2 class="anchored" data-anchor-id="growth-of-controls">Growth of Controls</h2>
+<p>Visualize an example of the growth of controls using the Cyentia/RiskRecon State of Third-Party Risk Management 2020 and 2024 reports (data from 2023).</p>
+<p>Source:</p>
+<ul>
+<li>2020 data: <a href="https://www.riskrecon.com/state-of-third-party-risk-management-report" class="uri">https://www.riskrecon.com/state-of-third-party-risk-management-report</a></li>
+<li>2023 data: <a href="https://www.riskrecon.com/state-of-third-party-risk-management-2024" class="uri">https://www.riskrecon.com/state-of-third-party-risk-management-2024</a></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1">questionnaire <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tribble</span>(</span>
+<span id="cb16-2">  <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span>year, <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span>questions, <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span>percent,</span>
+<span id="cb16-3">  <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2020</span>,  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"&gt;400"</span>,     <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.041</span>,</span>
+<span id="cb16-4">  <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2020</span>,  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"101-400"</span>,  <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.148</span>,</span>
+<span id="cb16-5">  <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2020</span>,  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"11-100"</span>,   <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.705</span>,</span>
+<span id="cb16-6">  <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2020</span>,  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"1-10"</span>,     <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.107</span>,</span>
+<span id="cb16-7">  <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2023</span>,  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"&gt;400"</span>,     <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.02</span>,</span>
+<span id="cb16-8">  <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2023</span>,  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"101-400"</span>,  <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.333</span>,</span>
+<span id="cb16-9">  <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2023</span>,  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"11-100"</span>,   <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.616</span>,</span>
+<span id="cb16-10">  <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2023</span>,  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"1-10"</span>,     <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.030</span></span>
+<span id="cb16-11">) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb16-12">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mutate</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">year =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.factor</span>(year)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb16-13">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mutate</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">questions =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">factor</span>(questions, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">levels =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"1-10"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"11-100"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"101-400"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"&gt;400"</span>)))</span>
+<span id="cb16-14"></span>
+<span id="cb16-15"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(questionnaire, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(questions, percent, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fill =</span> year)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb16-16">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_col</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">position =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"dodge"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb16-17">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_y_continuous</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">labels =</span> scales<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">label_percent</span>()) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb16-18">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_fill_manual</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">values =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"steelblue2"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"steelblue4"</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb16-19">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fill =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Year"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">title =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Third-Party Questionnaire Length by Year"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb16-20">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">caption =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Source: Cyentia/RiskRecon State of Third-Party Risk Management, 2020 and 2024"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb16-21">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_quo</span>()</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://jabenninghoff.github.io/security/analysis/constraints_files/figure-html/questionnaire-1.png" class="img-fluid figure-img" width="816"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">save_png</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"08-questionnaire-length.png"</span>)</span></code></pre></div>
+</div>
+</section>
+<section id="transparent-donut" class="level2">
+<h2 class="anchored" data-anchor-id="transparent-donut">Transparent Donut</h2>
+<p>Create a transparent donut plot showing an 80% reduction.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># custom function based on ggplot_donut_percent()</span></span>
+<span id="cb18-2">custom_donut <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(p, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">text =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">""</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">accuracy =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">hsize =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">family =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Lato"</span>) {</span>
+<span id="cb18-3">  data <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">group =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>, <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">FALSE</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">n =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(p, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> p))</span>
+<span id="cb18-4">  label <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">paste0</span>(scales<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">label_percent</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">accuracy =</span> accuracy)(p), <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">\n</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span>, text)</span>
+<span id="cb18-5"></span>
+<span id="cb18-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot_donut</span>(data, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">hsize =</span> hsize) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb18-7">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">guides</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fill =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"none"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb18-8">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_text</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">label =</span> label, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> size, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">family =</span> family) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb18-9">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_fill_grey</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb18-10">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">plot.background =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">element_rect</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fill =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"transparent"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NA</span>))</span>
+<span id="cb18-11">}</span>
+<span id="cb18-12"></span>
+<span id="cb18-13"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">custom_donut</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.8</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"reduction"</span>)</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://jabenninghoff.github.io/security/analysis/constraints_files/figure-html/custom_donut-1.png" class="img-fluid figure-img" width="816"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb19" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggsave</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rendered/80-percent-safety.png"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Saving 8.5 x 5 in image</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb21" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">custom_donut</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.8</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"reduction?"</span>)</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://jabenninghoff.github.io/security/analysis/constraints_files/figure-html/custom_donut-2.png" class="img-fluid figure-img" width="816"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb22" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggsave</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rendered/80-percent-security.png"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Saving 8.5 x 5 in image</code></pre>
+</div>
+</div>
+
+
+</section>
+
+ ]]></description>
+  <category>notes</category>
+  <guid>https://jabenninghoff.github.io/security/analysis/constraints.html</guid>
+  <pubDate>Tue, 30 Apr 2024 05:00:00 GMT</pubDate>
+</item>
+</channel>
+</rss>
