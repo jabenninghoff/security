@@ -1,0 +1,56 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# security
+
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/jabenninghoff/security/workflows/R-CMD-check/badge.svg)](https://github.com/jabenninghoff/security/actions)
+[![lint](https://github.com/jabenninghoff/security/workflows/lint/badge.svg)](https://github.com/jabenninghoff/security/actions)
+<!-- badges: end -->
+
+## Overview
+
+**`r desc::desc_get_field("Title")`:** `r desc::desc_get_field("Description")`
+
+Feel free to use and/or fork this project!
+
+## Installation
+
+You can install the development version of security from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("remotes")
+remotes::install_github("jabenninghoff/security")
+```
+
+Or using renv:
+
+``` r
+# install.packages("renv")
+renv::install("jabenninghoff/security")
+```
+
+## Development
+
+- Changelog: See "Changelog" or `NEWS.md`.
+- Planned: [TODO](TODO.md)
+
+## Example
+
+This is a basic example which shows you how to solve a common problem:
+
+```{r example}
+# basic example code
+```
