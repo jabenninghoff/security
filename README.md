@@ -11,10 +11,19 @@
 
 ## Overview
 
-**What the Package Does (One Line, Title Case):** What the package does
-(one paragraph).
+**Security Differently:** A collection of notebooks for analyzing
+security differently.
 
 Feel free to use and/or fork this project!
+
+## Notebooks
+
+Notebooks in this package:
+
+- [Constraints vs
+  Performance](https://jabenninghoff.github.io/security/analysis/constraints.html)
+  (2024-04-30): Visualizations exploring the use of constraints vs
+  performance improvements in risk management.
 
 ## Installation
 
@@ -37,11 +46,3 @@ renv::install("jabenninghoff/security")
 
 - Changelog: See “Changelog” or `NEWS.md`.
 - Planned: [TODO](TODO.md)
-
-## Example
-
-This is a basic example which shows you how to solve a common problem:
-
-``` r
-# basic example code
-```
