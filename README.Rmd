@@ -5,6 +5,11 @@ output: github_document
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 ```{r setup, include = FALSE}
+library(rdev)
+library(fs)
+library(dplyr)
+library(purrr)
+
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -26,6 +31,19 @@ knitr::opts_chunk$set(
 
 Feel free to use and/or fork this project!
 
+## Notebooks
+
+Notebooks in this package:
+
+```{r notebooks, echo = FALSE, results = 'asis'}
+notebooks <- dir_ls("analysis", regexp = "[.][Rq]md$") |>
+  map_dfr(rmd_metadata) |>
+  mutate(bullet = paste0("- [", title, "](", url, ") (", date, "): ", description)) |>
+  pull(bullet)
+
+writeLines(notebooks)
+```
+
 ## Installation
 
 You can install the development version of security from [GitHub](https://github.com/) with:
@@ -46,11 +64,3 @@ renv::install("jabenninghoff/security")
 
 - Changelog: See "Changelog" or `NEWS.md`.
 - Planned: [TODO](TODO.md)
-
-## Example
-
-This is a basic example which shows you how to solve a common problem:
-
-```{r example}
-# basic example code
-```

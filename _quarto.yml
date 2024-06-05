@@ -1,0 +1,53 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "security"
+  site-url: "https://jabenninghoff.github.io/security/"
+  description:
+    "A collection of notebooks for analyzing security differently."
+  repo-url: "https://github.com/jabenninghoff/security"
+  repo-actions: [source, issue]
+  page-navigation: true
+  sidebar:
+    contents: analysis/*
+  navbar:
+    background: light
+    search: true
+    left:
+      - text: Changelog
+        file: changelog.qmd
+      - text: TODO
+        file: TODO.md
+    tools:
+      - icon: rss
+        href: index.xml
+        aria-label: rss
+      - icon: github
+        url: https://github.com/jabenninghoff/security
+        aria-label: github
+  page-footer:
+    left: "Copyright 2024, John Benninghoff"
+    center:
+      - text: License
+        file: LICENSE.md
+    right:
+      - icon: github
+        href: https://github.com/jabenninghoff/security
+        aria-label: github
+
+execute:
+  freeze: auto
+
+format:
+  html:
+    theme:
+      light: flatly
+      dark: darkly
+    toc: true
+    fig-width: 8.5
+    grid:
+      sidebar-width: 225px
+      body-width: 850px
+      margin-width: 225px
