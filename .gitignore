@@ -39,18 +39,17 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 
-# pkgdown site
-docs/
-
 # translation temp files
 po/*~
 
 # RStudio Connect folder
 rsconnect/
+
 # macOS, vim
 .DS_Store
 *.swp
 ~$*
+
 # analysis package generated files
 # see: https://jabenninghoff.github.io/rdev/articles/analysis-package-layout.html
 analysis/*.docx
