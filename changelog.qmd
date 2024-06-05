@@ -1,0 +1,8 @@
+---
+title: "Changelog"
+format:
+  html:
+    shift-heading-level-by: 1
+---
+
+{{< include NEWS.md >}}

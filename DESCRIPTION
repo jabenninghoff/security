@@ -12,9 +12,12 @@ BugReports: https://github.com/jabenninghoff/security/issues
 Suggests: 
     desc,
     devtools,
+    dplyr,
     fs,
     knitr,
     pkgload,
+    purrr,
+    quarto,
     rdev (>= 1.10.11),
     rmarkdown,
     testthat (>= 3.0.0),

@@ -4,9 +4,9 @@
 \name{security-package}
 \alias{security}
 \alias{security-package}
-\title{security: What the Package Does (One Line, Title Case)}
+\title{security: Security Differently}
 \description{
-What the package does (one paragraph).
+A collection of notebooks for analyzing security differently.
 }
 \seealso{
 Useful links:
