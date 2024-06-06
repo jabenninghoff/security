@@ -2,26 +2,30 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://jabenninghoff.github.io/security/changelog.html</loc>
-    <lastmod>2024-06-05T16:42:39.065Z</lastmod>
+    <lastmod>2024-06-05T17:48:31.401Z</lastmod>
   </url>
   <url>
     <loc>https://jabenninghoff.github.io/security/TODO.html</loc>
-    <lastmod>2024-06-05T16:39:34.946Z</lastmod>
+    <lastmod>2024-06-05T17:48:31.422Z</lastmod>
   </url>
   <url>
     <loc>https://jabenninghoff.github.io/security/analysis/constraints.html</loc>
-    <lastmod>2024-06-05T17:12:18.665Z</lastmod>
+    <lastmod>2024-06-05T19:12:11.824Z</lastmod>
   </url>
   <url>
     <loc>https://jabenninghoff.github.io/security/LICENSE.html</loc>
-    <lastmod>2024-06-05T17:25:54.805Z</lastmod>
+    <lastmod>2024-06-05T17:48:31.420Z</lastmod>
+  </url>
+  <url>
+    <loc>https://jabenninghoff.github.io/security/analysis/breach-rates.html</loc>
+    <lastmod>2024-06-06T22:13:55.491Z</lastmod>
   </url>
   <url>
     <loc>https://jabenninghoff.github.io/security/NEWS.html</loc>
-    <lastmod>2024-06-05T17:19:16.674Z</lastmod>
+    <lastmod>2024-06-05T18:58:37.327Z</lastmod>
   </url>
   <url>
     <loc>https://jabenninghoff.github.io/security/index.html</loc>
-    <lastmod>2024-06-05T16:42:39.073Z</lastmod>
+    <lastmod>2024-06-05T17:48:31.419Z</lastmod>
   </url>
 </urlset>
