@@ -23,4 +23,5 @@ if (interactive()) {
   }
   # warn if pandoc not found in PATH
   if (Sys.which("pandoc") == "") warning("pandoc not found, run `open /Applications/RStudio.app`")
+  clipr::write_clip("open /Applications/RStudio.app")
 }
