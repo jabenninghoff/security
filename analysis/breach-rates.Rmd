@@ -2,7 +2,7 @@
 title: "Measuring Changes in Breach Rates"
 author: "John Benninghoff"
 date: '2024-06-05'
-date-modified: '2024-06-05'
+date-modified: '2024-06-06'
 categories: security differently
 order: 102
 output:
