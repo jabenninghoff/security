@@ -11,7 +11,443 @@
 <description>A collection of notebooks for analyzing security differently.</description>
 <language>en-us</language>
 <generator>quarto-1.4.555</generator>
-<lastBuildDate>Tue, 30 Apr 2024 05:00:00 GMT</lastBuildDate>
+<lastBuildDate>Wed, 05 Jun 2024 05:00:00 GMT</lastBuildDate>
+<item>
+  <title>Measuring Changes in Breach Rates</title>
+  <dc:creator>John Benninghoff</dc:creator>
+  <link>https://jabenninghoff.github.io/security/analysis/breach-rates.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<p>A critical review of using breach frequency as a measure of security success, inspired by <a href="https://sre.google/resources/practices-and-processes/incident-metrics-in-sre/">Incident Metrics in SRE: Critically Evaluating MTTR and Friends</a>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(poilog)</span>
+<span id="cb1-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(tibble)</span>
+<span id="cb1-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(dplyr)</span></code></pre></div>
+</div>
+<section id="background" class="level2">
+<h2 class="anchored" data-anchor-id="background">Background</h2>
+<p><a href="https://sre.google/resources/practices-and-processes/incident-metrics-in-sre/">Incident Metrics in SRE: Critically Evaluating MTTR and Friends</a> demonstrated the difficulty at detecting changes in MTTR over time. The paper tests a 10% reduction in MTTR using Monte Carlo simulation, and found:</p>
+<blockquote class="blockquote">
+<p>“Yikes! Even though in the simulation the improvement always worked, 38% of the simulations had the MTTR difference fall below zero for Company A, 40% for Company B, and 20% for Company C. Looking at the absolute change in MTTR, the probability of seeing at least a 15-minute improvement is only 49%, 50%, and 64%, respectively. Even though the product in the scenario worked and shortened incidents, the odds of detecting any improvement at all are well outside the tolerance of 10% random flukes.”</p>
+</blockquote>
+<p><a href="https://www.information-safety.org/2023/10/31/security-differently/">Safety Differently</a> argues that we shouldn’t measure success based on the absence of negative events. We can use real data on data breaches and Monte Carlo simulation to explore the question, “Is an organization’s breach rate a useful metric?”</p>
+</section>
+<section id="poisson-log-normal-model" class="level2">
+<h2 class="anchored" data-anchor-id="poisson-log-normal-model">Poisson Log-Normal Model</h2>
+<p>The 2022 <a href="https://www.cyentia.com/wp-content/uploads/IRIS-2022_Cyentia.pdf">Information Risk Insights Study (IRIS)</a> found that a Poisson log-normal distribution fits the data and provides realistic forecasts for years with multiple breaches, and provides suggested values for mean (<img src="https://latex.codecogs.com/png.latex?%5Cmu">) and standard deviation (<img src="https://latex.codecogs.com/png.latex?%5Csigma">) in Table 1, along with the likelihood of a breach with models that are adjusted for firm size in Table 2, since larger firms are more likely to experience a breach.</p>
+<p>Using the provided parameters from Table 1, we get:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1">breach_poilog <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(mu, sig, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">runs =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1e6</span>) {</span>
+<span id="cb2-2">  breaches <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rpoilog</span>(runs, mu, sig)</span>
+<span id="cb2-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tibble</span>(</span>
+<span id="cb2-4">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"One or more"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sum</span>(breaches <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> runs,</span>
+<span id="cb2-5">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Two or more"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sum</span>(breaches <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> runs,</span>
+<span id="cb2-6">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Three or more"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sum</span>(breaches <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> runs</span>
+<span id="cb2-7">  )</span>
+<span id="cb2-8">}</span>
+<span id="cb2-9"></span>
+<span id="cb2-10"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">breach_poilog</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mu =</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2.284585</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">sig =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.8690759</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 3
+  `One or more` `Two or more` `Three or more`
+          &lt;dbl&gt;         &lt;dbl&gt;           &lt;dbl&gt;
+1         0.129        0.0165         0.00264</code></pre>
+</div>
+</div>
+<p>These values are close to the upper bound for a firm in the $100M to $1B range on Table 2.</p>
+</section>
+<section id="poisson-model" class="level2">
+<h2 class="anchored" data-anchor-id="poisson-model">Poisson Model</h2>
+<p>If we were to use the number of breaches a firm has experienced as a useful metric, in the best-case scenario, we would have a high rate of breaches with a significant reduction after implementing a new control. Unfortunately, the IRIS paper doesn’t provide the model parameters for the group with the highest likelihood of a breach, firms with more than $100B in revenue. Additionally, because it is easier to understand and calculate improvements, we’d like to use a plain Poisson distribution, which has a single parameter for average arrival rate, <img src="https://latex.codecogs.com/png.latex?%5Clambda">.</p>
+<p>We can find a reasonable value for <img src="https://latex.codecogs.com/png.latex?%5Clambda"> using trial and error:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1">breach_pois <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(lambda, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">runs =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1e6</span>) {</span>
+<span id="cb4-2">  breaches <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rpois</span>(runs, lambda)</span>
+<span id="cb4-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tibble</span>(</span>
+<span id="cb4-4">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"One or more"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sum</span>(breaches <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> runs,</span>
+<span id="cb4-5">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Two or more"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sum</span>(breaches <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> runs,</span>
+<span id="cb4-6">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Three or more"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sum</span>(breaches <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> runs</span>
+<span id="cb4-7">  )</span>
+<span id="cb4-8">}</span>
+<span id="cb4-9"></span>
+<span id="cb4-10">base_lambda <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.347</span></span>
+<span id="cb4-11"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">breach_pois</span>(base_lambda)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 3
+  `One or more` `Two or more` `Three or more`
+          &lt;dbl&gt;         &lt;dbl&gt;           &lt;dbl&gt;
+1         0.293        0.0479         0.00532</code></pre>
+</div>
+</div>
+<p>A Poisson model with a <img src="https://latex.codecogs.com/png.latex?%5Clambda"> of 0.347 (a little more than once every three years) gives similar results to the Poisson log-normal model for the largest firms for one or more breaches, but underestimates the likelihood for 2+ and 3+.</p>
+</section>
+<section id="simulate-improvement" class="level2">
+<h2 class="anchored" data-anchor-id="simulate-improvement">Simulate Improvement</h2>
+<p>Using the Poisson model, it is easy to simulate improvements.</p>
+<p>Let’s assume that the firm implements a new security control that reduces the likelihood of a breach by 25%, and compares the number of breaches in the 5 years before and after implementing that control. We then simulate this scenario 100,000 times:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1">simulation <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(years, reduction, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">runs =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1e5</span>) {</span>
+<span id="cb6-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tibble</span>(</span>
+<span id="cb6-3">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">base =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">replicate</span>(runs, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sum</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rpois</span>(years, base_lambda))),</span>
+<span id="cb6-4">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">new =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">replicate</span>(runs, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sum</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rpois</span>(years, base_lambda <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> (<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> reduction))))</span>
+<span id="cb6-5">  ) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb6-6">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mutate</span>(</span>
+<span id="cb6-7">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">better =</span> .data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>new <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;</span> .data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>base, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">worse =</span> .data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>new <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;</span> .data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>base,</span>
+<span id="cb6-8">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">same =</span> .data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>new <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> .data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>base</span>
+<span id="cb6-9">    )</span>
+<span id="cb6-10">}</span>
+<span id="cb6-11"></span>
+<span id="cb6-12">results <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">simulation</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.25</span>)</span>
+<span id="cb6-13"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">head</span>(results, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 5
+    base   new better worse same 
+   &lt;int&gt; &lt;int&gt; &lt;lgl&gt;  &lt;lgl&gt; &lt;lgl&gt;
+ 1     3     2 TRUE   FALSE FALSE
+ 2     2     4 FALSE  TRUE  FALSE
+ 3     1     1 FALSE  FALSE TRUE 
+ 4     3     2 TRUE   FALSE FALSE
+ 5     2     2 FALSE  FALSE TRUE 
+ 6     4     0 TRUE   FALSE FALSE
+ 7     2     1 TRUE   FALSE FALSE
+ 8     1     1 FALSE  FALSE TRUE 
+ 9     1     3 FALSE  TRUE  FALSE
+10     5     3 TRUE   FALSE FALSE</code></pre>
+</div>
+</div>
+<p>OK, what are the results?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1">summarize_results <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(data) {</span>
+<span id="cb8-2">  data <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb8-3">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">summarize</span>(</span>
+<span id="cb8-4">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">better =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sum</span>(.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>better) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">n</span>(), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">worse =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sum</span>(.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>worse) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">n</span>(),</span>
+<span id="cb8-5">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">same =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sum</span>(.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>same) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">n</span>()</span>
+<span id="cb8-6">    )</span>
+<span id="cb8-7">}</span>
+<span id="cb8-8"></span>
+<span id="cb8-9"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">summarize_results</span>(results)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 3
+  better worse  same
+   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1  0.478 0.289 0.233</code></pre>
+</div>
+</div>
+<p>For this scenario, even though the true rate of breaches has been reduced by 25%, the number of breaches in the 5 years after implementing the control is better less than 50% of the time, and is actually worse nearly 30% of the time!</p>
+</section>
+<section id="larger-sample" class="level2">
+<h2 class="anchored" data-anchor-id="larger-sample">Larger Sample</h2>
+<p>To improve the likelihood of detecting the improvement, we can adjust the scenario, taking a larger sample of years before and after implementing the new control. How many years would we need to get a confident measurement of improvement?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">simulation</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.25</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb10-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">summarize_results</span>()</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 3
+  better worse  same
+   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1  0.561 0.284 0.155</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">simulation</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">50</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.25</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb12-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">summarize_results</span>()</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 3
+  better worse   same
+   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;
+1  0.756 0.190 0.0539</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">simulation</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">250</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.25</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb14-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">summarize_results</span>()</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 3
+  better  worse    same
+   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;
+1  0.957 0.0358 0.00672</code></pre>
+</div>
+</div>
+<p>Only the simulation which tests 250 years before and after (a total of 500 years!) gives a somewhat reasonable indication of improvement - and keep in mind that “better” is a reduction of <em>any</em> amount. Running metrics for a period this long at a single firm is impractical, which leads to our conclusion…</p>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>Even in a “best case” scenario of a very large firm that is able to measure the number of breaches over a 10 year period, a 25% reduction in breach rate only results in a lower number of actual breaches less than 50% of the time. A sample period of 500 years or more is needed to have confidence that the breach rate has been reduced.</p>
+<p>Realistically, this means that the only way to test the effectiveness of security controls is by sampling across large numbers of firms. A single organization simply won’t have enough data to make reasonable conclusions based on events that happen so infrequently.</p>
+
+
+</section>
+
+ ]]></description>
+  <category>security differently</category>
+  <guid>https://jabenninghoff.github.io/security/analysis/breach-rates.html</guid>
+  <pubDate>Wed, 05 Jun 2024 05:00:00 GMT</pubDate>
+</item>
 <item>
   <title>Constraints vs Performance</title>
   <dc:creator>John Benninghoff</dc:creator>
@@ -22,11 +458,6 @@
 
 
 <p>Visualizations exploring the use of constraints vs performance improvements in risk management.</p>
-<section id="questionstodo" class="level2">
-<h2 class="anchored" data-anchor-id="questionstodo">Questions/TODO</h2>
-<ul class="task-list">
-<li><label><input type="checkbox">Questions/TODO list here</label></li>
-</ul>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;
 background-color: null;
@@ -44,7 +475,6 @@ font-style: inherit;">library</span>(tibble)</span>
 background-color: null;
 font-style: inherit;">library</span>(dplyr)</span></code></pre></div>
 </div>
-</section>
 <section id="normal-performance" class="level2">
 <h2 class="anchored" data-anchor-id="normal-performance">Normal Performance</h2>
 <p>Replicate a version of Figure 9 from the <a href="https://www.england.nhs.uk/signuptosafety/wp-content/uploads/sites/16/2015/10/safety-1-safety-2-whte-papr.pdf">Safety-II White Paper</a>, with help from <a href="https://ggplot2tutor.com/tutorials/sampling_distributions" class="uri">https://ggplot2tutor.com/tutorials/sampling_distributions</a>:</p>
@@ -955,7 +1385,7 @@ font-style: inherit;">"rendered/80-percent-security.png"</span>)</span></code></
 </section>
 
  ]]></description>
-  <category>notes</category>
+  <category>security differently</category>
   <guid>https://jabenninghoff.github.io/security/analysis/constraints.html</guid>
   <pubDate>Tue, 30 Apr 2024 05:00:00 GMT</pubDate>
 </item>

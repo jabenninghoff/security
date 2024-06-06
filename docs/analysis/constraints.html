@@ -66,6 +66,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
+<link href="../analysis/breach-rates.html" rel="next">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -165,6 +166,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Constraints vs Performance</span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../analysis/breach-rates.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Measuring Changes in Breach Rates</span></a>
+  </div>
+</li>
     </ul>
     </div>
 </nav>
@@ -175,8 +182,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#questionstodo" id="toc-questionstodo" class="nav-link active" data-scroll-target="#questionstodo">Questions/TODO</a></li>
-  <li><a href="#normal-performance" id="toc-normal-performance" class="nav-link" data-scroll-target="#normal-performance">Normal Performance</a></li>
+  <li><a href="#normal-performance" id="toc-normal-performance" class="nav-link active" data-scroll-target="#normal-performance">Normal Performance</a></li>
   <li><a href="#constrained-performance" id="toc-constrained-performance" class="nav-link" data-scroll-target="#constrained-performance">Constrained Performance</a></li>
   <li><a href="#improved-performance" id="toc-improved-performance" class="nav-link" data-scroll-target="#improved-performance">Improved Performance</a></li>
   <li><a href="#growth-of-controls" id="toc-growth-of-controls" class="nav-link" data-scroll-target="#growth-of-controls">Growth of Controls</a></li>
@@ -191,7 +197,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="quarto-title">
 <h1 class="title">Constraints vs Performance</h1>
   <div class="quarto-categories">
-    <div class="quarto-category">notes</div>
+    <div class="quarto-category">security differently</div>
   </div>
   </div>
 
@@ -216,7 +222,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">May 10, 2024</p>
+      <p class="date-modified">June 5, 2024</p>
     </div>
   </div>
     
@@ -228,11 +234,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <p>Visualizations exploring the use of constraints vs performance improvements in risk management.</p>
-<section id="questionstodo" class="level2">
-<h2 class="anchored" data-anchor-id="questionstodo">Questions/TODO</h2>
-<ul class="task-list">
-<li><label><input type="checkbox">Questions/TODO list here</label></li>
-</ul>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(jbplot)</span>
@@ -240,7 +241,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tibble)</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section>
 <section id="normal-performance" class="level2">
 <h2 class="anchored" data-anchor-id="normal-performance">Normal Performance</h2>
 <p>Replicate a version of Figure 9 from the <a href="https://www.england.nhs.uk/signuptosafety/wp-content/uploads/sites/16/2015/10/safety-1-safety-2-whte-papr.pdf">Safety-II White Paper</a>, with help from <a href="https://ggplot2tutor.com/tutorials/sampling_distributions" class="uri">https://ggplot2tutor.com/tutorials/sampling_distributions</a>:</p>
@@ -1026,6 +1026,15 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../analysis/breach-rates.html" class="pagination-link" aria-label="Measuring Changes in Breach Rates">
+        <span class="nav-page-text">Measuring Changes in Breach Rates</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">

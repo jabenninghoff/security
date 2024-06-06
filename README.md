@@ -20,6 +20,12 @@ Feel free to use and/or fork this project!
 
 Notebooks in this package:
 
+- [Measuring Changes in Breach
+  Rates](https://jabenninghoff.github.io/security/analysis/breach-rates.html)
+  (2024-06-05): A critical review of using breach frequency as a measure
+  of security success, inspired by [Incident Metrics in SRE: Critically
+  Evaluating MTTR and
+  Friends](https://sre.google/resources/practices-and-processes/incident-metrics-in-sre/).
 - [Constraints vs
   Performance](https://jabenninghoff.github.io/security/analysis/constraints.html)
   (2024-04-30): Visualizations exploring the use of constraints vs

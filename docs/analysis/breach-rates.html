@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="John Benninghoff">
+<meta name="dcterms.date" content="2024-06-05">
 
-<title>security</title>
+<title>security - Measuring Changes in Breach Rates</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,27 +22,62 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../analysis/constraints.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -69,6 +106,35 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -79,7 +145,7 @@ ul.task-list li input[type="checkbox"] {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">security</span>
     </a>
   </div>
@@ -90,17 +156,17 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./changelog.html"> 
+    <a class="nav-link" href="../changelog.html"> 
 <span class="menu-text">Changelog</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./TODO.html"> 
+    <a class="nav-link" href="../TODO.html"> 
 <span class="menu-text">TODO</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
           <div class="quarto-navbar-tools tools-wide">
-    <a href="./index.xml" title="" class="quarto-navigation-tool px-1" aria-label="rss"><i class="bi bi-rss"></i></a>
+    <a href="../index.xml" title="" class="quarto-navigation-tool px-1" aria-label="rss"><i class="bi bi-rss"></i></a>
     <a href="https://github.com/jabenninghoff/security" title="" class="quarto-navigation-tool px-1" aria-label="github"><i class="bi bi-github"></i></a>
   <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
 </div>
@@ -111,7 +177,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../analysis/breach-rates.html">Measuring Changes in Breach Rates</a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -125,13 +191,13 @@ ul.task-list li input[type="checkbox"] {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./analysis/constraints.html" class="sidebar-item-text sidebar-link">
+  <a href="../analysis/constraints.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Constraints vs Performance</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./analysis/breach-rates.html" class="sidebar-item-text sidebar-link">
+  <a href="../analysis/breach-rates.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Measuring Changes in Breach Rates</span></a>
   </div>
 </li>
@@ -145,29 +211,210 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#security-1.0.1" id="toc-security-1.0.1" class="nav-link active" data-scroll-target="#security-1.0.1">security 1.0.1</a></li>
-  <li><a href="#security-1.0.0" id="toc-security-1.0.0" class="nav-link" data-scroll-target="#security-1.0.0">security 1.0.0</a></li>
+  <li><a href="#background" id="toc-background" class="nav-link active" data-scroll-target="#background">Background</a></li>
+  <li><a href="#poisson-log-normal-model" id="toc-poisson-log-normal-model" class="nav-link" data-scroll-target="#poisson-log-normal-model">Poisson Log-Normal Model</a></li>
+  <li><a href="#poisson-model" id="toc-poisson-model" class="nav-link" data-scroll-target="#poisson-model">Poisson Model</a></li>
+  <li><a href="#simulate-improvement" id="toc-simulate-improvement" class="nav-link" data-scroll-target="#simulate-improvement">Simulate Improvement</a></li>
+  <li><a href="#larger-sample" id="toc-larger-sample" class="nav-link" data-scroll-target="#larger-sample">Larger Sample</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/jabenninghoff/security/blob/main/NEWS.md" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/jabenninghoff/security/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/jabenninghoff/security/blob/main/analysis/breach-rates.Rmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/jabenninghoff/security/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Measuring Changes in Breach Rates</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">security differently</div>
+  </div>
+  </div>
 
 
 
-<section id="security-1.0.1" class="level1">
-<h1>security 1.0.1</h1>
-<ul>
-<li>Added Measuring Changes in Breach Rates: A critical review of using breach frequency as a measure of security success, inspired by <a href="https://sre.google/resources/practices-and-processes/incident-metrics-in-sre/">Incident Metrics in SRE: Critically Evaluating MTTR and Friends</a></li>
-</ul>
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>John Benninghoff </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">June 5, 2024</p>
+    </div>
+  </div>
+  
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">June 6, 2024</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>A critical review of using breach frequency as a measure of security success, inspired by <a href="https://sre.google/resources/practices-and-processes/incident-metrics-in-sre/">Incident Metrics in SRE: Critically Evaluating MTTR and Friends</a>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(poilog)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tibble)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="background" class="level2">
+<h2 class="anchored" data-anchor-id="background">Background</h2>
+<p><a href="https://sre.google/resources/practices-and-processes/incident-metrics-in-sre/">Incident Metrics in SRE: Critically Evaluating MTTR and Friends</a> demonstrated the difficulty at detecting changes in MTTR over time. The paper tests a 10% reduction in MTTR using Monte Carlo simulation, and found:</p>
+<blockquote class="blockquote">
+<p>“Yikes! Even though in the simulation the improvement always worked, 38% of the simulations had the MTTR difference fall below zero for Company A, 40% for Company B, and 20% for Company C. Looking at the absolute change in MTTR, the probability of seeing at least a 15-minute improvement is only 49%, 50%, and 64%, respectively. Even though the product in the scenario worked and shortened incidents, the odds of detecting any improvement at all are well outside the tolerance of 10% random flukes.”</p>
+</blockquote>
+<p><a href="https://www.information-safety.org/2023/10/31/security-differently/">Safety Differently</a> argues that we shouldn’t measure success based on the absence of negative events. We can use real data on data breaches and Monte Carlo simulation to explore the question, “Is an organization’s breach rate a useful metric?”</p>
 </section>
-<section id="security-1.0.0" class="level1">
-<h1>security 1.0.0</h1>
-<p>Initial release.</p>
-<ul>
-<li>Moved Constraints vs Performance from <a href="https://jabenninghoff.github.io/rtraining/">rtraining</a>: Visualizations exploring the use of constraints vs performance improvements in risk management.</li>
-</ul>
+<section id="poisson-log-normal-model" class="level2">
+<h2 class="anchored" data-anchor-id="poisson-log-normal-model">Poisson Log-Normal Model</h2>
+<p>The 2022 <a href="https://www.cyentia.com/wp-content/uploads/IRIS-2022_Cyentia.pdf">Information Risk Insights Study (IRIS)</a> found that a Poisson log-normal distribution fits the data and provides realistic forecasts for years with multiple breaches, and provides suggested values for mean (<span class="math inline">\(\mu\)</span>) and standard deviation (<span class="math inline">\(\sigma\)</span>) in Table 1, along with the likelihood of a breach with models that are adjusted for firm size in Table 2, since larger firms are more likely to experience a breach.</p>
+<p>Using the provided parameters from Table 1, we get:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>breach_poilog <span class="ot">&lt;-</span> <span class="cf">function</span>(mu, sig, <span class="at">runs =</span> <span class="fl">1e6</span>) {</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  breaches <span class="ot">&lt;-</span> <span class="fu">rpoilog</span>(runs, mu, sig)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"One or more"</span> <span class="ot">=</span> <span class="fu">sum</span>(breaches <span class="sc">&gt;=</span> <span class="dv">1</span>) <span class="sc">/</span> runs,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Two or more"</span> <span class="ot">=</span> <span class="fu">sum</span>(breaches <span class="sc">&gt;=</span> <span class="dv">2</span>) <span class="sc">/</span> runs,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Three or more"</span> <span class="ot">=</span> <span class="fu">sum</span>(breaches <span class="sc">&gt;=</span> <span class="dv">3</span>) <span class="sc">/</span> runs</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="fu">breach_poilog</span>(<span class="at">mu =</span> <span class="sc">-</span><span class="fl">2.284585</span>, <span class="at">sig =</span> <span class="fl">0.8690759</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 3
+  `One or more` `Two or more` `Three or more`
+          &lt;dbl&gt;         &lt;dbl&gt;           &lt;dbl&gt;
+1         0.129        0.0165         0.00264</code></pre>
+</div>
+</div>
+<p>These values are close to the upper bound for a firm in the $100M to $1B range on Table 2.</p>
+</section>
+<section id="poisson-model" class="level2">
+<h2 class="anchored" data-anchor-id="poisson-model">Poisson Model</h2>
+<p>If we were to use the number of breaches a firm has experienced as a useful metric, in the best-case scenario, we would have a high rate of breaches with a significant reduction after implementing a new control. Unfortunately, the IRIS paper doesn’t provide the model parameters for the group with the highest likelihood of a breach, firms with more than $100B in revenue. Additionally, because it is easier to understand and calculate improvements, we’d like to use a plain Poisson distribution, which has a single parameter for average arrival rate, <span class="math inline">\(\lambda\)</span>.</p>
+<p>We can find a reasonable value for <span class="math inline">\(\lambda\)</span> using trial and error:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>breach_pois <span class="ot">&lt;-</span> <span class="cf">function</span>(lambda, <span class="at">runs =</span> <span class="fl">1e6</span>) {</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  breaches <span class="ot">&lt;-</span> <span class="fu">rpois</span>(runs, lambda)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"One or more"</span> <span class="ot">=</span> <span class="fu">sum</span>(breaches <span class="sc">&gt;=</span> <span class="dv">1</span>) <span class="sc">/</span> runs,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Two or more"</span> <span class="ot">=</span> <span class="fu">sum</span>(breaches <span class="sc">&gt;=</span> <span class="dv">2</span>) <span class="sc">/</span> runs,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Three or more"</span> <span class="ot">=</span> <span class="fu">sum</span>(breaches <span class="sc">&gt;=</span> <span class="dv">3</span>) <span class="sc">/</span> runs</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>base_lambda <span class="ot">&lt;-</span> <span class="fl">0.347</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="fu">breach_pois</span>(base_lambda)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 3
+  `One or more` `Two or more` `Three or more`
+          &lt;dbl&gt;         &lt;dbl&gt;           &lt;dbl&gt;
+1         0.293        0.0479         0.00532</code></pre>
+</div>
+</div>
+<p>A Poisson model with a <span class="math inline">\(\lambda\)</span> of 0.347 (a little more than once every three years) gives similar results to the Poisson log-normal model for the largest firms for one or more breaches, but underestimates the likelihood for 2+ and 3+.</p>
+</section>
+<section id="simulate-improvement" class="level2">
+<h2 class="anchored" data-anchor-id="simulate-improvement">Simulate Improvement</h2>
+<p>Using the Poisson model, it is easy to simulate improvements.</p>
+<p>Let’s assume that the firm implements a new security control that reduces the likelihood of a breach by 25%, and compares the number of breaches in the 5 years before and after implementing that control. We then simulate this scenario 100,000 times:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>simulation <span class="ot">&lt;-</span> <span class="cf">function</span>(years, reduction, <span class="at">runs =</span> <span class="fl">1e5</span>) {</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">base =</span> <span class="fu">replicate</span>(runs, <span class="fu">sum</span>(<span class="fu">rpois</span>(years, base_lambda))),</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">new =</span> <span class="fu">replicate</span>(runs, <span class="fu">sum</span>(<span class="fu">rpois</span>(years, base_lambda <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> reduction))))</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">better =</span> .data<span class="sc">$</span>new <span class="sc">&lt;</span> .data<span class="sc">$</span>base, <span class="at">worse =</span> .data<span class="sc">$</span>new <span class="sc">&gt;</span> .data<span class="sc">$</span>base,</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">same =</span> .data<span class="sc">$</span>new <span class="sc">==</span> .data<span class="sc">$</span>base</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">simulation</span>(<span class="dv">5</span>, <span class="fl">0.25</span>)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(results, <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 5
+    base   new better worse same 
+   &lt;int&gt; &lt;int&gt; &lt;lgl&gt;  &lt;lgl&gt; &lt;lgl&gt;
+ 1     3     2 TRUE   FALSE FALSE
+ 2     2     4 FALSE  TRUE  FALSE
+ 3     1     1 FALSE  FALSE TRUE 
+ 4     3     2 TRUE   FALSE FALSE
+ 5     2     2 FALSE  FALSE TRUE 
+ 6     4     0 TRUE   FALSE FALSE
+ 7     2     1 TRUE   FALSE FALSE
+ 8     1     1 FALSE  FALSE TRUE 
+ 9     1     3 FALSE  TRUE  FALSE
+10     5     3 TRUE   FALSE FALSE</code></pre>
+</div>
+</div>
+<p>OK, what are the results?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>summarize_results <span class="ot">&lt;-</span> <span class="cf">function</span>(data) {</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  data <span class="sc">|&gt;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>      <span class="at">better =</span> <span class="fu">sum</span>(.data<span class="sc">$</span>better) <span class="sc">/</span> <span class="fu">n</span>(), <span class="at">worse =</span> <span class="fu">sum</span>(.data<span class="sc">$</span>worse) <span class="sc">/</span> <span class="fu">n</span>(),</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">same =</span> <span class="fu">sum</span>(.data<span class="sc">$</span>same) <span class="sc">/</span> <span class="fu">n</span>()</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="fu">summarize_results</span>(results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 3
+  better worse  same
+   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1  0.478 0.289 0.233</code></pre>
+</div>
+</div>
+<p>For this scenario, even though the true rate of breaches has been reduced by 25%, the number of breaches in the 5 years after implementing the control is better less than 50% of the time, and is actually worse nearly 30% of the time!</p>
+</section>
+<section id="larger-sample" class="level2">
+<h2 class="anchored" data-anchor-id="larger-sample">Larger Sample</h2>
+<p>To improve the likelihood of detecting the improvement, we can adjust the scenario, taking a larger sample of years before and after implementing the new control. How many years would we need to get a confident measurement of improvement?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">simulation</span>(<span class="dv">10</span>, <span class="fl">0.25</span>) <span class="sc">|&gt;</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_results</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 3
+  better worse  same
+   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1  0.561 0.284 0.155</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">simulation</span>(<span class="dv">50</span>, <span class="fl">0.25</span>) <span class="sc">|&gt;</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_results</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 3
+  better worse   same
+   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;
+1  0.756 0.190 0.0539</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">simulation</span>(<span class="dv">250</span>, <span class="fl">0.25</span>) <span class="sc">|&gt;</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_results</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 3
+  better  worse    same
+   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;
+1  0.957 0.0358 0.00672</code></pre>
+</div>
+</div>
+<p>Only the simulation which tests 250 years before and after (a total of 500 years!) gives a somewhat reasonable indication of improvement - and keep in mind that “better” is a reduction of <em>any</em> amount. Running metrics for a period this long at a single firm is impractical, which leads to our conclusion…</p>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>Even in a “best case” scenario of a very large firm that is able to measure the number of breaches over a 10 year period, a 25% reduction in breach rate only results in a lower number of actual breaches less than 50% of the time. A sample period of 500 years or more is needed to have confidence that the breach rate has been reduced.</p>
+<p>Realistically, this means that the only way to test the effectiveness of security controls is by sampling across large numbers of firms. A single organization simply won’t have enough data to make reasonable conclusions based on events that happen so infrequently.</p>
 
 
 </section>
@@ -726,6 +973,15 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../analysis/constraints.html" class="pagination-link" aria-label="Constraints vs Performance">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Constraints vs Performance</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
@@ -735,12 +991,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     <div class="nav-footer-center">
       <ul class="footer-items list-unstyled">
     <li class="nav-item">
-    <a class="nav-link" href="./LICENSE.html">
+    <a class="nav-link" href="../LICENSE.html">
 <p>License</p>
 </a>
   </li>  
 </ul>
-    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/jabenninghoff/security/blob/main/NEWS.md" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/jabenninghoff/security/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/jabenninghoff/security/blob/main/analysis/breach-rates.Rmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/jabenninghoff/security/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">
     <li class="nav-item compact">
