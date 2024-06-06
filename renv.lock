@@ -1104,6 +1104,13 @@
       ],
       "Hash": "876c618df5ae610be84356d5d7a5d124"
     },
+    "poilog": {
+      "Package": "poilog",
+      "Version": "0.4.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "9080e5678bf0e02866bc5fb9b721589f"
+    },
     "praise": {
       "Package": "praise",
       "Version": "1.0.0",

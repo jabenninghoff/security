@@ -10,6 +10,7 @@ URL: https://jabenninghoff.github.io/security/,
     https://github.com/jabenninghoff/security
 BugReports: https://github.com/jabenninghoff/security/issues
 Suggests: 
+    clipr,
     desc,
     devtools,
     dplyr,
@@ -18,6 +19,7 @@ Suggests:
     jbplot,
     knitr,
     pkgload,
+    poilog,
     purrr,
     quarto,
     rdev (>= 1.10.11),

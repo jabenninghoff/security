@@ -1,0 +1,91 @@
+---
+title: "Measuring Changes in Breach Rates"
+author: "John Benninghoff"
+date: '2024-06-05'
+date-modified: '2024-06-05'
+categories: security differently
+order: 102
+output:
+  html_notebook:
+    theme:
+      version: 5
+      preset: bootstrap
+    css: assets/extra.css
+    pandoc_args: --shift-heading-level-by=1
+    toc: yes
+    toc_float:
+      collapsed: no
+      smooth_scroll: no
+---
+
+A critical review of using breach frequency as a measure of security success, inspired by [Incident Metrics in SRE: Critically Evaluating MTTR and Friends](https://sre.google/resources/practices-and-processes/incident-metrics-in-sre/).
+
+```{r setup, message = FALSE, warning = FALSE}
+library(poilog)
+library(tibble)
+```
+
+# Background
+
+[Incident Metrics in SRE: Critically Evaluating MTTR and Friends](https://sre.google/resources/practices-and-processes/incident-metrics-in-sre/) demonstrated
+the difficulty at detecting changes in MTTR over time. The paper tests a 10% reduction in MTTR using
+Monte Carlo simulation, and found:
+
+> "Yikes! Even though in the simulation the improvement always worked, 38% of the simulations had
+> the MTTR difference fall below zero for Company A, 40% for Company B, and 20% for Company C.
+> Looking at the absolute change in MTTR, the probability of seeing at least a 15-minute improvement
+> is only 49%, 50%, and 64%, respectively. Even though the product in the scenario worked and
+> shortened incidents, the odds of detecting any improvement at all are well outside the tolerance
+> of 10% random flukes."
+
+[Safety Differently](https://www.information-safety.org/2023/10/31/security-differently/) argues
+that we shouldn't measure success based on the absence of negative events. We can use real data on
+data breaches and Monte Carlo simulation to explore the question, "Is an organization's breach rate
+a useful metric?"
+
+# Breach Simulation
+
+The 2022
+[Information Risk Insights Study (IRIS)](https://www.cyentia.com/wp-content/uploads/IRIS-2022_Cyentia.pdf)
+found that a Poisson log-normal distribution fits the data and provides realistic forecasts for
+years with multiple breaches, and provides suggested values for mean ($\mu$) and standard deviation
+($\sigma$) in Table 1, along with the likelihood of a breach with models that are adjusted for firm
+size, since larger firms are more likely to experience a breach.
+
+If we were to use the number of breaches a firm has experienced as a useful metric, in the best-case
+scenario, we would have a high rate of breaches with a significant reduction after implementing a
+new control. Unfortunately, the IRIS paper doesn't provide the model parameters for the group with
+the highest likelihood of a breach, firms with more than $100B in revenue.
+
+However, we can use Monte Carlo simulation to determine reasonable parameters.
+
+```{r breach_table}
+breach_table <- function(mu, sig, runs = 1e6) {
+  breaches <- rpoilog(runs, mu, sig)
+  tibble(
+    "One or more" = sum(breaches >= 1) / runs,
+    "Two or more" = sum(breaches >= 2) / runs,
+    "Three or more" = sum(breaches >= 3) / runs
+  )
+}
+
+breach_table(mu = -2.284585, sig = 0.8690759)
+```
+
+The suggested parameters from Table 1 are typical of a smaller organization. Through trial and
+error, we can find parameters that fit the largest group:
+
+```{r base}
+breach_table(mu = -1.35, sig = 1.07)
+```
+
+For the largest firms by revenue, over \$100B, a $\mu$ of 1.35 and $\sigma$ of 1.07 fit the data
+presented on Table 2 reasonably well.
+
+# Simulating Improvements
+
+For an improved value, we find parameters that cut the likelihood of a breach roughly in half:
+
+```{r improved}
+breach_table(mu = -2.7, sig = 1.6) * 2
+```
