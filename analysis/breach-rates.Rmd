@@ -125,11 +125,51 @@ head(results, 10)
 
 OK, what are the results?
 
-```{r summary}
-results |>
-  summarize(better = sum(better) / n(), worse = sum(worse) / n(), same = sum(same) / n())
+```{r summarize_results}
+summarize_results <- function(data) {
+  data |>
+    summarize(
+      better = sum(.data$better) / n(), worse = sum(.data$worse) / n(),
+      same = sum(.data$same) / n()
+    )
+}
+
+summarize_results(results)
 ```
 
 For this scenario, even though the true rate of breaches has been reduced by 25%, the number of
 breaches in the 5 years after implementing the control is better less than 50% of the time, and is
 actually worse nearly 30% of the time!
+
+# Larger Sample
+
+To improve the likelihood of detecting the improvement, we can adjust the scenario, taking a larger
+sample of years before and after implementing the new control. How many years would we need to get
+a confident measurement of improvement?
+
+```{r larger_sample}
+simulation(10, 0.25) |>
+  summarize_results()
+
+simulation(50, 0.25) |>
+  summarize_results()
+
+simulation(250, 0.25) |>
+  summarize_results()
+```
+
+Only the simulation which tests 250 years before and after (a total of 500 years!) gives a somewhat
+reasonable indication of improvement - and keep in mind that "better" is a reduction of *any*
+amount. Running metrics for a period this long at a single firm is impractical, which leads to our
+conclusion...
+
+# Conclusion
+
+Even in a "best case" scenario of a very large firm that is able to measure the number of breaches
+over a 10 year period, a 25% reduction in breach rate only results in a lower number of actual
+breaches less than 50% of the time. A sample period of 500 years or more is needed to have
+confidence that the breach rate has been reduced.
+
+Realistically, this means that the only way to test the effectiveness of security controls is by
+sampling across large numbers of firms. A single organization simply won't have enough data to
+make reasonable conclusions based on events that happen so infrequently.
