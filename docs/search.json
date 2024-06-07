@@ -4,14 +4,21 @@
     "href": "changelog.html",
     "title": "Changelog",
     "section": "",
-    "text": "Added Measuring Changes in Breach Rates: A critical review of using breach frequency as a measure of security success, inspired by Incident Metrics in SRE: Critically Evaluating MTTR and Friends"
+    "text": "Minor updates"
+  },
+  {
+    "objectID": "changelog.html#security-1.0.2",
+    "href": "changelog.html#security-1.0.2",
+    "title": "Changelog",
+    "section": "",
+    "text": "Minor updates"
   },
   {
     "objectID": "changelog.html#security-1.0.1",
     "href": "changelog.html#security-1.0.1",
     "title": "Changelog",
-    "section": "",
-    "text": "Added Measuring Changes in Breach Rates: A critical review of using breach frequency as a measure of security success, inspired by Incident Metrics in SRE: Critically Evaluating MTTR and Friends"
+    "section": "security 1.0.1",
+    "text": "security 1.0.1\n\nAdded Measuring Changes in Breach Rates: A critical review of using breach frequency as a measure of security success, inspired by Incident Metrics in SRE: Critically Evaluating MTTR and Friends"
   },
   {
     "objectID": "changelog.html#security-1.0.0",
@@ -180,9 +187,9 @@
   {
     "objectID": "NEWS.html",
     "href": "NEWS.html",
-    "title": "security 1.0.1",
+    "title": "security 1.0.2",
     "section": "",
-    "text": "security 1.0.1\n\nAdded Measuring Changes in Breach Rates: A critical review of using breach frequency as a measure of security success, inspired by Incident Metrics in SRE: Critically Evaluating MTTR and Friends\n\n\n\nsecurity 1.0.0\nInitial release.\n\nMoved Constraints vs Performance from rtraining: Visualizations exploring the use of constraints vs performance improvements in risk management."
+    "text": "security 1.0.2\n\nMinor updates\n\n\n\nsecurity 1.0.1\n\nAdded Measuring Changes in Breach Rates: A critical review of using breach frequency as a measure of security success, inspired by Incident Metrics in SRE: Critically Evaluating MTTR and Friends\n\n\n\nsecurity 1.0.0\nInitial release.\n\nMoved Constraints vs Performance from rtraining: Visualizations exploring the use of constraints vs performance improvements in risk management."
   },
   {
     "objectID": "index.html",
