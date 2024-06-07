@@ -1,3 +1,7 @@
+# security 1.0.2
+
+* Minor updates
+
 # security 1.0.1
 
 * Added Measuring Changes in Breach Rates: A critical review of using breach frequency as a measure of security success, inspired by [Incident Metrics in SRE: Critically Evaluating MTTR and Friends](https://sre.google/resources/practices-and-processes/incident-metrics-in-sre/)

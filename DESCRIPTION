@@ -10,7 +10,6 @@ URL: https://jabenninghoff.github.io/security/,
     https://github.com/jabenninghoff/security
 BugReports: https://github.com/jabenninghoff/security/issues
 Suggests: 
-    clipr,
     desc,
     devtools,
     dplyr,
