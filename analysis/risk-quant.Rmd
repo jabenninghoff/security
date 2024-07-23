@@ -1,0 +1,76 @@
+---
+title: "Technology Risk Quantification"
+author: "John Benninghoff"
+date: '2024-07-23'
+date-modified: '2024-07-23'
+categories: risk quantification
+order: 103
+output:
+  html_notebook:
+    theme:
+      version: 5
+      preset: bootstrap
+    css: assets/extra.css
+    pandoc_args: --shift-heading-level-by=1
+    toc: yes
+    toc_float:
+      collapsed: no
+      smooth_scroll: no
+---
+
+Prototype Risk Quantification tool for my SIRAcon 2024 talk, "[UnFAIR: Simplifying and Expanding Technology Risk Quantification](https://web.cvent.com/event/7f49b0a6-bca9-46fd-8245-a2deb671efee/websitePage:23d1376e-2723-411a-910a-0edf87b03015?session=956b9176-13ad-4dac-af3c-e8ccb30bae8a&shareLink=true)."
+
+# Questions/TODO
+
+- [ ] Figure out how to calculate log normal `meanlog` and `sdlog` from expert estimation (see [Calculating SD for normal distribution with only mean and 5% and 95% quantile values](https://stats.stackexchange.com/questions/158110/calculating-sd-for-normal-distribution-with-only-mean-and-5-and-95-quantile-va))
+
+```{r setup, message = FALSE, warning = FALSE}
+library(ggplot2)
+library(jbplot)
+```
+
+# Example Data
+
+Generate realistic example data to populate the Excel spreadsheet. As discovered in practice, while
+the initial risks ("cybersecurity breach" and "technology outage") are raised by the technology
+team, we find that the business risks (here represented by "loss of customer") are significantly
+larger, caused by the functional obsolescence of the inventory system.
+
+## Frequency
+
+Experts are asked to estimate the frequency of an adverse event, which is used as the average
+arrival rate for a Poisson distribution ($\lambda$).
+
+From my [breach rate analysis](breach-rates.Rmd), the largest firms experience a breach about once
+every three years ($\lambda$ = 0.347). A reasonably high breach rate for a system is between 0.2 and
+0.33.
+
+## Impact
+
+Drawing from the [IRIS 2022](https://www.cyentia.com/wp-content/uploads/IRIS-2022_Cyentia.pdf)
+report, the loss magnitude follows a log-normal distribution with a mean ($\mu$) of 12.56 and a
+standard deviation ($\sigma$) of 3.07, which gives a log-transformed lognormal curve of:
+
+```{r dnorm}
+ggplot(data.frame(x = c(0, 25)), aes(x)) +
+  stat_function(fun = dnorm, args = list(mean = 12.56, sd = 3.07)) +
+  labs(x = NULL, y = NULL) +
+  theme_quo()
+```
+
+Note: from
+[Making sense of the rlnorm() function in R](https://msalganik.wordpress.com/2017/01/21/making-sense-of-the-rlnorm-function-in-r/):
+
+> `rlnorm(n = 1000000, meanlog = 7, sdlog = 75)` and `exp(rnorm(n = 1000000, mean = 7, sd = 75))`
+> produce the same result
+
+An expert estimate matching this outcome for a breach would have low (5%), high (95%) and most
+likely values of:
+
+```{r qlnorm}
+qlnorm(c(0.05, 0.95, 0.5), meanlog = 12.56, sdlog = 3.07)
+```
+
+# Import
+
+Import data from Excel template.
