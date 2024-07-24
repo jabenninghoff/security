@@ -45,13 +45,25 @@ From my [breach rate analysis](breach-rates.Rmd), the largest firms experience a
 every three years ($\lambda$ = 0.347). A reasonably high breach rate for a system is between 0.2 and
 0.33.
 
+From my own experience, an unstable system might experience between 1-4 outages per year; a
+$\lambda$ of 2 fits this nicely:
+
+```{r outage_freq}
+ggplot(data.frame(x = rpois(1e5, 2)), aes(x)) +
+  geom_hist_bw(binwidth = 1) +
+  scale_x_continuous(breaks = scales::breaks_width(1, offset = 1)) +
+  coord_cartesian(xlim = c(0, 10)) +
+  labs(x = NULL, y = NULL) +
+  theme_quo(minor = FALSE)
+```
+
 ## Impact
 
 Drawing from the [IRIS 2022](https://www.cyentia.com/wp-content/uploads/IRIS-2022_Cyentia.pdf)
 report, the loss magnitude follows a log-normal distribution with a mean ($\mu$) of 12.56 and a
 standard deviation ($\sigma$) of 3.07, which gives a log-transformed lognormal curve of:
 
-```{r dnorm}
+```{r breach_impact_dist}
 ggplot(data.frame(x = c(0, 25)), aes(x)) +
   stat_function(fun = dnorm, args = list(mean = 12.56, sd = 3.07)) +
   labs(x = NULL, y = NULL) +
@@ -67,8 +79,35 @@ Note: from
 An expert estimate matching this outcome for a breach would have low (5%), high (95%) and most
 likely values of:
 
-```{r qlnorm}
+```{r breach_impact}
 qlnorm(c(0.05, 0.95, 0.5), meanlog = 12.56, sdlog = 3.07)
+```
+
+For an outage, a mean of 0.1 and a standard deviation of 1.7 are reasonable choices for parameters
+that fit the data for outage duration from the
+[2022 VOID Report](https://mcusercontent.com/ad9b3a31c069c03a14227a79c/files/29e138f4-05b7-f560-a7d5-c337538a93eb/2022_Void_Report.pdf):
+
+```{r outage_duration_dist}
+ggplot(data.frame(x = rlnorm(1e3, meanlog = 0.1, sdlog = 1.7)), aes(x)) +
+  geom_hist_bw(binwidth = 1) +
+  coord_cartesian(xlim = c(0, 80)) +
+  labs(x = NULL, y = NULL) +
+  theme_quo(minor = FALSE)
+```
+
+This gives low (5%), high (95%) and most likely values of:
+
+```{r outage_duration}
+qlnorm(c(0.05, 0.95, 0.5), meanlog = 0.1, sdlog = 1.7)
+```
+
+This fits with my own experience; most outages last around an hour, and 95% of outages are resolved
+in 18 hours or less. From this, we can calculate a reasonable outage cost by multiplying by a
+per-hour rate. We assume that the main cost is caused by response and overtime paid out to catch up
+after the system is restored, $10K/hour.
+
+```{r outage_impact}
+qlnorm(c(0.05, 0.95, 0.5), meanlog = 0.1, sdlog = 1.7) * 10000
 ```
 
 # Import
