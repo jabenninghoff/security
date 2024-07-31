@@ -27,6 +27,10 @@ Prototype Risk Quantification tool for my SIRAcon 2024 talk, "[UnFAIR: Simplifyi
 ```{r setup, message = FALSE, warning = FALSE}
 library(ggplot2)
 library(jbplot)
+library(readxl)
+library(janitor)
+library(dplyr)
+library(formattable)
 ```
 
 # Example Data
@@ -143,4 +147,43 @@ qlnorm(c(0.05, 0.95, 0.5), meanlog = meanlog_customer, sdlog = sdlog_customer)
 
 # Import
 
-Import data from Excel template.
+Import data from Excel template, loading each tab into its own data frame. The data in
+`prototype.xlsx` is based on the examples provided above.
+
+Risk descriptions:
+
+```{r risks}
+risks <- read_xlsx("data/prototype.xlsx", sheet = "Risks") |>
+  clean_names()
+
+risks |>
+  formattable(align = "l")
+```
+
+Risk estimates:
+
+```{r estimates}
+estimates <- read_xlsx("data/prototype.xlsx", sheet = "Estimates") |>
+  clean_names() |>
+  rename(
+    lambda = frequency_per_yer, p05 = low_5_percent, p95 = high_95_percent, p50 = most_likely
+  )
+
+currency0 <- function(x) currency(x, digits = 0L)
+estimates |>
+  formattable(formatters = list(p05 = currency0, p95 = currency0, p50 = currency0), align = "l")
+```
+
+## Consensus Estimate
+
+Using a simple average of all experts that provided an estimate (not blank/NA), this gives us a
+consensus estimate for the three risks of:
+
+```{r consensus}
+consensus <- estimates |>
+  group_by(risk) |>
+  summarize(across(lambda:p50, ~ mean(.x, na.rm = TRUE)))
+
+consensus |>
+  formattable(formatters = list(p05 = currency0, p95 = currency0, p50 = currency0), align = "l")
+```
