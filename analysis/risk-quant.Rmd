@@ -169,9 +169,9 @@ estimates <- read_xlsx("data/prototype.xlsx", sheet = "Estimates") |>
     lambda = frequency_per_yer, p05 = low_5_percent, p95 = high_95_percent, p50 = most_likely
   )
 
-currency0 <- function(x) currency(x, digits = 0L)
 estimates |>
-  formattable(formatters = list(p05 = currency0, p95 = currency0, p50 = currency0), align = "l")
+  mutate(across(p05:p50, ~ currency(.x, digits = 0L))) |>
+  formattable(align = "l")
 ```
 
 ## Consensus Estimate
@@ -185,5 +185,6 @@ consensus <- estimates |>
   summarize(across(lambda:p50, ~ mean(.x, na.rm = TRUE)))
 
 consensus |>
-  formattable(formatters = list(p05 = currency0, p95 = currency0, p50 = currency0), align = "l")
+  mutate(across(p05:p50, ~ currency(.x, digits = 0L))) |>
+  formattable(align = "l")
 ```
