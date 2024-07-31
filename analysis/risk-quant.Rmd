@@ -22,7 +22,7 @@ Prototype Risk Quantification tool for my SIRAcon 2024 talk, "[UnFAIR: Simplifyi
 
 # Questions/TODO
 
-- [ ] Figure out how to calculate log normal `meanlog` and `sdlog` from expert estimation (see [Calculating SD for normal distribution with only mean and 5% and 95% quantile values](https://stats.stackexchange.com/questions/158110/calculating-sd-for-normal-distribution-with-only-mean-and-5-and-95-quantile-va))
+- [x] Figure out how to calculate log normal `meanlog` and `sdlog` from expert estimation (see [Calculating SD for normal distribution with only mean and 5% and 95% quantile values](https://stats.stackexchange.com/questions/158110/calculating-sd-for-normal-distribution-with-only-mean-and-5-and-95-quantile-va))
 
 ```{r setup, message = FALSE, warning = FALSE}
 library(ggplot2)
@@ -41,12 +41,12 @@ larger, caused by the functional obsolescence of the inventory system.
 Experts are asked to estimate the frequency of an adverse event, which is used as the average
 arrival rate for a Poisson distribution ($\lambda$).
 
-From my [breach rate analysis](breach-rates.Rmd), the largest firms experience a breach about once
-every three years ($\lambda$ = 0.347). A reasonably high breach rate for a system is between 0.2 and
-0.33.
+From my [breach rate analysis](breach-rates.Rmd), the largest firms experience a cybersecurity
+breach about once every three years ($\lambda$ = 0.347). A reasonably high breach rate for a system
+is between 0.2 and 0.33.
 
-From my own experience, an unstable system might experience between 1-4 outages per year; a
-$\lambda$ of 2 fits this nicely:
+From my own experience, an unstable system might experience between 1-4 technology outages per year;
+a $\lambda$ of 2 fits this nicely:
 
 ```{r outage_freq}
 ggplot(data.frame(x = rpois(1e5, 2)), aes(x)) +
@@ -57,11 +57,15 @@ ggplot(data.frame(x = rpois(1e5, 2)), aes(x)) +
   theme_quo(minor = FALSE)
 ```
 
+For the third risk, loss of customer, the firm has already experienced a loss, and expects this to
+increase. For loss of customer we also choose a $\lambda$ of 2.
+
 ## Impact
 
 Drawing from the [IRIS 2022](https://www.cyentia.com/wp-content/uploads/IRIS-2022_Cyentia.pdf)
-report, the loss magnitude follows a log-normal distribution with a mean ($\mu$) of 12.56 and a
-standard deviation ($\sigma$) of 3.07, which gives a log-transformed lognormal curve of:
+report, the loss magnitude of a cybersecurity breach follows a log-normal distribution with a mean
+($\mu$) of 12.56 and a standard deviation ($\sigma$) of 3.07, which gives a log-transformed
+lognormal curve of:
 
 ```{r breach_impact_dist}
 ggplot(data.frame(x = c(0, 25)), aes(x)) +
@@ -83,8 +87,8 @@ likely values of:
 qlnorm(c(0.05, 0.95, 0.5), meanlog = 12.56, sdlog = 3.07)
 ```
 
-For an outage, a mean of 0.1 and a standard deviation of 1.7 are reasonable choices for parameters
-that fit the data for outage duration from the
+For a technology outage, a mean of 0.1 and a standard deviation of 1.7 are reasonable choices for
+parameters that fit the data for outage duration from the
 [2022 VOID Report](https://mcusercontent.com/ad9b3a31c069c03a14227a79c/files/29e138f4-05b7-f560-a7d5-c337538a93eb/2022_Void_Report.pdf):
 
 ```{r outage_duration_dist}
@@ -108,6 +112,33 @@ after the system is restored, $10K/hour.
 
 ```{r outage_impact}
 qlnorm(c(0.05, 0.95, 0.5), meanlog = 0.1, sdlog = 1.7) * 10000
+```
+
+For loss of customer, we estimate the low (5%) and high (95%) values at \$100K and \$20M
+respectively; these are reasonable choices given the size of the firm. We can test this by
+calculating the most likely value, after determining the mean and standard deviation using the
+approach from this
+[StackExchange Post](https://stats.stackexchange.com/questions/158110/calculating-sd-for-normal-distribution-with-only-mean-and-5-and-95-quantile-va):
+
+The mean is calculated using: $\mu = \large \frac{\log(high) - \log(low)}{2}$
+
+```{r meanlog_customer}
+meanlog_customer <- ((log(20000000) - log(100000)) / 2) + log(100000)
+meanlog_customer
+```
+
+The standard deviation is calculated using:
+$\DeclareMathOperator{\qnorm}{qnorm} \large \sigma = \frac{\log(high) - \log(low)}{2 \times \qnorm(0.95)}$
+
+```{r sdlog_customer}
+sdlog_customer <- (log(20000000) - log(100000)) / (2 * qnorm(0.95))
+sdlog_customer
+```
+
+From this we get a customer impact range of:
+
+```{r customer_impact}
+qlnorm(c(0.05, 0.95, 0.5), meanlog = meanlog_customer, sdlog = sdlog_customer)
 ```
 
 # Import
