@@ -175,7 +175,7 @@
     },
     "bslib": {
       "Package": "bslib",
-      "Version": "0.7.0",
+      "Version": "0.8.0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -193,7 +193,7 @@
         "rlang",
         "sass"
       ],
-      "Hash": "8644cc53f43828f19133548195d7e59e"
+      "Hash": "b299c6741ca9746fb227debcb0f9fb6c"
     },
     "cachem": {
       "Package": "cachem",
@@ -221,7 +221,7 @@
     },
     "checkmate": {
       "Package": "checkmate",
-      "Version": "2.3.1",
+      "Version": "2.3.2",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -229,7 +229,7 @@
         "backports",
         "utils"
       ],
-      "Hash": "c01cab1cb0f9125211a6fc99d540e315"
+      "Hash": "0e14e01ce07e7c88fd25de6d4260d26b"
     },
     "cli": {
       "Package": "cli",
@@ -264,7 +264,7 @@
     },
     "colorspace": {
       "Package": "colorspace",
-      "Version": "2.1-0",
+      "Version": "2.1-1",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -274,7 +274,7 @@
         "methods",
         "stats"
       ],
-      "Hash": "f20c47fd52fae58b4e377c37bb8c335b"
+      "Hash": "d954cb1c57e8d8b756165d7ba18aa55a"
     },
     "commonmark": {
       "Package": "commonmark",
@@ -1489,7 +1489,7 @@
     },
     "shiny": {
       "Package": "shiny",
-      "Version": "1.8.1.1",
+      "Version": "1.9.0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -1518,7 +1518,7 @@
         "withr",
         "xtable"
       ],
-      "Hash": "54b26646816af9960a4c64d8ceec75d6"
+      "Hash": "01666113b04d504390d60736f39bd0d0"
     },
     "sourcetools": {
       "Package": "sourcetools",
@@ -1714,7 +1714,7 @@
     },
     "usethis": {
       "Package": "usethis",
-      "Version": "2.2.3",
+      "Version": "3.0.0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -1741,7 +1741,7 @@
         "withr",
         "yaml"
       ],
-      "Hash": "d524fd42c517035027f866064417d7e6"
+      "Hash": "b2fbf93c2127bedd2cbe9b799530d5d2"
     },
     "utf8": {
       "Package": "utf8",
@@ -1874,10 +1874,10 @@
     },
     "yaml": {
       "Package": "yaml",
-      "Version": "2.3.9",
+      "Version": "2.3.10",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "9cb28d11799d93c953f852083d55ee9e"
+      "Hash": "51dab85c6c98e50a18d7551e9d49f76c"
     },
     "zip": {
       "Package": "zip",
