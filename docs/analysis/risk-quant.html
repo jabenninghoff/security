@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="John Benninghoff">
-<meta name="dcterms.date" content="2024-06-05">
+<meta name="dcterms.date" content="2024-07-23">
 
-<title>Measuring Changes in Breach Rates – security</title>
+<title>Technology Risk Quantification – security</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -66,8 +66,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../analysis/risk-quant.html" rel="next">
-<link href="../analysis/constraints.html" rel="prev">
+<link href="../analysis/breach-rates.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -178,7 +177,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../analysis/breach-rates.html">Measuring Changes in Breach Rates</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../analysis/risk-quant.html">Technology Risk Quantification</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -198,13 +197,13 @@ window.Quarto = {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../analysis/breach-rates.html" class="sidebar-item-text sidebar-link active">
+  <a href="../analysis/breach-rates.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Measuring Changes in Breach Rates</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../analysis/risk-quant.html" class="sidebar-item-text sidebar-link">
+  <a href="../analysis/risk-quant.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Technology Risk Quantification</span></a>
   </div>
 </li>
@@ -218,23 +217,27 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#background" id="toc-background" class="nav-link active" data-scroll-target="#background">Background</a></li>
-  <li><a href="#poisson-log-normal-model" id="toc-poisson-log-normal-model" class="nav-link" data-scroll-target="#poisson-log-normal-model">Poisson Log-Normal Model</a></li>
-  <li><a href="#poisson-model" id="toc-poisson-model" class="nav-link" data-scroll-target="#poisson-model">Poisson Model</a></li>
-  <li><a href="#simulate-improvement" id="toc-simulate-improvement" class="nav-link" data-scroll-target="#simulate-improvement">Simulate Improvement</a></li>
-  <li><a href="#larger-sample" id="toc-larger-sample" class="nav-link" data-scroll-target="#larger-sample">Larger Sample</a></li>
-  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  <li><a href="#questionstodo" id="toc-questionstodo" class="nav-link active" data-scroll-target="#questionstodo">Questions/TODO</a></li>
+  <li><a href="#example-data" id="toc-example-data" class="nav-link" data-scroll-target="#example-data">Example Data</a>
+  <ul class="collapse">
+  <li><a href="#frequency" id="toc-frequency" class="nav-link" data-scroll-target="#frequency">Frequency</a></li>
+  <li><a href="#impact" id="toc-impact" class="nav-link" data-scroll-target="#impact">Impact</a></li>
+  </ul></li>
+  <li><a href="#import" id="toc-import" class="nav-link" data-scroll-target="#import">Import</a>
+  <ul class="collapse">
+  <li><a href="#consensus-estimate" id="toc-consensus-estimate" class="nav-link" data-scroll-target="#consensus-estimate">Consensus Estimate</a></li>
+  </ul></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/jabenninghoff/security/blob/main/analysis/breach-rates.Rmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/jabenninghoff/security/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/jabenninghoff/security/blob/main/analysis/risk-quant.Rmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/jabenninghoff/security/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Measuring Changes in Breach Rates</h1>
+<h1 class="title">Technology Risk Quantification</h1>
   <div class="quarto-categories">
-    <div class="quarto-category">security differently</div>
+    <div class="quarto-category">risk quantification</div>
   </div>
   </div>
 
@@ -252,14 +255,14 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">June 5, 2024</p>
+      <p class="date">July 23, 2024</p>
     </div>
   </div>
   
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">June 6, 2024</p>
+      <p class="date-modified">July 23, 2024</p>
     </div>
   </div>
     
@@ -270,160 +273,730 @@ window.Quarto = {
 </header>
 
 
-<p>A critical review of using breach frequency as a measure of security success, inspired by <a href="https://sre.google/resources/practices-and-processes/incident-metrics-in-sre/">Incident Metrics in SRE: Critically Evaluating MTTR and Friends</a>.</p>
+<p>Prototype Risk Quantification tool for my SIRAcon 2024 talk, “<a href="https://web.cvent.com/event/7f49b0a6-bca9-46fd-8245-a2deb671efee/websitePage:23d1376e-2723-411a-910a-0edf87b03015?session=956b9176-13ad-4dac-af3c-e8ccb30bae8a&amp;shareLink=true">UnFAIR: Simplifying and Expanding Technology Risk Quantification</a>.”</p>
+<section id="questionstodo" class="level2">
+<h2 class="anchored" data-anchor-id="questionstodo">Questions/TODO</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" checked="">Figure out how to calculate log normal <code>meanlog</code> and <code>sdlog</code> from expert estimation (see <a href="https://stats.stackexchange.com/questions/158110/calculating-sd-for-normal-distribution-with-only-mean-and-5-and-95-quantile-va">Calculating SD for normal distribution with only mean and 5% and 95% quantile values</a>)</label></li>
+</ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(poilog)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tibble)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(jbplot)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(janitor)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(formattable)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<section id="background" class="level2">
-<h2 class="anchored" data-anchor-id="background">Background</h2>
-<p><a href="https://sre.google/resources/practices-and-processes/incident-metrics-in-sre/">Incident Metrics in SRE: Critically Evaluating MTTR and Friends</a> demonstrated the difficulty at detecting changes in MTTR over time. The paper tests a 10% reduction in MTTR using Monte Carlo simulation, and found:</p>
+</section>
+<section id="example-data" class="level2">
+<h2 class="anchored" data-anchor-id="example-data">Example Data</h2>
+<p>Generate realistic example data to populate the Excel spreadsheet. As discovered in practice, while the initial risks (“cybersecurity breach” and “technology outage”) are raised by the technology team, we find that the business risks (here represented by “loss of customer”) are significantly larger, caused by the functional obsolescence of the inventory system.</p>
+<section id="frequency" class="level3">
+<h3 class="anchored" data-anchor-id="frequency">Frequency</h3>
+<p>Experts are asked to estimate the frequency of an adverse event, which is used as the average arrival rate for a Poisson distribution (<span class="math inline">\(\lambda\)</span>).</p>
+<p>From my <a href="../analysis/breach-rates.html">breach rate analysis</a>, the largest firms experience a cybersecurity breach about once every three years (<span class="math inline">\(\lambda\)</span> = 0.347). A reasonably high breach rate for a system is between 0.2 and 0.33.</p>
+<p>From my own experience, an unstable system might experience between 1-4 technology outages per year; a <span class="math inline">\(\lambda\)</span> of 2 fits this nicely:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="fu">data.frame</span>(<span class="at">x =</span> <span class="fu">rpois</span>(<span class="fl">1e5</span>, <span class="dv">2</span>)), <span class="fu">aes</span>(x)) <span class="sc">+</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hist_bw</span>(<span class="at">binwidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> scales<span class="sc">::</span><span class="fu">breaks_width</span>(<span class="dv">1</span>, <span class="at">offset =</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">10</span>)) <span class="sc">+</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_quo</span>(<span class="at">minor =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="risk-quant_files/figure-html/outage_freq-1.png" class="img-fluid figure-img" width="816"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>For the third risk, loss of customer, the firm has already experienced a loss, and expects this to increase. For loss of customer we also choose a <span class="math inline">\(\lambda\)</span> of 2.</p>
+</section>
+<section id="impact" class="level3">
+<h3 class="anchored" data-anchor-id="impact">Impact</h3>
+<p>Drawing from the <a href="https://www.cyentia.com/wp-content/uploads/IRIS-2022_Cyentia.pdf">IRIS 2022</a> report, the loss magnitude of a cybersecurity breach follows a log-normal distribution with a mean (<span class="math inline">\(\mu\)</span>) of 12.56 and a standard deviation (<span class="math inline">\(\sigma\)</span>) of 3.07, which gives a log-transformed lognormal curve of:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="fu">data.frame</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">25</span>)), <span class="fu">aes</span>(x)) <span class="sc">+</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_function</span>(<span class="at">fun =</span> dnorm, <span class="at">args =</span> <span class="fu">list</span>(<span class="at">mean =</span> <span class="fl">12.56</span>, <span class="at">sd =</span> <span class="fl">3.07</span>)) <span class="sc">+</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_quo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="risk-quant_files/figure-html/breach_impact_dist-1.png" class="img-fluid figure-img" width="816"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Note: from <a href="https://msalganik.wordpress.com/2017/01/21/making-sense-of-the-rlnorm-function-in-r/">Making sense of the rlnorm() function in R</a>:</p>
 <blockquote class="blockquote">
-<p>“Yikes! Even though in the simulation the improvement always worked, 38% of the simulations had the MTTR difference fall below zero for Company A, 40% for Company B, and 20% for Company C. Looking at the absolute change in MTTR, the probability of seeing at least a 15-minute improvement is only 49%, 50%, and 64%, respectively. Even though the product in the scenario worked and shortened incidents, the odds of detecting any improvement at all are well outside the tolerance of 10% random flukes.”</p>
+<p><code>rlnorm(n = 1000000, meanlog = 7, sdlog = 75)</code> and <code>exp(rnorm(n = 1000000, mean = 7, sd = 75))</code> produce the same result</p>
 </blockquote>
-<p><a href="https://www.information-safety.org/2023/10/31/security-differently/">Safety Differently</a> argues that we shouldn’t measure success based on the absence of negative events. We can use real data on data breaches and Monte Carlo simulation to explore the question, “Is an organization’s breach rate a useful metric?”</p>
-</section>
-<section id="poisson-log-normal-model" class="level2">
-<h2 class="anchored" data-anchor-id="poisson-log-normal-model">Poisson Log-Normal Model</h2>
-<p>The 2022 <a href="https://www.cyentia.com/wp-content/uploads/IRIS-2022_Cyentia.pdf">Information Risk Insights Study (IRIS)</a> found that a Poisson log-normal distribution fits the data and provides realistic forecasts for years with multiple breaches, and provides suggested values for mean (<span class="math inline">\(\mu\)</span>) and standard deviation (<span class="math inline">\(\sigma\)</span>) in Table 1, along with the likelihood of a breach with models that are adjusted for firm size in Table 2, since larger firms are more likely to experience a breach.</p>
-<p>Using the provided parameters from Table 1, we get:</p>
+<p>An expert estimate matching this outcome for a breach would have low (5%), high (95%) and most likely values of:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>breach_poilog <span class="ot">&lt;-</span> <span class="cf">function</span>(mu, sig, <span class="at">runs =</span> <span class="fl">1e6</span>) {</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  breaches <span class="ot">&lt;-</span> <span class="fu">rpoilog</span>(runs, mu, sig)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"One or more"</span> <span class="ot">=</span> <span class="fu">sum</span>(breaches <span class="sc">&gt;=</span> <span class="dv">1</span>) <span class="sc">/</span> runs,</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Two or more"</span> <span class="ot">=</span> <span class="fu">sum</span>(breaches <span class="sc">&gt;=</span> <span class="dv">2</span>) <span class="sc">/</span> runs,</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Three or more"</span> <span class="ot">=</span> <span class="fu">sum</span>(breaches <span class="sc">&gt;=</span> <span class="dv">3</span>) <span class="sc">/</span> runs</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="fu">breach_poilog</span>(<span class="at">mu =</span> <span class="sc">-</span><span class="fl">2.284585</span>, <span class="at">sig =</span> <span class="fl">0.8690759</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qlnorm</span>(<span class="fu">c</span>(<span class="fl">0.05</span>, <span class="fl">0.95</span>, <span class="fl">0.5</span>), <span class="at">meanlog =</span> <span class="fl">12.56</span>, <span class="at">sdlog =</span> <span class="fl">3.07</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 1 × 3
-  `One or more` `Two or more` `Three or more`
-          &lt;dbl&gt;         &lt;dbl&gt;           &lt;dbl&gt;
-1         0.129        0.0165         0.00264</code></pre>
+<pre><code>[1]     1826.76 44442227.03   284930.34</code></pre>
 </div>
 </div>
-<p>These values are close to the upper bound for a firm in the $100M to $1B range on Table 2.</p>
-</section>
-<section id="poisson-model" class="level2">
-<h2 class="anchored" data-anchor-id="poisson-model">Poisson Model</h2>
-<p>If we were to use the number of breaches a firm has experienced as a useful metric, in the best-case scenario, we would have a high rate of breaches with a significant reduction after implementing a new control. Unfortunately, the IRIS paper doesn’t provide the model parameters for the group with the highest likelihood of a breach, firms with more than $100B in revenue. Additionally, because it is easier to understand and calculate improvements, we’d like to use a plain Poisson distribution, which has a single parameter for average arrival rate, <span class="math inline">\(\lambda\)</span>.</p>
-<p>We can find a reasonable value for <span class="math inline">\(\lambda\)</span> using trial and error:</p>
+<p>For a technology outage, a mean of 0.1 and a standard deviation of 1.7 are reasonable choices for parameters that fit the data for outage duration from the <a href="https://mcusercontent.com/ad9b3a31c069c03a14227a79c/files/29e138f4-05b7-f560-a7d5-c337538a93eb/2022_Void_Report.pdf">2022 VOID Report</a>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>breach_pois <span class="ot">&lt;-</span> <span class="cf">function</span>(lambda, <span class="at">runs =</span> <span class="fl">1e6</span>) {</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  breaches <span class="ot">&lt;-</span> <span class="fu">rpois</span>(runs, lambda)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"One or more"</span> <span class="ot">=</span> <span class="fu">sum</span>(breaches <span class="sc">&gt;=</span> <span class="dv">1</span>) <span class="sc">/</span> runs,</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Two or more"</span> <span class="ot">=</span> <span class="fu">sum</span>(breaches <span class="sc">&gt;=</span> <span class="dv">2</span>) <span class="sc">/</span> runs,</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Three or more"</span> <span class="ot">=</span> <span class="fu">sum</span>(breaches <span class="sc">&gt;=</span> <span class="dv">3</span>) <span class="sc">/</span> runs</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>base_lambda <span class="ot">&lt;-</span> <span class="fl">0.347</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="fu">breach_pois</span>(base_lambda)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 1 × 3
-  `One or more` `Two or more` `Three or more`
-          &lt;dbl&gt;         &lt;dbl&gt;           &lt;dbl&gt;
-1         0.293        0.0479         0.00532</code></pre>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="fu">data.frame</span>(<span class="at">x =</span> <span class="fu">rlnorm</span>(<span class="fl">1e3</span>, <span class="at">meanlog =</span> <span class="fl">0.1</span>, <span class="at">sdlog =</span> <span class="fl">1.7</span>)), <span class="fu">aes</span>(x)) <span class="sc">+</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hist_bw</span>(<span class="at">binwidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">80</span>)) <span class="sc">+</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_quo</span>(<span class="at">minor =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="risk-quant_files/figure-html/outage_duration_dist-1.png" class="img-fluid figure-img" width="816"></p>
+</figure>
 </div>
 </div>
-<p>A Poisson model with a <span class="math inline">\(\lambda\)</span> of 0.347 (a little more than once every three years) gives similar results to the Poisson log-normal model for the largest firms for one or more breaches, but underestimates the likelihood for 2+ and 3+.</p>
-</section>
-<section id="simulate-improvement" class="level2">
-<h2 class="anchored" data-anchor-id="simulate-improvement">Simulate Improvement</h2>
-<p>Using the Poisson model, it is easy to simulate improvements.</p>
-<p>Let’s assume that the firm implements a new security control that reduces the likelihood of a breach by 25%, and compares the number of breaches in the 5 years before and after implementing that control. We then simulate this scenario 100,000 times:</p>
+</div>
+<p>This gives low (5%), high (95%) and most likely values of:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>simulation <span class="ot">&lt;-</span> <span class="cf">function</span>(years, reduction, <span class="at">runs =</span> <span class="fl">1e5</span>) {</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">base =</span> <span class="fu">replicate</span>(runs, <span class="fu">sum</span>(<span class="fu">rpois</span>(years, base_lambda))),</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">new =</span> <span class="fu">replicate</span>(runs, <span class="fu">sum</span>(<span class="fu">rpois</span>(years, base_lambda <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> reduction))))</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">better =</span> .data<span class="sc">$</span>new <span class="sc">&lt;</span> .data<span class="sc">$</span>base, <span class="at">worse =</span> .data<span class="sc">$</span>new <span class="sc">&gt;</span> .data<span class="sc">$</span>base,</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">same =</span> .data<span class="sc">$</span>new <span class="sc">==</span> .data<span class="sc">$</span>base</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">simulation</span>(<span class="dv">5</span>, <span class="fl">0.25</span>)</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(results, <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qlnorm</span>(<span class="fu">c</span>(<span class="fl">0.05</span>, <span class="fl">0.95</span>, <span class="fl">0.5</span>), <span class="at">meanlog =</span> <span class="fl">0.1</span>, <span class="at">sdlog =</span> <span class="fl">1.7</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 10 × 5
-    base   new better worse same 
-   &lt;int&gt; &lt;int&gt; &lt;lgl&gt;  &lt;lgl&gt; &lt;lgl&gt;
- 1     3     2 TRUE   FALSE FALSE
- 2     2     4 FALSE  TRUE  FALSE
- 3     1     1 FALSE  FALSE TRUE 
- 4     3     2 TRUE   FALSE FALSE
- 5     2     2 FALSE  FALSE TRUE 
- 6     4     0 TRUE   FALSE FALSE
- 7     2     1 TRUE   FALSE FALSE
- 8     1     1 FALSE  FALSE TRUE 
- 9     1     3 FALSE  TRUE  FALSE
-10     5     3 TRUE   FALSE FALSE</code></pre>
+<pre><code>[1]  0.06745793 18.10614106  1.10517092</code></pre>
 </div>
 </div>
-<p>OK, what are the results?</p>
+<p>This fits with my own experience; most outages last around an hour, and 95% of outages are resolved in 18 hours or less. From this, we can calculate a reasonable outage cost by multiplying by a per-hour rate. We assume that the main cost is caused by response and overtime paid out to catch up after the system is restored, $10K/hour.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>summarize_results <span class="ot">&lt;-</span> <span class="cf">function</span>(data) {</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  data <span class="sc">|&gt;</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>      <span class="at">better =</span> <span class="fu">sum</span>(.data<span class="sc">$</span>better) <span class="sc">/</span> <span class="fu">n</span>(), <span class="at">worse =</span> <span class="fu">sum</span>(.data<span class="sc">$</span>worse) <span class="sc">/</span> <span class="fu">n</span>(),</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">same =</span> <span class="fu">sum</span>(.data<span class="sc">$</span>same) <span class="sc">/</span> <span class="fu">n</span>()</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="fu">summarize_results</span>(results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qlnorm</span>(<span class="fu">c</span>(<span class="fl">0.05</span>, <span class="fl">0.95</span>, <span class="fl">0.5</span>), <span class="at">meanlog =</span> <span class="fl">0.1</span>, <span class="at">sdlog =</span> <span class="fl">1.7</span>) <span class="sc">*</span> <span class="dv">10000</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 1 × 3
-  better worse  same
-   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-1  0.478 0.289 0.233</code></pre>
+<pre><code>[1]    674.5793 181061.4106  11051.7092</code></pre>
 </div>
 </div>
-<p>For this scenario, even though the true rate of breaches has been reduced by 25%, the number of breaches in the 5 years after implementing the control is better less than 50% of the time, and is actually worse nearly 30% of the time!</p>
-</section>
-<section id="larger-sample" class="level2">
-<h2 class="anchored" data-anchor-id="larger-sample">Larger Sample</h2>
-<p>To improve the likelihood of detecting the improvement, we can adjust the scenario, taking a larger sample of years before and after implementing the new control. How many years would we need to get a confident measurement of improvement?</p>
+<p>For loss of customer, we estimate the low (5%) and high (95%) values at $100K and $20M respectively; these are reasonable choices given the size of the firm. We can test this by calculating the most likely value, after determining the mean and standard deviation using the approach from this <a href="https://stats.stackexchange.com/questions/158110/calculating-sd-for-normal-distribution-with-only-mean-and-5-and-95-quantile-va">StackExchange Post</a>:</p>
+<p>The mean is calculated using: <span class="math inline">\(\mu = \large \frac{\log(high) - \log(low)}{2}\)</span></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">simulation</span>(<span class="dv">10</span>, <span class="fl">0.25</span>) <span class="sc">|&gt;</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_results</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>meanlog_customer <span class="ot">&lt;-</span> ((<span class="fu">log</span>(<span class="dv">20000000</span>) <span class="sc">-</span> <span class="fu">log</span>(<span class="dv">100000</span>)) <span class="sc">/</span> <span class="dv">2</span>) <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">100000</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>meanlog_customer</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 1 × 3
-  better worse  same
-   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-1  0.561 0.284 0.155</code></pre>
+<pre><code>[1] 14.16208</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">simulation</span>(<span class="dv">50</span>, <span class="fl">0.25</span>) <span class="sc">|&gt;</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_results</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The standard deviation is calculated using: <span class="math inline">\(\DeclareMathOperator{\qnorm}{qnorm} \large \sigma = \frac{\log(high) - \log(low)}{2 \times \qnorm(0.95)}\)</span></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>sdlog_customer <span class="ot">&lt;-</span> (<span class="fu">log</span>(<span class="dv">20000000</span>) <span class="sc">-</span> <span class="fu">log</span>(<span class="dv">100000</span>)) <span class="sc">/</span> (<span class="dv">2</span> <span class="sc">*</span> <span class="fu">qnorm</span>(<span class="fl">0.95</span>))</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>sdlog_customer</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 1 × 3
-  better worse   same
-   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;
-1  0.756 0.190 0.0539</code></pre>
+<pre><code>[1] 1.610574</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">simulation</span>(<span class="dv">250</span>, <span class="fl">0.25</span>) <span class="sc">|&gt;</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_results</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>From this we get a customer impact range of:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qlnorm</span>(<span class="fu">c</span>(<span class="fl">0.05</span>, <span class="fl">0.95</span>, <span class="fl">0.5</span>), <span class="at">meanlog =</span> meanlog_customer, <span class="at">sdlog =</span> sdlog_customer)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 1 × 3
-  better  worse    same
-   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;
-1  0.957 0.0358 0.00672</code></pre>
+<pre><code>[1]   100000 20000000  1414214</code></pre>
 </div>
 </div>
-<p>Only the simulation which tests 250 years before and after (a total of 500 years!) gives a somewhat reasonable indication of improvement - and keep in mind that “better” is a reduction of <em>any</em> amount. Running metrics for a period this long at a single firm is impractical, which leads to our conclusion…</p>
 </section>
-<section id="conclusion" class="level2">
-<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
-<p>Even in a “best case” scenario of a very large firm that is able to measure the number of breaches over a 10 year period, a 25% reduction in breach rate only results in a lower number of actual breaches less than 50% of the time. A sample period of 500 years or more is needed to have confidence that the breach rate has been reduced.</p>
-<p>Realistically, this means that the only way to test the effectiveness of security controls is by sampling across large numbers of firms. A single organization simply won’t have enough data to make reasonable conclusions based on events that happen so infrequently.</p>
+</section>
+<section id="import" class="level2">
+<h2 class="anchored" data-anchor-id="import">Import</h2>
+<p>Import data from Excel template, loading each tab into its own data frame. The data in <code>prototype.xlsx</code> is based on the examples provided above.</p>
+<p>Risk descriptions:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>risks <span class="ot">&lt;-</span> <span class="fu">read_xlsx</span>(<span class="st">"data/prototype.xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Risks"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">clean_names</span>()</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>risks <span class="sc">|&gt;</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">formattable</span>(<span class="at">align =</span> <span class="st">"l"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-condensed">
+<thead>
+<tr>
+<th style="text-align:left;">
+risk
+</th>
+<th style="text-align:left;">
+description
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Cybersecurity Breach
+</td>
+<td style="text-align:left;">
+Risk of a cybersecurity breach of the inventory system.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Technology Outage
+</td>
+<td style="text-align:left;">
+Risk of an inventory system outage.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Loss of Customer
+</td>
+<td style="text-align:left;">
+Risk of losing and existing customer or failure to acquire a new customer due to functional limitations of the inventory system.
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Risk estimates:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>estimates <span class="ot">&lt;-</span> <span class="fu">read_xlsx</span>(<span class="st">"data/prototype.xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Estimates"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">clean_names</span>() <span class="sc">|&gt;</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">lambda =</span> frequency_per_yer, <span class="at">p05 =</span> low_5_percent, <span class="at">p95 =</span> high_95_percent, <span class="at">p50 =</span> most_likely</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>estimates <span class="sc">|&gt;</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(p05<span class="sc">:</span>p50, <span class="sc">~</span> <span class="fu">currency</span>(.x, <span class="at">digits =</span> <span class="dv">0</span>L))) <span class="sc">|&gt;</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">formattable</span>(<span class="at">align =</span> <span class="st">"l"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-condensed">
+<thead>
+<tr>
+<th style="text-align:left;">
+risk
+</th>
+<th style="text-align:left;">
+expert
+</th>
+<th style="text-align:left;">
+lambda
+</th>
+<th style="text-align:left;">
+p05
+</th>
+<th style="text-align:left;">
+p95
+</th>
+<th style="text-align:left;">
+p50
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Cybersecurity Breach
+</td>
+<td style="text-align:left;">
+Technology Expert 1
+</td>
+<td style="text-align:left;">
+0.25
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cybersecurity Breach
+</td>
+<td style="text-align:left;">
+Technology Expert 2
+</td>
+<td style="text-align:left;">
+0.33
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cybersecurity Breach
+</td>
+<td style="text-align:left;">
+Technology Expert 3
+</td>
+<td style="text-align:left;">
+0.20
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cybersecurity Breach
+</td>
+<td style="text-align:left;">
+Business Expert 1
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+$2,000
+</td>
+<td style="text-align:left;">
+$45,000,000
+</td>
+<td style="text-align:left;">
+$300,000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cybersecurity Breach
+</td>
+<td style="text-align:left;">
+Business Expert 2
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+$1,400
+</td>
+<td style="text-align:left;">
+$34,000,000
+</td>
+<td style="text-align:left;">
+$200,000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cybersecurity Breach
+</td>
+<td style="text-align:left;">
+Business Expert 3
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+$2,100
+</td>
+<td style="text-align:left;">
+$54,000,000
+</td>
+<td style="text-align:left;">
+$500,000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cybersecurity Breach
+</td>
+<td style="text-align:left;">
+Unicorn Expert
+</td>
+<td style="text-align:left;">
+0.25
+</td>
+<td style="text-align:left;">
+$1,900
+</td>
+<td style="text-align:left;">
+$44,000,000
+</td>
+<td style="text-align:left;">
+$275,000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Technology Outage
+</td>
+<td style="text-align:left;">
+Technology Expert 1
+</td>
+<td style="text-align:left;">
+2.00
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Technology Outage
+</td>
+<td style="text-align:left;">
+Technology Expert 2
+</td>
+<td style="text-align:left;">
+3.00
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Technology Outage
+</td>
+<td style="text-align:left;">
+Technology Expert 3
+</td>
+<td style="text-align:left;">
+1.00
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Technology Outage
+</td>
+<td style="text-align:left;">
+Business Expert 1
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+$700
+</td>
+<td style="text-align:left;">
+$200,000
+</td>
+<td style="text-align:left;">
+$15,000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Technology Outage
+</td>
+<td style="text-align:left;">
+Business Expert 2
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+$500
+</td>
+<td style="text-align:left;">
+$150,000
+</td>
+<td style="text-align:left;">
+$10,000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Technology Outage
+</td>
+<td style="text-align:left;">
+Business Expert 3
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+$675
+</td>
+<td style="text-align:left;">
+$180,000
+</td>
+<td style="text-align:left;">
+$11,000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Technology Outage
+</td>
+<td style="text-align:left;">
+Unicorn Expert
+</td>
+<td style="text-align:left;">
+2.00
+</td>
+<td style="text-align:left;">
+$800
+</td>
+<td style="text-align:left;">
+$220,000
+</td>
+<td style="text-align:left;">
+$16,000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Loss of Customer
+</td>
+<td style="text-align:left;">
+Technology Expert 1
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Loss of Customer
+</td>
+<td style="text-align:left;">
+Technology Expert 2
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Loss of Customer
+</td>
+<td style="text-align:left;">
+Technology Expert 3
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Loss of Customer
+</td>
+<td style="text-align:left;">
+Business Expert 1
+</td>
+<td style="text-align:left;">
+2.00
+</td>
+<td style="text-align:left;">
+$100,000
+</td>
+<td style="text-align:left;">
+$20,000,000
+</td>
+<td style="text-align:left;">
+$1,500,000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Loss of Customer
+</td>
+<td style="text-align:left;">
+Business Expert 2
+</td>
+<td style="text-align:left;">
+3.00
+</td>
+<td style="text-align:left;">
+$150,000
+</td>
+<td style="text-align:left;">
+$30,000,000
+</td>
+<td style="text-align:left;">
+$2,000,000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Loss of Customer
+</td>
+<td style="text-align:left;">
+Business Expert 3
+</td>
+<td style="text-align:left;">
+1.00
+</td>
+<td style="text-align:left;">
+$75,000
+</td>
+<td style="text-align:left;">
+$15,000,000
+</td>
+<td style="text-align:left;">
+$1,200,000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Loss of Customer
+</td>
+<td style="text-align:left;">
+Unicorn Expert
+</td>
+<td style="text-align:left;">
+2.00
+</td>
+<td style="text-align:left;">
+$75,000
+</td>
+<td style="text-align:left;">
+$15,000,000
+</td>
+<td style="text-align:left;">
+$1,000,000
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="consensus-estimate" class="level3">
+<h3 class="anchored" data-anchor-id="consensus-estimate">Consensus Estimate</h3>
+<p>Using a simple average of all experts that provided an estimate (not blank/NA), this gives us a consensus estimate for the three risks of:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>consensus <span class="ot">&lt;-</span> estimates <span class="sc">|&gt;</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(risk) <span class="sc">|&gt;</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="fu">across</span>(lambda<span class="sc">:</span>p50, <span class="sc">~</span> <span class="fu">mean</span>(.x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)))</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>consensus <span class="sc">|&gt;</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(p05<span class="sc">:</span>p50, <span class="sc">~</span> <span class="fu">currency</span>(.x, <span class="at">digits =</span> <span class="dv">0</span>L))) <span class="sc">|&gt;</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">formattable</span>(<span class="at">align =</span> <span class="st">"l"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-condensed">
+<thead>
+<tr>
+<th style="text-align:left;">
+risk
+</th>
+<th style="text-align:left;">
+lambda
+</th>
+<th style="text-align:left;">
+p05
+</th>
+<th style="text-align:left;">
+p95
+</th>
+<th style="text-align:left;">
+p50
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Cybersecurity Breach
+</td>
+<td style="text-align:left;">
+0.2575
+</td>
+<td style="text-align:left;">
+$1,850
+</td>
+<td style="text-align:left;">
+$44,250,000
+</td>
+<td style="text-align:left;">
+$318,750
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Loss of Customer
+</td>
+<td style="text-align:left;">
+2.0000
+</td>
+<td style="text-align:left;">
+$100,000
+</td>
+<td style="text-align:left;">
+$20,000,000
+</td>
+<td style="text-align:left;">
+$1,425,000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Technology Outage
+</td>
+<td style="text-align:left;">
+2.0000
+</td>
+<td style="text-align:left;">
+$669
+</td>
+<td style="text-align:left;">
+$187,500
+</td>
+<td style="text-align:left;">
+$13,000
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
@@ -993,14 +1566,11 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../analysis/constraints.html" class="pagination-link" aria-label="Constraints vs Performance">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Constraints vs Performance</span>
+      <a href="../analysis/breach-rates.html" class="pagination-link" aria-label="Measuring Changes in Breach Rates">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Measuring Changes in Breach Rates</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../analysis/risk-quant.html" class="pagination-link" aria-label="Technology Risk Quantification">
-        <span class="nav-page-text">Technology Risk Quantification</span> <i class="bi bi-arrow-right-short"></i>
-      </a>
   </div>
 </nav>
 </div> <!-- /content -->
@@ -1017,7 +1587,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </a>
   </li>  
 </ul>
-    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/jabenninghoff/security/blob/main/analysis/breach-rates.Rmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/jabenninghoff/security/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/jabenninghoff/security/blob/main/analysis/risk-quant.Rmd" class="toc-action"><i class="bi bi-github"></i>View source</a></li><li><a href="https://github.com/jabenninghoff/security/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">
     <li class="nav-item compact">

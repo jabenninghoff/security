@@ -10,8 +10,1172 @@
 <atom:link href="https://jabenninghoff.github.io/security/index.xml" rel="self" type="application/rss+xml"/>
 <description>A collection of notebooks for analyzing security differently.</description>
 <language>en-us</language>
-<generator>quarto-1.4.555</generator>
-<lastBuildDate>Wed, 05 Jun 2024 05:00:00 GMT</lastBuildDate>
+<generator>quarto-1.5.55</generator>
+<lastBuildDate>Tue, 23 Jul 2024 05:00:00 GMT</lastBuildDate>
+<item>
+  <title>Technology Risk Quantification</title>
+  <dc:creator>John Benninghoff</dc:creator>
+  <link>https://jabenninghoff.github.io/security/analysis/risk-quant.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<p>Prototype Risk Quantification tool for my SIRAcon 2024 talk, “<a href="https://web.cvent.com/event/7f49b0a6-bca9-46fd-8245-a2deb671efee/websitePage:23d1376e-2723-411a-910a-0edf87b03015?session=956b9176-13ad-4dac-af3c-e8ccb30bae8a&amp;shareLink=true">UnFAIR: Simplifying and Expanding Technology Risk Quantification</a>.”</p>
+<section id="questionstodo" class="level2">
+<h2 class="anchored" data-anchor-id="questionstodo">Questions/TODO</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" checked="">Figure out how to calculate log normal <code>meanlog</code> and <code>sdlog</code> from expert estimation (see <a href="https://stats.stackexchange.com/questions/158110/calculating-sd-for-normal-distribution-with-only-mean-and-5-and-95-quantile-va">Calculating SD for normal distribution with only mean and 5% and 95% quantile values</a>)</label></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(ggplot2)</span>
+<span id="cb1-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(jbplot)</span>
+<span id="cb1-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(readxl)</span>
+<span id="cb1-4"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(janitor)</span>
+<span id="cb1-5"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(dplyr)</span>
+<span id="cb1-6"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(formattable)</span></code></pre></div>
+</div>
+</section>
+<section id="example-data" class="level2">
+<h2 class="anchored" data-anchor-id="example-data">Example Data</h2>
+<p>Generate realistic example data to populate the Excel spreadsheet. As discovered in practice, while the initial risks (“cybersecurity breach” and “technology outage”) are raised by the technology team, we find that the business risks (here represented by “loss of customer”) are significantly larger, caused by the functional obsolescence of the inventory system.</p>
+<section id="frequency" class="level3">
+<h3 class="anchored" data-anchor-id="frequency">Frequency</h3>
+<p>Experts are asked to estimate the frequency of an adverse event, which is used as the average arrival rate for a Poisson distribution (<img src="https://latex.codecogs.com/png.latex?%5Clambda">).</p>
+<p>From my <a href="../analysis/breach-rates.html">breach rate analysis</a>, the largest firms experience a cybersecurity breach about once every three years (<img src="https://latex.codecogs.com/png.latex?%5Clambda"> = 0.347). A reasonably high breach rate for a system is between 0.2 and 0.33.</p>
+<p>From my own experience, an unstable system might experience between 1-4 technology outages per year; a <img src="https://latex.codecogs.com/png.latex?%5Clambda"> of 2 fits this nicely:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rpois</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1e5</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)), <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(x)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb2-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_hist_bw</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">binwidth =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb2-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_x_continuous</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">breaks =</span> scales<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">breaks_width</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">offset =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb2-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">coord_cartesian</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">xlim =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb2-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb2-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_quo</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">minor =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">FALSE</span>)</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://jabenninghoff.github.io/security/analysis/risk-quant_files/figure-html/outage_freq-1.png" class="img-fluid figure-img" width="816"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>For the third risk, loss of customer, the firm has already experienced a loss, and expects this to increase. For loss of customer we also choose a <img src="https://latex.codecogs.com/png.latex?%5Clambda"> of 2.</p>
+</section>
+<section id="impact" class="level3">
+<h3 class="anchored" data-anchor-id="impact">Impact</h3>
+<p>Drawing from the <a href="https://www.cyentia.com/wp-content/uploads/IRIS-2022_Cyentia.pdf">IRIS 2022</a> report, the loss magnitude of a cybersecurity breach follows a log-normal distribution with a mean (<img src="https://latex.codecogs.com/png.latex?%5Cmu">) of 12.56 and a standard deviation (<img src="https://latex.codecogs.com/png.latex?%5Csigma">) of 3.07, which gives a log-transformed lognormal curve of:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">25</span>)), <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(x)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb3-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">stat_function</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fun =</span> dnorm, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">args =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mean =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12.56</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">sd =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3.07</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb3-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb3-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_quo</span>()</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://jabenninghoff.github.io/security/analysis/risk-quant_files/figure-html/breach_impact_dist-1.png" class="img-fluid figure-img" width="816"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Note: from <a href="https://msalganik.wordpress.com/2017/01/21/making-sense-of-the-rlnorm-function-in-r/">Making sense of the rlnorm() function in R</a>:</p>
+<blockquote class="blockquote">
+<p><code>rlnorm(n = 1000000, meanlog = 7, sdlog = 75)</code> and <code>exp(rnorm(n = 1000000, mean = 7, sd = 75))</code> produce the same result</p>
+</blockquote>
+<p>An expert estimate matching this outcome for a breach would have low (5%), high (95%) and most likely values of:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">qlnorm</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.05</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.95</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">meanlog =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12.56</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">sdlog =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3.07</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]     1826.76 44442227.03   284930.34</code></pre>
+</div>
+</div>
+<p>For a technology outage, a mean of 0.1 and a standard deviation of 1.7 are reasonable choices for parameters that fit the data for outage duration from the <a href="https://mcusercontent.com/ad9b3a31c069c03a14227a79c/files/29e138f4-05b7-f560-a7d5-c337538a93eb/2022_Void_Report.pdf">2022 VOID Report</a>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rlnorm</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1e3</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">meanlog =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.1</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">sdlog =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.7</span>)), <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(x)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb6-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_hist_bw</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">binwidth =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb6-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">coord_cartesian</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">xlim =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">80</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb6-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb6-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_quo</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">minor =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">FALSE</span>)</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://jabenninghoff.github.io/security/analysis/risk-quant_files/figure-html/outage_duration_dist-1.png" class="img-fluid figure-img" width="816"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>This gives low (5%), high (95%) and most likely values of:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">qlnorm</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.05</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.95</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">meanlog =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.1</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">sdlog =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.7</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]  0.06745793 18.10614106  1.10517092</code></pre>
+</div>
+</div>
+<p>This fits with my own experience; most outages last around an hour, and 95% of outages are resolved in 18 hours or less. From this, we can calculate a reasonable outage cost by multiplying by a per-hour rate. We assume that the main cost is caused by response and overtime paid out to catch up after the system is restored, $10K/hour.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">qlnorm</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.05</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.95</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">meanlog =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.1</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">sdlog =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.7</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10000</span></span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]    674.5793 181061.4106  11051.7092</code></pre>
+</div>
+</div>
+<p>For loss of customer, we estimate the low (5%) and high (95%) values at $100K and $20M respectively; these are reasonable choices given the size of the firm. We can test this by calculating the most likely value, after determining the mean and standard deviation using the approach from this <a href="https://stats.stackexchange.com/questions/158110/calculating-sd-for-normal-distribution-with-only-mean-and-5-and-95-quantile-va">StackExchange Post</a>:</p>
+<p>The mean is calculated using: <img src="https://latex.codecogs.com/png.latex?%5Cmu%20=%20%5Clarge%20%5Cfrac%7B%5Clog(high)%20-%20%5Clog(low)%7D%7B2%7D"></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1">meanlog_customer <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> ((<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">log</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">20000000</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">log</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100000</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">log</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100000</span>)</span>
+<span id="cb11-2">meanlog_customer</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 14.16208</code></pre>
+</div>
+</div>
+<p>The standard deviation is calculated using: <img src="https://latex.codecogs.com/png.latex?%5CDeclareMathOperator%7B%5Cqnorm%7D%7Bqnorm%7D%20%5Clarge%20%5Csigma%20=%20%5Cfrac%7B%5Clog(high)%20-%20%5Clog(low)%7D%7B2%20%5Ctimes%20%5Cqnorm(0.95)%7D"></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1">sdlog_customer <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> (<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">log</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">20000000</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">log</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100000</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> (<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">qnorm</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.95</span>))</span>
+<span id="cb13-2">sdlog_customer</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1.610574</code></pre>
+</div>
+</div>
+<p>From this we get a customer impact range of:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">qlnorm</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.05</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.95</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">meanlog =</span> meanlog_customer, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">sdlog =</span> sdlog_customer)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]   100000 20000000  1414214</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="import" class="level2">
+<h2 class="anchored" data-anchor-id="import">Import</h2>
+<p>Import data from Excel template, loading each tab into its own data frame. The data in <code>prototype.xlsx</code> is based on the examples provided above.</p>
+<p>Risk descriptions:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1">risks <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">read_xlsx</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"data/prototype.xlsx"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">sheet =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Risks"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb17-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">clean_names</span>()</span>
+<span id="cb17-3"></span>
+<span id="cb17-4">risks <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb17-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">formattable</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">align =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"l"</span>)</span></code></pre></div>
+<div class="cell-output-display">
+<table class="table table-condensed">
+<thead>
+<tr>
+<th style="text-align:left;">
+risk
+</th>
+<th style="text-align:left;">
+description
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Cybersecurity Breach
+</td>
+<td style="text-align:left;">
+Risk of a cybersecurity breach of the inventory system.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Technology Outage
+</td>
+<td style="text-align:left;">
+Risk of an inventory system outage.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Loss of Customer
+</td>
+<td style="text-align:left;">
+Risk of losing and existing customer or failure to acquire a new customer due to functional limitations of the inventory system.
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Risk estimates:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1">estimates <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">read_xlsx</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"data/prototype.xlsx"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">sheet =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Estimates"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb18-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">clean_names</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb18-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rename</span>(</span>
+<span id="cb18-4">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">lambda =</span> frequency_per_yer, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">p05 =</span> low_5_percent, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">p95 =</span> high_95_percent, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">p50 =</span> most_likely</span>
+<span id="cb18-5">  )</span>
+<span id="cb18-6"></span>
+<span id="cb18-7">estimates <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb18-8">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mutate</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">across</span>(p05<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span>p50, <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">currency</span>(.x, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">digits =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>L))) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb18-9">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">formattable</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">align =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"l"</span>)</span></code></pre></div>
+<div class="cell-output-display">
+<table class="table table-condensed">
+<thead>
+<tr>
+<th style="text-align:left;">
+risk
+</th>
+<th style="text-align:left;">
+expert
+</th>
+<th style="text-align:left;">
+lambda
+</th>
+<th style="text-align:left;">
+p05
+</th>
+<th style="text-align:left;">
+p95
+</th>
+<th style="text-align:left;">
+p50
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Cybersecurity Breach
+</td>
+<td style="text-align:left;">
+Technology Expert 1
+</td>
+<td style="text-align:left;">
+0.25
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cybersecurity Breach
+</td>
+<td style="text-align:left;">
+Technology Expert 2
+</td>
+<td style="text-align:left;">
+0.33
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cybersecurity Breach
+</td>
+<td style="text-align:left;">
+Technology Expert 3
+</td>
+<td style="text-align:left;">
+0.20
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cybersecurity Breach
+</td>
+<td style="text-align:left;">
+Business Expert 1
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+$2,000
+</td>
+<td style="text-align:left;">
+$45,000,000
+</td>
+<td style="text-align:left;">
+$300,000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cybersecurity Breach
+</td>
+<td style="text-align:left;">
+Business Expert 2
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+$1,400
+</td>
+<td style="text-align:left;">
+$34,000,000
+</td>
+<td style="text-align:left;">
+$200,000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cybersecurity Breach
+</td>
+<td style="text-align:left;">
+Business Expert 3
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+$2,100
+</td>
+<td style="text-align:left;">
+$54,000,000
+</td>
+<td style="text-align:left;">
+$500,000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cybersecurity Breach
+</td>
+<td style="text-align:left;">
+Unicorn Expert
+</td>
+<td style="text-align:left;">
+0.25
+</td>
+<td style="text-align:left;">
+$1,900
+</td>
+<td style="text-align:left;">
+$44,000,000
+</td>
+<td style="text-align:left;">
+$275,000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Technology Outage
+</td>
+<td style="text-align:left;">
+Technology Expert 1
+</td>
+<td style="text-align:left;">
+2.00
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Technology Outage
+</td>
+<td style="text-align:left;">
+Technology Expert 2
+</td>
+<td style="text-align:left;">
+3.00
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Technology Outage
+</td>
+<td style="text-align:left;">
+Technology Expert 3
+</td>
+<td style="text-align:left;">
+1.00
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Technology Outage
+</td>
+<td style="text-align:left;">
+Business Expert 1
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+$700
+</td>
+<td style="text-align:left;">
+$200,000
+</td>
+<td style="text-align:left;">
+$15,000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Technology Outage
+</td>
+<td style="text-align:left;">
+Business Expert 2
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+$500
+</td>
+<td style="text-align:left;">
+$150,000
+</td>
+<td style="text-align:left;">
+$10,000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Technology Outage
+</td>
+<td style="text-align:left;">
+Business Expert 3
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+$675
+</td>
+<td style="text-align:left;">
+$180,000
+</td>
+<td style="text-align:left;">
+$11,000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Technology Outage
+</td>
+<td style="text-align:left;">
+Unicorn Expert
+</td>
+<td style="text-align:left;">
+2.00
+</td>
+<td style="text-align:left;">
+$800
+</td>
+<td style="text-align:left;">
+$220,000
+</td>
+<td style="text-align:left;">
+$16,000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Loss of Customer
+</td>
+<td style="text-align:left;">
+Technology Expert 1
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Loss of Customer
+</td>
+<td style="text-align:left;">
+Technology Expert 2
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Loss of Customer
+</td>
+<td style="text-align:left;">
+Technology Expert 3
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Loss of Customer
+</td>
+<td style="text-align:left;">
+Business Expert 1
+</td>
+<td style="text-align:left;">
+2.00
+</td>
+<td style="text-align:left;">
+$100,000
+</td>
+<td style="text-align:left;">
+$20,000,000
+</td>
+<td style="text-align:left;">
+$1,500,000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Loss of Customer
+</td>
+<td style="text-align:left;">
+Business Expert 2
+</td>
+<td style="text-align:left;">
+3.00
+</td>
+<td style="text-align:left;">
+$150,000
+</td>
+<td style="text-align:left;">
+$30,000,000
+</td>
+<td style="text-align:left;">
+$2,000,000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Loss of Customer
+</td>
+<td style="text-align:left;">
+Business Expert 3
+</td>
+<td style="text-align:left;">
+1.00
+</td>
+<td style="text-align:left;">
+$75,000
+</td>
+<td style="text-align:left;">
+$15,000,000
+</td>
+<td style="text-align:left;">
+$1,200,000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Loss of Customer
+</td>
+<td style="text-align:left;">
+Unicorn Expert
+</td>
+<td style="text-align:left;">
+2.00
+</td>
+<td style="text-align:left;">
+$75,000
+</td>
+<td style="text-align:left;">
+$15,000,000
+</td>
+<td style="text-align:left;">
+$1,000,000
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="consensus-estimate" class="level3">
+<h3 class="anchored" data-anchor-id="consensus-estimate">Consensus Estimate</h3>
+<p>Using a simple average of all experts that provided an estimate (not blank/NA), this gives us a consensus estimate for the three risks of:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1">consensus <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> estimates <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb19-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">group_by</span>(risk) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb19-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">summarize</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">across</span>(lambda<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span>p50, <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(.x, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">na.rm =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>)))</span>
+<span id="cb19-4"></span>
+<span id="cb19-5">consensus <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb19-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mutate</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">across</span>(p05<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span>p50, <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">currency</span>(.x, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">digits =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>L))) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb19-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">formattable</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">align =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"l"</span>)</span></code></pre></div>
+<div class="cell-output-display">
+<table class="table table-condensed">
+<thead>
+<tr>
+<th style="text-align:left;">
+risk
+</th>
+<th style="text-align:left;">
+lambda
+</th>
+<th style="text-align:left;">
+p05
+</th>
+<th style="text-align:left;">
+p95
+</th>
+<th style="text-align:left;">
+p50
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Cybersecurity Breach
+</td>
+<td style="text-align:left;">
+0.2575
+</td>
+<td style="text-align:left;">
+$1,850
+</td>
+<td style="text-align:left;">
+$44,250,000
+</td>
+<td style="text-align:left;">
+$318,750
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Loss of Customer
+</td>
+<td style="text-align:left;">
+2.0000
+</td>
+<td style="text-align:left;">
+$100,000
+</td>
+<td style="text-align:left;">
+$20,000,000
+</td>
+<td style="text-align:left;">
+$1,425,000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Technology Outage
+</td>
+<td style="text-align:left;">
+2.0000
+</td>
+<td style="text-align:left;">
+$669
+</td>
+<td style="text-align:left;">
+$187,500
+</td>
+<td style="text-align:left;">
+$13,000
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+</section>
+</section>
+
+ ]]></description>
+  <category>risk quantification</category>
+  <guid>https://jabenninghoff.github.io/security/analysis/risk-quant.html</guid>
+  <pubDate>Tue, 23 Jul 2024 05:00:00 GMT</pubDate>
+</item>
 <item>
   <title>Measuring Changes in Breach Rates</title>
   <dc:creator>John Benninghoff</dc:creator>
@@ -50,6 +1214,7 @@ font-style: inherit;">library</span>(dplyr)</span></code></pre></div>
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(mu, sig, <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">runs =</span> <span class="fl" style="color: #AD0000;
@@ -136,6 +1301,7 @@ font-style: inherit;">0.8690759</span>)</span></code></pre></div>
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(lambda, <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">runs =</span> <span class="fl" style="color: #AD0000;
@@ -217,6 +1383,7 @@ font-style: inherit;">breach_pois</span>(base_lambda)</span></code></pre></div>
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(years, reduction, <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">runs =</span> <span class="fl" style="color: #AD0000;
@@ -320,6 +1487,7 @@ font-style: inherit;">10</span>)</span></code></pre></div>
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(data) {</span>
 <span id="cb8-2">  data <span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -496,6 +1664,7 @@ font-style: inherit;">5</span></span>
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(filename) {</span>
 <span id="cb2-5">  <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -1222,6 +2391,7 @@ font-style: inherit;"># custom function based on ggplot_donut_percent()</span></
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(p, <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">text =</span> <span class="st" style="color: #20794D;

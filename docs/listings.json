@@ -3,7 +3,8 @@
     "listing": "/index.html",
     "items": [
       "/analysis/constraints.html",
-      "/analysis/breach-rates.html"
+      "/analysis/breach-rates.html",
+      "/analysis/risk-quant.html"
     ]
   }
 ]
