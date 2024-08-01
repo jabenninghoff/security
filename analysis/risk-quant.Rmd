@@ -31,6 +31,8 @@ library(readxl)
 library(janitor)
 library(dplyr)
 library(formattable)
+library(purrr)
+library(tibble)
 ```
 
 # Example Data
@@ -174,7 +176,7 @@ estimates |>
   formattable(align = "l")
 ```
 
-## Consensus Estimate
+# Consensus Estimate
 
 Using a simple average of all experts that provided an estimate (not blank/NA), this gives us a
 consensus estimate for the three risks of:
@@ -186,5 +188,64 @@ consensus <- estimates |>
 
 consensus |>
   mutate(across(p05:p50, ~ currency(.x, digits = 0L))) |>
+  formattable(align = "l")
+```
+
+# Forecast
+
+Forecast risk using Monte Carlo simulation.
+
+First calculate the parameters of the log normal distributions for each risk. Also calculate the
+differential of the most likely outcome (50th percentile) to provide insight into estimate accuracy:
+
+```{r lnorm_param}
+#' Calculate Log Normal Parameters
+#'
+#' Calculate the parameters of a log normal distribution from estimated 0.05 and 0.95 quantile. Also
+#'   calculate the fractional difference between the estimated median value (0.5 quantile) and the
+#'   median value calculated from the 0.05 and 0.95 values.
+#'
+#' @param p05 the "low" value, the 0.05 quantile.
+#' @param p95 the "high" value, the 0.95 quantile.
+#' @param p50 the most likely value, the 0.5 quantile.
+#'
+#' @return a list including the `meanlog` and `sdlog` parameters, as well as the fractional
+#'         difference between the estimated and actual median (0.5 quantile), `mdiff`.
+#' @export
+lnorm_param <- function(p05, p95, p50 = NA) {
+  meanlog <- ((log(p95) - log(p05)) / 2) + log(p05)
+  sdlog <- (log(p95) - log(p05)) / (2 * qnorm(0.95))
+  median <- qlnorm(0.5, meanlog = meanlog, sdlog = sdlog)
+  mdiff <- (p50 - median) / median
+
+  return(list(meanlog = meanlog, sdlog = sdlog, mdiff = mdiff))
+}
+
+consensus_params <- consensus |>
+  mutate(as_tibble(lnorm_param(.data$p05, .data$p95, .data$p50)))
+
+consensus_params |>
+  mutate(across(p05:p50, ~ currency(.x, digits = 0L))) |>
+  formattable(align = "l")
+```
+
+Run the simulation:
+
+```{r calc_risk}
+calc_risk <- function(risk, lambda, meanlog, sdlog, runs = 5) {
+  events <- rpois(runs, lambda)
+  losses <- map_dbl(events, \(n) sum(rlnorm(n, meanlog, sdlog)))
+
+  as_tibble(list(events = events, losses = losses)) |>
+    mutate(risk = risk, .before = events)
+}
+
+forecast <- consensus_params |>
+  select(c("risk", "lambda", "meanlog", "sdlog")) |>
+  pmap(calc_risk) |>
+  list_rbind()
+
+forecast |>
+  mutate(losses = currency(losses, digits = 0L)) |>
   formattable(align = "l")
 ```
