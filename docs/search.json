@@ -4,14 +4,21 @@
     "href": "changelog.html",
     "title": "Changelog",
     "section": "",
-    "text": "Added Technology Risk Quantification: Prototype Risk Quantification tool for my SIRAcon 2024 talk, “UnFAIR: Simplifying and Expanding Technology Risk Quantification.”"
+    "text": "Updated Technology Risk Quantification: added preliminary Forecast section"
+  },
+  {
+    "objectID": "changelog.html#security-1.0.4",
+    "href": "changelog.html#security-1.0.4",
+    "title": "Changelog",
+    "section": "",
+    "text": "Updated Technology Risk Quantification: added preliminary Forecast section"
   },
   {
     "objectID": "changelog.html#security-1.0.3",
     "href": "changelog.html#security-1.0.3",
     "title": "Changelog",
-    "section": "",
-    "text": "Added Technology Risk Quantification: Prototype Risk Quantification tool for my SIRAcon 2024 talk, “UnFAIR: Simplifying and Expanding Technology Risk Quantification.”"
+    "section": "security 1.0.3",
+    "text": "security 1.0.3\n\nAdded Technology Risk Quantification: Prototype Risk Quantification tool for my SIRAcon 2024 talk, “UnFAIR: Simplifying and Expanding Technology Risk Quantification”"
   },
   {
     "objectID": "changelog.html#security-1.0.2",
@@ -32,7 +39,7 @@
     "href": "changelog.html#security-1.0.0",
     "title": "Changelog",
     "section": "security 1.0.0",
-    "text": "security 1.0.0\nInitial release.\n\nMoved Constraints vs Performance from rtraining: Visualizations exploring the use of constraints vs performance improvements in risk management."
+    "text": "security 1.0.0\nInitial release.\n\nMoved Constraints vs Performance from rtraining: Visualizations exploring the use of constraints vs performance improvements in risk management"
   },
   {
     "objectID": "TODO.html",
@@ -57,7 +64,7 @@
     "href": "analysis/risk-quant.html#questionstodo",
     "title": "Technology Risk Quantification",
     "section": "Questions/TODO",
-    "text": "Questions/TODO\n\nFigure out how to calculate log normal meanlog and sdlog from expert estimation (see Calculating SD for normal distribution with only mean and 5% and 95% quantile values)\n\n\nlibrary(ggplot2)\nlibrary(jbplot)\nlibrary(readxl)\nlibrary(janitor)\nlibrary(dplyr)\nlibrary(formattable)",
+    "text": "Questions/TODO\n\nFigure out how to calculate log normal meanlog and sdlog from expert estimation (see Calculating SD for normal distribution with only mean and 5% and 95% quantile values)\n\n\nlibrary(ggplot2)\nlibrary(jbplot)\nlibrary(readxl)\nlibrary(janitor)\nlibrary(dplyr)\nlibrary(formattable)\nlibrary(purrr)\nlibrary(tibble)",
     "crumbs": [
       "Changelog",
       "Technology Risk Quantification"
@@ -79,7 +86,29 @@
     "href": "analysis/risk-quant.html#import",
     "title": "Technology Risk Quantification",
     "section": "Import",
-    "text": "Import\nImport data from Excel template, loading each tab into its own data frame. The data in prototype.xlsx is based on the examples provided above.\nRisk descriptions:\n\nrisks &lt;- read_xlsx(\"data/prototype.xlsx\", sheet = \"Risks\") |&gt;\n  clean_names()\n\nrisks |&gt;\n  formattable(align = \"l\")\n\n\n\n\n\nrisk\n\n\ndescription\n\n\n\n\n\n\nCybersecurity Breach\n\n\nRisk of a cybersecurity breach of the inventory system.\n\n\n\n\nTechnology Outage\n\n\nRisk of an inventory system outage.\n\n\n\n\nLoss of Customer\n\n\nRisk of losing and existing customer or failure to acquire a new customer due to functional limitations of the inventory system.\n\n\n\n\n\n\nRisk estimates:\n\nestimates &lt;- read_xlsx(\"data/prototype.xlsx\", sheet = \"Estimates\") |&gt;\n  clean_names() |&gt;\n  rename(\n    lambda = frequency_per_yer, p05 = low_5_percent, p95 = high_95_percent, p50 = most_likely\n  )\n\nestimates |&gt;\n  mutate(across(p05:p50, ~ currency(.x, digits = 0L))) |&gt;\n  formattable(align = \"l\")\n\n\n\n\n\nrisk\n\n\nexpert\n\n\nlambda\n\n\np05\n\n\np95\n\n\np50\n\n\n\n\n\n\nCybersecurity Breach\n\n\nTechnology Expert 1\n\n\n0.25\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nCybersecurity Breach\n\n\nTechnology Expert 2\n\n\n0.33\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nCybersecurity Breach\n\n\nTechnology Expert 3\n\n\n0.20\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nCybersecurity Breach\n\n\nBusiness Expert 1\n\n\nNA\n\n\n$2,000\n\n\n$45,000,000\n\n\n$300,000\n\n\n\n\nCybersecurity Breach\n\n\nBusiness Expert 2\n\n\nNA\n\n\n$1,400\n\n\n$34,000,000\n\n\n$200,000\n\n\n\n\nCybersecurity Breach\n\n\nBusiness Expert 3\n\n\nNA\n\n\n$2,100\n\n\n$54,000,000\n\n\n$500,000\n\n\n\n\nCybersecurity Breach\n\n\nUnicorn Expert\n\n\n0.25\n\n\n$1,900\n\n\n$44,000,000\n\n\n$275,000\n\n\n\n\nTechnology Outage\n\n\nTechnology Expert 1\n\n\n2.00\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nTechnology Outage\n\n\nTechnology Expert 2\n\n\n3.00\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nTechnology Outage\n\n\nTechnology Expert 3\n\n\n1.00\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nTechnology Outage\n\n\nBusiness Expert 1\n\n\nNA\n\n\n$700\n\n\n$200,000\n\n\n$15,000\n\n\n\n\nTechnology Outage\n\n\nBusiness Expert 2\n\n\nNA\n\n\n$500\n\n\n$150,000\n\n\n$10,000\n\n\n\n\nTechnology Outage\n\n\nBusiness Expert 3\n\n\nNA\n\n\n$675\n\n\n$180,000\n\n\n$11,000\n\n\n\n\nTechnology Outage\n\n\nUnicorn Expert\n\n\n2.00\n\n\n$800\n\n\n$220,000\n\n\n$16,000\n\n\n\n\nLoss of Customer\n\n\nTechnology Expert 1\n\n\nNA\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nLoss of Customer\n\n\nTechnology Expert 2\n\n\nNA\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nLoss of Customer\n\n\nTechnology Expert 3\n\n\nNA\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nLoss of Customer\n\n\nBusiness Expert 1\n\n\n2.00\n\n\n$100,000\n\n\n$20,000,000\n\n\n$1,500,000\n\n\n\n\nLoss of Customer\n\n\nBusiness Expert 2\n\n\n3.00\n\n\n$150,000\n\n\n$30,000,000\n\n\n$2,000,000\n\n\n\n\nLoss of Customer\n\n\nBusiness Expert 3\n\n\n1.00\n\n\n$75,000\n\n\n$15,000,000\n\n\n$1,200,000\n\n\n\n\nLoss of Customer\n\n\nUnicorn Expert\n\n\n2.00\n\n\n$75,000\n\n\n$15,000,000\n\n\n$1,000,000\n\n\n\n\n\n\n\nConsensus Estimate\nUsing a simple average of all experts that provided an estimate (not blank/NA), this gives us a consensus estimate for the three risks of:\n\nconsensus &lt;- estimates |&gt;\n  group_by(risk) |&gt;\n  summarize(across(lambda:p50, ~ mean(.x, na.rm = TRUE)))\n\nconsensus |&gt;\n  mutate(across(p05:p50, ~ currency(.x, digits = 0L))) |&gt;\n  formattable(align = \"l\")\n\n\n\n\n\nrisk\n\n\nlambda\n\n\np05\n\n\np95\n\n\np50\n\n\n\n\n\n\nCybersecurity Breach\n\n\n0.2575\n\n\n$1,850\n\n\n$44,250,000\n\n\n$318,750\n\n\n\n\nLoss of Customer\n\n\n2.0000\n\n\n$100,000\n\n\n$20,000,000\n\n\n$1,425,000\n\n\n\n\nTechnology Outage\n\n\n2.0000\n\n\n$669\n\n\n$187,500\n\n\n$13,000",
+    "text": "Import\nImport data from Excel template, loading each tab into its own data frame. The data in prototype.xlsx is based on the examples provided above.\nRisk descriptions:\n\nrisks &lt;- read_xlsx(\"data/prototype.xlsx\", sheet = \"Risks\") |&gt;\n  clean_names()\n\nrisks |&gt;\n  formattable(align = \"l\")\n\n\n\n\n\nrisk\n\n\ndescription\n\n\n\n\n\n\nCybersecurity Breach\n\n\nRisk of a cybersecurity breach of the inventory system.\n\n\n\n\nTechnology Outage\n\n\nRisk of an inventory system outage.\n\n\n\n\nLoss of Customer\n\n\nRisk of losing and existing customer or failure to acquire a new customer due to functional limitations of the inventory system.\n\n\n\n\n\n\nRisk estimates:\n\nestimates &lt;- read_xlsx(\"data/prototype.xlsx\", sheet = \"Estimates\") |&gt;\n  clean_names() |&gt;\n  rename(\n    lambda = frequency_per_yer, p05 = low_5_percent, p95 = high_95_percent, p50 = most_likely\n  )\n\nestimates |&gt;\n  mutate(across(p05:p50, ~ currency(.x, digits = 0L))) |&gt;\n  formattable(align = \"l\")\n\n\n\n\n\nrisk\n\n\nexpert\n\n\nlambda\n\n\np05\n\n\np95\n\n\np50\n\n\n\n\n\n\nCybersecurity Breach\n\n\nTechnology Expert 1\n\n\n0.25\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nCybersecurity Breach\n\n\nTechnology Expert 2\n\n\n0.33\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nCybersecurity Breach\n\n\nTechnology Expert 3\n\n\n0.20\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nCybersecurity Breach\n\n\nBusiness Expert 1\n\n\nNA\n\n\n$2,000\n\n\n$45,000,000\n\n\n$300,000\n\n\n\n\nCybersecurity Breach\n\n\nBusiness Expert 2\n\n\nNA\n\n\n$1,400\n\n\n$34,000,000\n\n\n$200,000\n\n\n\n\nCybersecurity Breach\n\n\nBusiness Expert 3\n\n\nNA\n\n\n$2,100\n\n\n$54,000,000\n\n\n$500,000\n\n\n\n\nCybersecurity Breach\n\n\nUnicorn Expert\n\n\n0.25\n\n\n$1,900\n\n\n$44,000,000\n\n\n$275,000\n\n\n\n\nTechnology Outage\n\n\nTechnology Expert 1\n\n\n2.00\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nTechnology Outage\n\n\nTechnology Expert 2\n\n\n3.00\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nTechnology Outage\n\n\nTechnology Expert 3\n\n\n1.00\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nTechnology Outage\n\n\nBusiness Expert 1\n\n\nNA\n\n\n$700\n\n\n$200,000\n\n\n$15,000\n\n\n\n\nTechnology Outage\n\n\nBusiness Expert 2\n\n\nNA\n\n\n$500\n\n\n$150,000\n\n\n$10,000\n\n\n\n\nTechnology Outage\n\n\nBusiness Expert 3\n\n\nNA\n\n\n$675\n\n\n$180,000\n\n\n$11,000\n\n\n\n\nTechnology Outage\n\n\nUnicorn Expert\n\n\n2.00\n\n\n$800\n\n\n$220,000\n\n\n$16,000\n\n\n\n\nLoss of Customer\n\n\nTechnology Expert 1\n\n\nNA\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nLoss of Customer\n\n\nTechnology Expert 2\n\n\nNA\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nLoss of Customer\n\n\nTechnology Expert 3\n\n\nNA\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nLoss of Customer\n\n\nBusiness Expert 1\n\n\n2.00\n\n\n$100,000\n\n\n$20,000,000\n\n\n$1,500,000\n\n\n\n\nLoss of Customer\n\n\nBusiness Expert 2\n\n\n3.00\n\n\n$150,000\n\n\n$30,000,000\n\n\n$2,000,000\n\n\n\n\nLoss of Customer\n\n\nBusiness Expert 3\n\n\n1.00\n\n\n$75,000\n\n\n$15,000,000\n\n\n$1,200,000\n\n\n\n\nLoss of Customer\n\n\nUnicorn Expert\n\n\n2.00\n\n\n$75,000\n\n\n$15,000,000\n\n\n$1,000,000",
+    "crumbs": [
+      "Changelog",
+      "Technology Risk Quantification"
+    ]
+  },
+  {
+    "objectID": "analysis/risk-quant.html#consensus-estimate",
+    "href": "analysis/risk-quant.html#consensus-estimate",
+    "title": "Technology Risk Quantification",
+    "section": "Consensus Estimate",
+    "text": "Consensus Estimate\nUsing a simple average of all experts that provided an estimate (not blank/NA), this gives us a consensus estimate for the three risks of:\n\nconsensus &lt;- estimates |&gt;\n  group_by(risk) |&gt;\n  summarize(across(lambda:p50, ~ mean(.x, na.rm = TRUE)))\n\nconsensus |&gt;\n  mutate(across(p05:p50, ~ currency(.x, digits = 0L))) |&gt;\n  formattable(align = \"l\")\n\n\n\n\n\nrisk\n\n\nlambda\n\n\np05\n\n\np95\n\n\np50\n\n\n\n\n\n\nCybersecurity Breach\n\n\n0.2575\n\n\n$1,850\n\n\n$44,250,000\n\n\n$318,750\n\n\n\n\nLoss of Customer\n\n\n2.0000\n\n\n$100,000\n\n\n$20,000,000\n\n\n$1,425,000\n\n\n\n\nTechnology Outage\n\n\n2.0000\n\n\n$669\n\n\n$187,500\n\n\n$13,000",
+    "crumbs": [
+      "Changelog",
+      "Technology Risk Quantification"
+    ]
+  },
+  {
+    "objectID": "analysis/risk-quant.html#forecast",
+    "href": "analysis/risk-quant.html#forecast",
+    "title": "Technology Risk Quantification",
+    "section": "Forecast",
+    "text": "Forecast\nForecast risk using Monte Carlo simulation.\nFirst calculate the parameters of the log normal distributions for each risk. Also calculate the differential of the most likely outcome (50th percentile) to provide insight into estimate accuracy:\n\n#' Calculate Log Normal Parameters\n#'\n#' Calculate the parameters of a log normal distribution from estimated 0.05 and 0.95 quantile. Also\n#'   calculate the fractional difference between the estimated median value (0.5 quantile) and the\n#'   median value calculated from the 0.05 and 0.95 values.\n#'\n#' @param p05 the \"low\" value, the 0.05 quantile.\n#' @param p95 the \"high\" value, the 0.95 quantile.\n#' @param p50 the most likely value, the 0.5 quantile.\n#'\n#' @return a list including the `meanlog` and `sdlog` parameters, as well as the fractional\n#'         difference between the estimated and actual median (0.5 quantile), `mdiff`.\n#' @export\nlnorm_param &lt;- function(p05, p95, p50 = NA) {\n  meanlog &lt;- ((log(p95) - log(p05)) / 2) + log(p05)\n  sdlog &lt;- (log(p95) - log(p05)) / (2 * qnorm(0.95))\n  median &lt;- qlnorm(0.5, meanlog = meanlog, sdlog = sdlog)\n  mdiff &lt;- (p50 - median) / median\n\n  return(list(meanlog = meanlog, sdlog = sdlog, mdiff = mdiff))\n}\n\nconsensus_params &lt;- consensus |&gt;\n  mutate(as_tibble(lnorm_param(.data$p05, .data$p95, .data$p50)))\n\nconsensus_params |&gt;\n  mutate(across(p05:p50, ~ currency(.x, digits = 0L))) |&gt;\n  formattable(align = \"l\")\n\n\n\n\n\nrisk\n\n\nlambda\n\n\np05\n\n\np95\n\n\np50\n\n\nmeanlog\n\n\nsdlog\n\n\nmdiff\n\n\n\n\n\n\nCybersecurity Breach\n\n\n0.2575\n\n\n$1,850\n\n\n$44,250,000\n\n\n$318,750\n\n\n12.564153\n\n\n3.064840\n\n\n0.114057718\n\n\n\n\nLoss of Customer\n\n\n2.0000\n\n\n$100,000\n\n\n$20,000,000\n\n\n$1,425,000\n\n\n14.162084\n\n\n1.610574\n\n\n0.007627163\n\n\n\n\nTechnology Outage\n\n\n2.0000\n\n\n$669\n\n\n$187,500\n\n\n$13,000\n\n\n9.323472\n\n\n1.713260\n\n\n0.160942790\n\n\n\n\n\n\nRun the simulation:\n\ncalc_risk &lt;- function(risk, lambda, meanlog, sdlog, runs = 5) {\n  events &lt;- rpois(runs, lambda)\n  losses &lt;- map_dbl(events, \\(n) sum(rlnorm(n, meanlog, sdlog)))\n\n  as_tibble(list(events = events, losses = losses)) |&gt;\n    mutate(risk = risk, .before = events)\n}\n\nforecast &lt;- consensus_params |&gt;\n  select(c(\"risk\", \"lambda\", \"meanlog\", \"sdlog\")) |&gt;\n  pmap(calc_risk) |&gt;\n  list_rbind()\n\nforecast |&gt;\n  mutate(losses = currency(losses, digits = 0L)) |&gt;\n  formattable(align = \"l\")\n\n\n\n\n\nrisk\n\n\nevents\n\n\nlosses\n\n\n\n\n\n\nCybersecurity Breach\n\n\n0\n\n\n$0\n\n\n\n\nCybersecurity Breach\n\n\n1\n\n\n$101,451\n\n\n\n\nCybersecurity Breach\n\n\n1\n\n\n$3,244\n\n\n\n\nCybersecurity Breach\n\n\n0\n\n\n$0\n\n\n\n\nCybersecurity Breach\n\n\n1\n\n\n$168,146\n\n\n\n\nLoss of Customer\n\n\n1\n\n\n$238,068\n\n\n\n\nLoss of Customer\n\n\n4\n\n\n$4,842,615\n\n\n\n\nLoss of Customer\n\n\n4\n\n\n$26,459,675\n\n\n\n\nLoss of Customer\n\n\n2\n\n\n$5,896,601\n\n\n\n\nLoss of Customer\n\n\n2\n\n\n$4,053,714\n\n\n\n\nTechnology Outage\n\n\n4\n\n\n$42,869\n\n\n\n\nTechnology Outage\n\n\n1\n\n\n$6,334\n\n\n\n\nTechnology Outage\n\n\n1\n\n\n$5,052\n\n\n\n\nTechnology Outage\n\n\n3\n\n\n$127,779\n\n\n\n\nTechnology Outage\n\n\n0\n\n\n$0",
     "crumbs": [
       "Changelog",
       "Technology Risk Quantification"
@@ -238,9 +267,9 @@
   {
     "objectID": "NEWS.html",
     "href": "NEWS.html",
-    "title": "security 1.0.3",
+    "title": "security 1.0.4",
     "section": "",
-    "text": "security 1.0.3\n\nAdded Technology Risk Quantification: Prototype Risk Quantification tool for my SIRAcon 2024 talk, “UnFAIR: Simplifying and Expanding Technology Risk Quantification.”\n\n\n\nsecurity 1.0.2\n\nMinor updates\n\n\n\nsecurity 1.0.1\n\nAdded Measuring Changes in Breach Rates: A critical review of using breach frequency as a measure of security success, inspired by Incident Metrics in SRE: Critically Evaluating MTTR and Friends\n\n\n\nsecurity 1.0.0\nInitial release.\n\nMoved Constraints vs Performance from rtraining: Visualizations exploring the use of constraints vs performance improvements in risk management."
+    "text": "security 1.0.4\n\nUpdated Technology Risk Quantification: added preliminary Forecast section\n\n\n\nsecurity 1.0.3\n\nAdded Technology Risk Quantification: Prototype Risk Quantification tool for my SIRAcon 2024 talk, “UnFAIR: Simplifying and Expanding Technology Risk Quantification”\n\n\n\nsecurity 1.0.2\n\nMinor updates\n\n\n\nsecurity 1.0.1\n\nAdded Measuring Changes in Breach Rates: A critical review of using breach frequency as a measure of security success, inspired by Incident Metrics in SRE: Critically Evaluating MTTR and Friends\n\n\n\nsecurity 1.0.0\nInitial release.\n\nMoved Constraints vs Performance from rtraining: Visualizations exploring the use of constraints vs performance improvements in risk management"
   },
   {
     "objectID": "index.html",
