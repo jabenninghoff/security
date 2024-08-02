@@ -232,7 +232,7 @@ consensus_params |>
 Run the simulation:
 
 ```{r calc_risk}
-calc_risk <- function(risk, lambda, meanlog, sdlog, runs = 5) {
+calc_risk <- function(risk, lambda, meanlog, sdlog, runs = 1e5) {
   events <- rpois(runs, lambda)
   losses <- map_dbl(events, \(n) sum(rlnorm(n, meanlog, sdlog)))
 
@@ -246,6 +246,8 @@ forecast <- consensus_params |>
   list_rbind()
 
 forecast |>
-  mutate(losses = currency(losses, digits = 0L)) |>
+  group_by(risk) |>
+  summarize(avg_events = mean(events), avg_losses = mean(losses)) |>
+  mutate(avg_losses = currency(avg_losses, digits = 0L)) |>
   formattable(align = "l")
 ```
