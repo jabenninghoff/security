@@ -251,3 +251,19 @@ forecast |>
   mutate(avg_losses = currency(avg_losses, digits = 0L)) |>
   formattable(align = "l")
 ```
+
+## Loss Exceedance Curves
+
+Plot loss exceedance curves for all risks and combined risk.
+
+```{r loss_exceedance}
+forecast |>
+  ggplot(aes(losses)) +
+  facet_grid(vars(risk)) +
+  stat_ecdf(aes(y = after_stat(1 - y))) +
+  scale_y_continuous(labels = scales::label_percent()) +
+  scale_x_continuous(labels = scales::label_currency(scale_cut = scales::cut_short_scale())) +
+  coord_cartesian(xlim = c(0, 5e7)) +
+  labs(x = NULL, y = NULL) +
+  theme_quo()
+```
