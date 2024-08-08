@@ -4,14 +4,21 @@
     "href": "changelog.html",
     "title": "Changelog",
     "section": "",
-    "text": "Updated Technology Risk Quantification: added loss exceedance plots"
+    "text": "Updated Technology Risk Quantification: added summary histograms"
+  },
+  {
+    "objectID": "changelog.html#security-1.0.6",
+    "href": "changelog.html#security-1.0.6",
+    "title": "Changelog",
+    "section": "",
+    "text": "Updated Technology Risk Quantification: added summary histograms"
   },
   {
     "objectID": "changelog.html#security-1.0.5",
     "href": "changelog.html#security-1.0.5",
     "title": "Changelog",
-    "section": "",
-    "text": "Updated Technology Risk Quantification: added loss exceedance plots"
+    "section": "security 1.0.5",
+    "text": "security 1.0.5\n\nUpdated Technology Risk Quantification: added loss exceedance plots"
   },
   {
     "objectID": "changelog.html#security-1.0.4",
@@ -115,7 +122,18 @@
     "href": "analysis/risk-quant.html#forecast",
     "title": "Technology Risk Quantification",
     "section": "Forecast",
-    "text": "Forecast\nForecast risk using Monte Carlo simulation.\nFirst calculate the parameters of the log normal distributions for each risk. Also calculate the differential of the most likely outcome (50th percentile) to provide insight into estimate accuracy:\n\n#' Calculate Log Normal Parameters\n#'\n#' Calculate the parameters of a log normal distribution from estimated 0.05 and 0.95 quantile. Also\n#'   calculate the fractional difference between the estimated median value (0.5 quantile) and the\n#'   median value calculated from the 0.05 and 0.95 values.\n#'\n#' @param p05 the \"low\" value, the 0.05 quantile.\n#' @param p95 the \"high\" value, the 0.95 quantile.\n#' @param p50 the most likely value, the 0.5 quantile.\n#'\n#' @return a list including the `meanlog` and `sdlog` parameters, as well as the fractional\n#'         difference between the estimated and actual median (0.5 quantile), `mdiff`.\n#' @export\nlnorm_param &lt;- function(p05, p95, p50 = NA) {\n  meanlog &lt;- ((log(p95) - log(p05)) / 2) + log(p05)\n  sdlog &lt;- (log(p95) - log(p05)) / (2 * qnorm(0.95))\n  median &lt;- qlnorm(0.5, meanlog = meanlog, sdlog = sdlog)\n  mdiff &lt;- (p50 - median) / median\n\n  return(list(meanlog = meanlog, sdlog = sdlog, mdiff = mdiff))\n}\n\nconsensus_params &lt;- consensus |&gt;\n  mutate(as_tibble(lnorm_param(.data$p05, .data$p95, .data$p50)))\n\nconsensus_params |&gt;\n  mutate(across(p05:p50, ~ currency(.x, digits = 0L))) |&gt;\n  formattable(align = \"l\")\n\n\n\n\n\nrisk\n\n\nlambda\n\n\np05\n\n\np95\n\n\np50\n\n\nmeanlog\n\n\nsdlog\n\n\nmdiff\n\n\n\n\n\n\nCybersecurity Breach\n\n\n0.2575\n\n\n$1,850\n\n\n$44,250,000\n\n\n$318,750\n\n\n12.564153\n\n\n3.064840\n\n\n0.114057718\n\n\n\n\nLoss of Customer\n\n\n2.0000\n\n\n$100,000\n\n\n$20,000,000\n\n\n$1,425,000\n\n\n14.162084\n\n\n1.610574\n\n\n0.007627163\n\n\n\n\nTechnology Outage\n\n\n2.0000\n\n\n$669\n\n\n$187,500\n\n\n$13,000\n\n\n9.323472\n\n\n1.713260\n\n\n0.160942790\n\n\n\n\n\n\nRun the simulation:\n\ncalc_risk &lt;- function(risk, lambda, meanlog, sdlog, runs = 1e5) {\n  events &lt;- rpois(runs, lambda)\n  losses &lt;- map_dbl(events, \\(n) sum(rlnorm(n, meanlog, sdlog)))\n\n  as_tibble(list(events = events, losses = losses)) |&gt;\n    mutate(year = row_number(), risk = risk, .before = events)\n}\n\nforecast &lt;- consensus_params |&gt;\n  select(c(\"risk\", \"lambda\", \"meanlog\", \"sdlog\")) |&gt;\n  pmap(calc_risk) |&gt;\n  list_rbind()\n\nforecast |&gt;\n  group_by(risk) |&gt;\n  summarize(avg_events = mean(events), avg_losses = mean(losses)) |&gt;\n  mutate(avg_losses = currency(avg_losses, digits = 0L)) |&gt;\n  formattable(align = \"l\")\n\n\n\n\n\nrisk\n\n\navg_events\n\n\navg_losses\n\n\n\n\n\n\nCybersecurity Breach\n\n\n0.25700\n\n\n$9,553,873\n\n\n\n\nLoss of Customer\n\n\n2.00012\n\n\n$10,229,982\n\n\n\n\nTechnology Outage\n\n\n1.99078\n\n\n$96,190",
+    "text": "Forecast\nForecast risk using Monte Carlo simulation.\nFirst calculate the parameters of the log normal distributions for each risk. Also calculate the differential of the most likely outcome (50th percentile) to provide insight into estimate accuracy:\n\n#' Calculate Log Normal Parameters\n#'\n#' Calculate the parameters of a log normal distribution from estimated 0.05 and 0.95 quantile. Also\n#'   calculate the fractional difference between the estimated median value (0.5 quantile) and the\n#'   median value calculated from the 0.05 and 0.95 values.\n#'\n#' @param p05 the \"low\" value, the 0.05 quantile.\n#' @param p95 the \"high\" value, the 0.95 quantile.\n#' @param p50 the most likely value, the 0.5 quantile.\n#'\n#' @return a list including the `meanlog` and `sdlog` parameters, as well as the fractional\n#'         difference between the estimated and actual median (0.5 quantile), `mdiff`.\n#' @export\nlnorm_param &lt;- function(p05, p95, p50 = NA) {\n  meanlog &lt;- ((log(p95) - log(p05)) / 2) + log(p05)\n  sdlog &lt;- (log(p95) - log(p05)) / (2 * qnorm(0.95))\n  median &lt;- qlnorm(0.5, meanlog = meanlog, sdlog = sdlog)\n  mdiff &lt;- (p50 - median) / median\n\n  return(list(meanlog = meanlog, sdlog = sdlog, mdiff = mdiff))\n}\n\nconsensus_params &lt;- consensus |&gt;\n  mutate(as_tibble(lnorm_param(.data$p05, .data$p95, .data$p50)))\n\nconsensus_params |&gt;\n  mutate(across(p05:p50, ~ currency(.x, digits = 0L))) |&gt;\n  formattable(align = \"l\")\n\n\n\n\n\nrisk\n\n\nlambda\n\n\np05\n\n\np95\n\n\np50\n\n\nmeanlog\n\n\nsdlog\n\n\nmdiff\n\n\n\n\n\n\nCybersecurity Breach\n\n\n0.2575\n\n\n$1,850\n\n\n$44,250,000\n\n\n$318,750\n\n\n12.564153\n\n\n3.064840\n\n\n0.114057718\n\n\n\n\nLoss of Customer\n\n\n2.0000\n\n\n$100,000\n\n\n$20,000,000\n\n\n$1,425,000\n\n\n14.162084\n\n\n1.610574\n\n\n0.007627163\n\n\n\n\nTechnology Outage\n\n\n2.0000\n\n\n$669\n\n\n$187,500\n\n\n$13,000\n\n\n9.323472\n\n\n1.713260\n\n\n0.160942790\n\n\n\n\n\n\nRun the simulation:\n\ncalc_risk &lt;- function(risk, lambda, meanlog, sdlog, runs = 1e5) {\n  events &lt;- rpois(runs, lambda)\n  losses &lt;- map_dbl(events, \\(n) sum(rlnorm(n, meanlog, sdlog)))\n\n  as_tibble(list(events = events, losses = losses)) |&gt;\n    mutate(year = row_number(), risk = risk, .before = events)\n}\n\nforecast &lt;- consensus_params |&gt;\n  select(c(\"risk\", \"lambda\", \"meanlog\", \"sdlog\")) |&gt;\n  pmap(calc_risk) |&gt;\n  list_rbind()\n\nforecast |&gt;\n  group_by(risk) |&gt;\n  summarize(avg_events = mean(events), avg_losses = mean(losses)) |&gt;\n  mutate(avg_losses = currency(avg_losses, digits = 0L)) |&gt;\n  formattable(align = \"l\")\n\n\n\n\n\nrisk\n\n\navg_events\n\n\navg_losses\n\n\n\n\n\n\nCybersecurity Breach\n\n\n0.25781\n\n\n$8,940,396\n\n\n\n\nLoss of Customer\n\n\n1.99538\n\n\n$10,339,679\n\n\n\n\nTechnology Outage\n\n\n1.99748\n\n\n$98,126",
+    "crumbs": [
+      "Changelog",
+      "Technology Risk Quantification"
+    ]
+  },
+  {
+    "objectID": "analysis/risk-quant.html#histograms",
+    "href": "analysis/risk-quant.html#histograms",
+    "title": "Technology Risk Quantification",
+    "section": "Histograms",
+    "text": "Histograms\nUse histograms to compare risks and visualize overall risk.\n\nforecast |&gt;\n  ggplot(aes(losses)) +\n  facet_grid(vars(risk)) +\n  geom_hist_bw(bins = 100) +\n  scale_x_log10(labels = scales::label_currency(scale_cut = scales::cut_short_scale())) +\n  labs(x = NULL, y = NULL) +\n  theme_quo()\n\nWarning in scale_x_log10(labels = scales::label_currency(scale_cut =\nscales::cut_short_scale())): log-10 transformation introduced infinite values.\n\n\nWarning: Removed 104143 rows containing non-finite outside the scale range\n(`stat_bin()`).\n\n\n\n\n\n\n\n\n\nCombined risk:\n\nforecast |&gt;\n  ggplot(aes(losses, fill = risk)) +\n  geom_histogram(bins = 100) +\n  scale_x_log10(labels = scales::label_currency(scale_cut = scales::cut_short_scale())) +\n  labs(x = NULL, y = NULL, fill = \"Risk\") +\n  theme_quo()\n\nWarning in scale_x_log10(labels = scales::label_currency(scale_cut =\nscales::cut_short_scale())): log-10 transformation introduced infinite values.\n\n\nWarning: Removed 104143 rows containing non-finite outside the scale range\n(`stat_bin()`).",
     "crumbs": [
       "Changelog",
       "Technology Risk Quantification"
@@ -285,9 +303,9 @@
   {
     "objectID": "NEWS.html",
     "href": "NEWS.html",
-    "title": "security 1.0.5",
+    "title": "security 1.0.6",
     "section": "",
-    "text": "security 1.0.5\n\nUpdated Technology Risk Quantification: added loss exceedance plots\n\n\n\nsecurity 1.0.4\n\nUpdated Technology Risk Quantification: added preliminary Forecast section\n\n\n\nsecurity 1.0.3\n\nAdded Technology Risk Quantification: Prototype Risk Quantification tool for my SIRAcon 2024 talk, “UnFAIR: Simplifying and Expanding Technology Risk Quantification”\n\n\n\nsecurity 1.0.2\n\nMinor updates\n\n\n\nsecurity 1.0.1\n\nAdded Measuring Changes in Breach Rates: A critical review of using breach frequency as a measure of security success, inspired by Incident Metrics in SRE: Critically Evaluating MTTR and Friends\n\n\n\nsecurity 1.0.0\nInitial release.\n\nMoved Constraints vs Performance from rtraining: Visualizations exploring the use of constraints vs performance improvements in risk management"
+    "text": "security 1.0.6\n\nUpdated Technology Risk Quantification: added summary histograms\n\n\n\nsecurity 1.0.5\n\nUpdated Technology Risk Quantification: added loss exceedance plots\n\n\n\nsecurity 1.0.4\n\nUpdated Technology Risk Quantification: added preliminary Forecast section\n\n\n\nsecurity 1.0.3\n\nAdded Technology Risk Quantification: Prototype Risk Quantification tool for my SIRAcon 2024 talk, “UnFAIR: Simplifying and Expanding Technology Risk Quantification”\n\n\n\nsecurity 1.0.2\n\nMinor updates\n\n\n\nsecurity 1.0.1\n\nAdded Measuring Changes in Breach Rates: A critical review of using breach frequency as a measure of security success, inspired by Incident Metrics in SRE: Critically Evaluating MTTR and Friends\n\n\n\nsecurity 1.0.0\nInitial release.\n\nMoved Constraints vs Performance from rtraining: Visualizations exploring the use of constraints vs performance improvements in risk management"
   },
   {
     "objectID": "index.html",
