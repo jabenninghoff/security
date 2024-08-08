@@ -1,3 +1,7 @@
+# security 1.0.6
+
+* Updated Technology Risk Quantification: added summary histograms
+
 # security 1.0.5
 
 * Updated Technology Risk Quantification: added loss exceedance plots
