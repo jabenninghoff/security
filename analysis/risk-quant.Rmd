@@ -253,6 +253,31 @@ forecast |>
   formattable(align = "l")
 ```
 
+# Histograms
+
+Use histograms to compare risks and visualize overall risk.
+
+```{r risk_hist}
+forecast |>
+  ggplot(aes(losses)) +
+  facet_grid(vars(risk)) +
+  geom_hist_bw(bins = 100) +
+  scale_x_log10(labels = scales::label_currency(scale_cut = scales::cut_short_scale())) +
+  labs(x = NULL, y = NULL) +
+  theme_quo()
+```
+
+Combined risk:
+
+```{r combined_hist}
+forecast |>
+  ggplot(aes(losses, fill = risk)) +
+  geom_histogram(bins = 100) +
+  scale_x_log10(labels = scales::label_currency(scale_cut = scales::cut_short_scale())) +
+  labs(x = NULL, y = NULL, fill = "Risk") +
+  theme_quo()
+```
+
 # Loss Exceedance Curves
 
 Plot loss exceedance curves for all risks and combined risk.
