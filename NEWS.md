@@ -1,3 +1,7 @@
+# security 1.0.7
+
+* Updated Technology Risk Quantification: update TODO
+
 # security 1.0.6
 
 * Updated Technology Risk Quantification: added summary histograms

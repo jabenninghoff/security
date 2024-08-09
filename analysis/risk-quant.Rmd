@@ -23,6 +23,8 @@ Prototype Risk Quantification tool for my SIRAcon 2024 talk, "[UnFAIR: Simplifyi
 # Questions/TODO
 
 - [x] Figure out how to calculate log normal `meanlog` and `sdlog` from expert estimation (see [Calculating SD for normal distribution with only mean and 5% and 95% quantile values](https://stats.stackexchange.com/questions/158110/calculating-sd-for-normal-distribution-with-only-mean-and-5-and-95-quantile-va))
+- [ ] Add environment statement: describe the background and history of the system being analyzed, summary of existing state and description of the risks [builds trust and common ground through demonstrating shared understanding of the system, include a diagram if available]
+- [ ] Add before and after: baseline risk vs after replacing system (investment), which allows calculation of ROI
 
 ```{r setup, message = FALSE, warning = FALSE}
 library(ggplot2)
