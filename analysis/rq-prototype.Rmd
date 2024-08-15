@@ -25,6 +25,7 @@ Prototype Risk Quantification tool for my SIRAcon 2024 talk, "[UnFAIR: Simplifyi
 - [x] Figure out how to calculate log normal `meanlog` and `sdlog` from expert estimation (see [Calculating SD for normal distribution with only mean and 5% and 95% quantile values](https://stats.stackexchange.com/questions/158110/calculating-sd-for-normal-distribution-with-only-mean-and-5-and-95-quantile-va))
 
 ```{r setup, message = FALSE, warning = FALSE}
+library(security)
 library(ggplot2)
 library(jbplot)
 library(readxl)
@@ -199,28 +200,8 @@ Forecast risk using Monte Carlo simulation.
 First calculate the parameters of the log normal distributions for each risk. Also calculate the
 differential of the most likely outcome (50th percentile) to provide insight into estimate accuracy:
 
-```{r lnorm_param}
-#' Calculate Log Normal Parameters
-#'
-#' Calculate the parameters of a log normal distribution from estimated 0.05 and 0.95 quantile. Also
-#'   calculate the fractional difference between the estimated median value (0.5 quantile) and the
-#'   median value calculated from the 0.05 and 0.95 values.
-#'
-#' @param p05 the "low" value, the 0.05 quantile.
-#' @param p95 the "high" value, the 0.95 quantile.
-#' @param p50 the most likely value, the 0.5 quantile.
-#'
-#' @return a list including the `meanlog` and `sdlog` parameters, as well as the fractional
-#'         difference between the estimated and actual median (0.5 quantile), `mdiff`.
-#' @export
-lnorm_param <- function(p05, p95, p50 = NA) {
-  meanlog <- ((log(p95) - log(p05)) / 2) + log(p05)
-  sdlog <- (log(p95) - log(p05)) / (2 * qnorm(0.95))
-  median <- qlnorm(0.5, meanlog = meanlog, sdlog = sdlog)
-  mdiff <- (p50 - median) / median
-
-  return(list(meanlog = meanlog, sdlog = sdlog, mdiff = mdiff))
-}
+```{r consensus_params}
+lnorm_param
 
 consensus_params <- consensus |>
   mutate(as_tibble(lnorm_param(.data$p05, .data$p95, .data$p50)))
