@@ -37,6 +37,9 @@ library(purrr)
 library(ggplot2)
 library(jbplot)
 library(plotly)
+
+# TODO: implement better solution
+source("../R/risk.R") # nolint: undesirable_function_linter. quarto can't load library(security).
 ```
 
 # Import
