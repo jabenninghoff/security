@@ -4,7 +4,8 @@
     "items": [
       "/analysis/constraints.html",
       "/analysis/breach-rates.html",
-      "/analysis/risk-quant.html"
+      "/analysis/rq-prototype.html",
+      "/analysis/rq-demo.html"
     ]
   }
 ]

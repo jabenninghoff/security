@@ -30,8 +30,13 @@ Notebooks in this package:
   Performance](https://jabenninghoff.github.io/security/analysis/constraints.html)
   (2024-04-30): Visualizations exploring the use of constraints vs
   performance improvements in risk management.
-- [Technology Risk
-  Quantification](https://jabenninghoff.github.io/security/analysis/risk-quant.html)
+- [Risk Quantification
+  Demo](https://jabenninghoff.github.io/security/analysis/rq-demo.html)
+  (2024-08-15): Risk Quantification demonstration for my SIRAcon 2024
+  talk, “[UnFAIR: Simplifying and Expanding Technology Risk
+  Quantification](https://web.cvent.com/event/7f49b0a6-bca9-46fd-8245-a2deb671efee/websitePage:23d1376e-2723-411a-910a-0edf87b03015?session=956b9176-13ad-4dac-af3c-e8ccb30bae8a&shareLink=true).”
+- [Risk Quantification
+  Prototype](https://jabenninghoff.github.io/security/analysis/rq-prototype.html)
   (2024-07-23): Prototype Risk Quantification tool for my SIRAcon 2024
   talk, “[UnFAIR: Simplifying and Expanding Technology Risk
   Quantification](https://web.cvent.com/event/7f49b0a6-bca9-46fd-8245-a2deb671efee/websitePage:23d1376e-2723-411a-910a-0edf87b03015?session=956b9176-13ad-4dac-af3c-e8ccb30bae8a&shareLink=true).”
