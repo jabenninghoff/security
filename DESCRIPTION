@@ -9,10 +9,13 @@ License: MIT + file LICENSE
 URL: https://jabenninghoff.github.io/security/,
     https://github.com/jabenninghoff/security
 BugReports: https://github.com/jabenninghoff/security/issues
+Imports:
+    dplyr,
+    purrr,
+    tibble
 Suggests: 
     desc,
     devtools,
-    dplyr,
     formattable,
     fs,
     ggplot2,
@@ -22,7 +25,6 @@ Suggests:
     pkgload,
     plotly,
     poilog,
-    purrr,
     quarto,
     rdev (>= 1.10.11),
     readxl,
@@ -30,7 +32,6 @@ Suggests:
     scales,
     spelling,
     testthat (>= 3.0.0),
-    tibble,
     usethis,
     validate,
     withr

@@ -7,3 +7,7 @@ test_that("lnorm_param returns correct values", {
     tolerance = testthat_tolerance()
   )
 })
+
+# calc_risk
+
+# TODO: create a valid unit test

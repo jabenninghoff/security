@@ -23,3 +23,27 @@ lnorm_param <- function(p05, p95, p50) {
 
   return(list(meanlog = meanlog, sdlog = sdlog, mdiff = mdiff))
 }
+
+#' Calculate Risk
+#'
+#' Calculate risk using a Poisson log-normal model. The number of events per time period is
+#'   calculated using `rpois(runs, lambda)` and total loss for each time period using
+#'   `sum(rlnorm(events, meanlog, sdlog))`.
+#'
+#' @param risk Risk name (a string)
+#' @param lambda Parameter passed to `rpois()`
+#' @param meanlog Parameter passed to `rlnorm()`
+#' @param sdlog Parameter passed to `rlnorm()`
+#' @param runs Number of simulations
+#'
+#' @return A tibble of `runs` rows containing the number of events (`events`), and the total value
+#'         of losses (`losses`) for each run.
+#'
+#' @export
+calc_risk <- function(risk, lambda, meanlog, sdlog, runs = 1e5) {
+  events <- stats::rpois(runs, lambda)
+  losses <- purrr::map_dbl(events, \(n) sum(stats::rlnorm(n, meanlog, sdlog)))
+
+  tibble::as_tibble(list(events = events, losses = losses)) |>
+    dplyr::mutate(year = dplyr::row_number(), risk = risk, .before = events)
+}
