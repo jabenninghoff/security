@@ -44,8 +44,8 @@ source("../R/risk.R") # nolint: undesirable_function_linter. quarto can't load l
 
 # Import
 
-Import and validate data from Excel template, loading each tab into its own data frame. The data in
-`demo.xlsx` is based on the examples developed [here](rq-prototype.Rmd).
+Import and validate data from Excel. The data in `demo.xlsx` is based on the examples developed
+[here](rq-prototype.Rmd).
 
 ```{r import}
 risks <- read_xlsx("data/demo.xlsx", sheet = "Risks") |>
