@@ -25,7 +25,6 @@ Prototype Risk Quantification tool for my SIRAcon 2024 talk, "[UnFAIR: Simplifyi
 - [x] Figure out how to calculate log normal `meanlog` and `sdlog` from expert estimation (see [Calculating SD for normal distribution with only mean and 5% and 95% quantile values](https://stats.stackexchange.com/questions/158110/calculating-sd-for-normal-distribution-with-only-mean-and-5-and-95-quantile-va))
 
 ```{r setup, message = FALSE, warning = FALSE}
-library(security)
 library(ggplot2)
 library(jbplot)
 library(readxl)
@@ -35,6 +34,9 @@ library(formattable)
 library(purrr)
 library(tibble)
 library(plotly)
+
+# TODO: implement better solution
+source("../R/risk.R") # nolint: undesirable_function_linter. quarto can't load library(security).
 ```
 
 # Example Data
