@@ -1,0 +1,166 @@
+---
+title: "Risk Quantification Demo"
+author: "John Benninghoff"
+date: '2024-08-15'
+date-modified: '2024-08-15'
+categories: risk quantification
+order: 104
+execute:
+  echo: false
+output:
+  html_notebook:
+    theme:
+      version: 5
+      preset: bootstrap
+    css: assets/extra.css
+    pandoc_args: --shift-heading-level-by=1
+    toc: yes
+    toc_float:
+      collapsed: no
+      smooth_scroll: no
+---
+
+Risk Quantification demonstration for my SIRAcon 2024 talk, "[UnFAIR: Simplifying and Expanding Technology Risk Quantification](https://web.cvent.com/event/7f49b0a6-bca9-46fd-8245-a2deb671efee/websitePage:23d1376e-2723-411a-910a-0edf87b03015?session=956b9176-13ad-4dac-af3c-e8ccb30bae8a&shareLink=true)."
+
+# Questions/TODO
+
+- [ ] Add environment statement: describe the background and history of the system being analyzed, summary of existing state and description of the risks [builds trust and common ground through demonstrating shared understanding of the system, include a diagram if available]
+- [ ] Add before and after: baseline risk vs after replacing system (investment), which allows calculation of ROI
+
+```{r setup, message = FALSE, warning = FALSE}
+library(readxl)
+library(janitor)
+library(validate)
+library(dplyr)
+library(formattable)
+```
+
+# Import
+
+Import and validate data from Excel template, loading each tab into its own data frame. The data in
+`demo.xlsx` is based on the examples developed [here](rq-prototype.Rmd).
+
+```{r import}
+risks <- read_xlsx("data/demo.xlsx", sheet = "Risks") |>
+  clean_names()
+
+validate_risks <- local({
+  validate_rules <- validator(
+    risk_char = is.character(risk),
+    risk_not_na = !is.na(risk),
+    risk_not_blank = nchar(risk) > 0,
+    desc_char = is.character(description),
+    desc_not_na = !is.na(description),
+    desc_not_blank = nchar(description) > 0
+  )
+  validate_out <- confront(risks, validate_rules)
+  validate_summary <- summary(validate_out)
+
+  # end processing on any failures, disallow NA
+  stopifnot(
+    all(validate_summary$fails == 0),
+    all(validate_summary$nNA == 0),
+    !all(validate_summary$error),
+    !all(validate_summary$warning)
+  )
+
+  return(validate_out)
+})
+
+estimates <- read_xlsx("data/prototype.xlsx", sheet = "Estimates") |>
+  clean_names() |>
+  rename(
+    lambda = frequency_per_yer, p05 = low_5_percent, p95 = high_95_percent, p50 = most_likely
+  )
+
+validate_estimates <- local({
+  validate_rules <- validator(
+    risk_not_na = !is.na(risk),
+    risk_match = risk %in% risks$risk,
+    expert_char = is.character(expert),
+    expert_not_na = !is.na(expert),
+    expert_not_blank = nchar(expert) > 0,
+    lambda_num = is.numeric(lambda),
+    lambda_pos = lambda > 0,
+    p05_num = is.numeric(p05),
+    p05_pos = p05 > 0,
+    p95_num = is.numeric(p95),
+    p95_pos = p95 > 0,
+    p50_num = is.numeric(p50),
+    p50_pos = p50 > 0
+  )
+
+  validate_out <- confront(estimates, validate_rules)
+  validate_summary <- summary(validate_out)
+
+  # end processing on any failures, allow NA
+  stopifnot(
+    all(validate_summary$fails == 0),
+    !all(validate_summary$error),
+    !all(validate_summary$warning)
+  )
+
+  return(validate_out)
+})
+```
+
+# Environment Statement
+
+(Describe the background and history of the system being analyzed, summary of existing state, and
+extended description of the risks)
+
+Risk descriptions:
+
+```{r risks}
+risks |>
+  formattable(align = "l")
+```
+
+# Forecast
+
+Forecast risk using Monte Carlo simulation.
+
+```{r forecast}
+consensus <- estimates |>
+  group_by(risk) |>
+  summarize(across(lambda:p50, ~ mean(.x, na.rm = TRUE)))
+```
+
+# Appendix
+
+Additional details on the risk quantification analysis.
+
+## Validation
+
+Data validation results for Risks tab:
+
+```{r validate_risks}
+plot(validate_risks)
+```
+
+Data validation results for Estimates tab:
+
+```{r validate_estimates}
+plot(validate_estimates)
+```
+
+## Estimates
+
+All risk estimates:
+
+```{r estimates}
+estimates |>
+  mutate(across(p05:p50, ~ currency(.x, digits = 0L))) |>
+  formattable(align = "l")
+```
+
+## Consensus Estimate
+
+Using a simple average of all experts that provided an estimate (not blank/NA), this gives us a
+consensus estimate for the three risks of:
+
+```{r consensus}
+consensus |>
+  mutate(across(p05:p50, ~ currency(.x, digits = 0L))) |>
+  formattable(align = "l")
+```
