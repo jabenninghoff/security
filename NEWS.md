@@ -1,3 +1,7 @@
+# security 1.1.0
+
+* Renamed "Technology Risk Quantification" to "Risk Quantification Prototype"
+
 # security 1.0.7
 
 * Updated Technology Risk Quantification: update TODO
