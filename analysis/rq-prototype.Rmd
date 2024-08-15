@@ -213,14 +213,8 @@ consensus_params |>
 
 Run the simulation:
 
-```{r calc_risk}
-calc_risk <- function(risk, lambda, meanlog, sdlog, runs = 1e5) {
-  events <- rpois(runs, lambda)
-  losses <- map_dbl(events, \(n) sum(rlnorm(n, meanlog, sdlog)))
-
-  as_tibble(list(events = events, losses = losses)) |>
-    mutate(year = row_number(), risk = risk, .before = events)
-}
+```{r forecast}
+calc_risk
 
 forecast <- consensus_params |>
   select(c("risk", "lambda", "meanlog", "sdlog")) |>
