@@ -209,7 +209,7 @@ ggplotly(risk_le + theme_minimal())
 
 ## Combined Risk
 
-Plot loss exceedance curves for combined risk:
+Plot loss exceedance curve for combined risk:
 
 ```{r combined_le}
 combined_le <- forecast |>
