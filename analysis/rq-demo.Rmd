@@ -58,7 +58,9 @@ management market.
 # Import
 
 Import and validate data from Excel. The data in `demo.xlsx` is based on the examples developed
-[here](rq-prototype.Rmd).
+[here](rq-prototype.Rmd). The data was collected from 3 Technology SMEs, 3 Business SMEs, and one
+SME with experience in both. Experts were calibrated, informed by historical and industry data, and
+only gave estimates for areas in which they were confident in answering.
 
 ```{r import}
 risks <- read_xlsx("data/demo.xlsx", sheet = "Risks") |>
