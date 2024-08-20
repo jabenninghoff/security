@@ -1,3 +1,7 @@
+# security 1.1.1
+
+* Updated Risk Quantification Demo: added Environment Statement
+
 # security 1.1.0
 
 * Renamed "Technology Risk Quantification" to "Risk Quantification Prototype"
