@@ -24,8 +24,7 @@ Risk Quantification demonstration for my SIRAcon 2024 talk, "[UnFAIR: Simplifyin
 
 # Questions/TODO
 
-- [ ] Add environment statement: describe the background and history of the system being analyzed, summary of existing state and description of the risks [builds trust and common ground through demonstrating shared understanding of the system, include a diagram if available]
-- [ ] Add before and after: baseline risk vs after replacing system (investment), which allows calculation of ROI
+- [ ] Add before and after: baseline risk vs after investment, which allows calculation of ROI.
 
 ```{r setup, message = FALSE, warning = FALSE}
 library(readxl)
@@ -41,6 +40,20 @@ library(plotly)
 # TODO: implement better solution
 source("../R/risk.R") # nolint: undesirable_function_linter. quarto can't load library(security).
 ```
+
+# Environment Statement
+
+The widget management system is over 30 years old and its architecture has not changed significantly
+since the original implementation. Over the years, the widget system has become an integral part of
+our services in managing widgets for our clients. In reviewing the system, three major risks were
+identified: First, the age of the technology prevents updating components of the system that no
+longer meet contemporary cybersecurity standards, which increases the risk of a breach. Second, the
+system is less reliable and experiences frequent outages, typically about 2 major outages per year,
+which results in lost revenue, contractual penalties, and overtime pay to recover from the incident.
+Third, limitations of the widget system have started to affect sales - we have recently lost a
+customer due to the functional obsolescence of the widget system, and expect to both lose more
+existing and prospective customers in the future due to increased competition in the widget
+management market.
 
 # Import
 
@@ -111,10 +124,7 @@ validate_estimates <- local({
 })
 ```
 
-# Environment Statement
-
-(Describe the background and history of the system being analyzed, summary of existing state, and
-extended description of the risks)
+# Risks
 
 Risk descriptions:
 
