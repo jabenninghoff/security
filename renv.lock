@@ -454,14 +454,14 @@
     },
     "digest": {
       "Package": "digest",
-      "Version": "0.6.36",
+      "Version": "0.6.37",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "R",
         "utils"
       ],
-      "Hash": "fd6824ad91ede64151e93af67df6376b"
+      "Hash": "33698c4b3127fc9f506654607fb73676"
     },
     "downlit": {
       "Package": "downlit",
@@ -806,7 +806,7 @@
     },
     "hunspell": {
       "Package": "hunspell",
-      "Version": "3.0.3",
+      "Version": "3.0.4",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -814,7 +814,7 @@
         "Rcpp",
         "digest"
       ],
-      "Hash": "e957e989ea17f937964f0d46b0f0bca0"
+      "Hash": "f543163714aba1ff9e8cfe76d8d15381"
     },
     "ini": {
       "Package": "ini",
