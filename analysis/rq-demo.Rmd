@@ -25,6 +25,7 @@ Risk Quantification demonstration for my SIRAcon 2024 talk, "[UnFAIR: Simplifyin
 # Questions/TODO
 
 - [ ] Add before and after: baseline risk vs after investment, which allows calculation of ROI.
+- [ ] Investigate use of [mc2d](https://cran.r-project.org/web/packages/mc2d/index.html)
 
 ```{r setup, message = FALSE, warning = FALSE}
 library(readxl)
