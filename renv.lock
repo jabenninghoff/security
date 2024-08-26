@@ -1345,6 +1345,24 @@
       ],
       "Hash": "1cba04a4e9414bdefc9dcaa99649a8dc"
     },
+    "quantrr": {
+      "Package": "quantrr",
+      "Version": "0.1.0",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "jabenninghoff",
+      "RemoteRepo": "quantrr",
+      "RemoteRef": "main",
+      "RemoteSha": "6ffcfa339d637051b19b37c67426616da15c08fb",
+      "Remotes": "jabenninghoff/rdev",
+      "Requirements": [
+        "dplyr",
+        "purrr",
+        "tibble"
+      ],
+      "Hash": "f034e806640ec94ca6e36aa5c9f74239"
+    },
     "quarto": {
       "Package": "quarto",
       "Version": "1.4.4",

@@ -1,3 +1,7 @@
+# security 1.1.3
+
+* Migrated `lnorm_param()` and `calc_risk()` functions to [quantrr](https://jabenninghoff.github.io/quantrr/), the (future) production version of the Risk Quantification Tool
+
 # security 1.1.2
 
 * Updated Risk Quantification Demo: updated TODO from SIRAcon 2024 session feedback
