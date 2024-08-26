@@ -6,6 +6,7 @@ Donut
 MTTR
 ORCID
 ROI
+RStudio
 RiskRecon
 SIRAcon
 SME
@@ -18,8 +19,9 @@ donut
 frac
 mc
 qnorm
+qrisk
+quantrr
 renv
 rlnorm
 rtraining
 th
-tibble
