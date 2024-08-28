@@ -274,6 +274,13 @@
       ],
       "Hash": "61e097f35917d342622f21cdc79c256e"
     },
+    "collections": {
+      "Package": "collections",
+      "Version": "0.3.7",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "90a0eda114ab0bef170ddbf5ef0cd93f"
+    },
     "colorspace": {
       "Package": "colorspace",
       "Version": "2.1-1",
@@ -297,13 +304,13 @@
     },
     "cpp11": {
       "Package": "cpp11",
-      "Version": "0.4.7",
+      "Version": "0.5.0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "R"
       ],
-      "Hash": "5a295d7d963cc5035284dcdbaf334f4e"
+      "Hash": "91570bba75d0c9d3f1040c835cee8fba"
     },
     "cranlogs": {
       "Package": "cranlogs",
@@ -357,13 +364,13 @@
     },
     "curl": {
       "Package": "curl",
-      "Version": "5.2.1",
+      "Version": "5.2.2",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "R"
       ],
-      "Hash": "411ca2c03b1ce5f548345d2fc2685f7a"
+      "Hash": "8f27335f2bcff4d6035edcc82d7d46de"
     },
     "cyclocomp": {
       "Package": "cyclocomp",
@@ -381,14 +388,14 @@
     },
     "data.table": {
       "Package": "data.table",
-      "Version": "1.15.4",
+      "Version": "1.16.0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "R",
         "methods"
       ],
-      "Hash": "8ee9ac56ef633d0c7cab8b2ca87d683e"
+      "Hash": "fb24e05d4a91d8b1c7ff8e284bde834a"
     },
     "desc": {
       "Package": "desc",
@@ -923,6 +930,30 @@
       ],
       "Hash": "b64ec208ac5bc1852b285f665d6368b3"
     },
+    "languageserver": {
+      "Package": "languageserver",
+      "Version": "0.3.16",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "R6",
+        "callr",
+        "collections",
+        "fs",
+        "jsonlite",
+        "lintr",
+        "parallel",
+        "roxygen2",
+        "stringi",
+        "styler",
+        "tools",
+        "utils",
+        "xml2",
+        "xmlparsedata"
+      ],
+      "Hash": "f8901f44aedb6d7e7d03b5533986bd97"
+    },
     "later": {
       "Package": "later",
       "Version": "1.3.2",
@@ -1428,13 +1459,13 @@
     },
     "rdev": {
       "Package": "rdev",
-      "Version": "1.11.1",
+      "Version": "1.11.3",
       "Source": "GitHub",
       "RemoteType": "github",
       "RemoteUsername": "jabenninghoff",
       "RemoteRepo": "rdev",
       "RemoteRef": "main",
-      "RemoteSha": "90737bdb726b2537c7497ce642acf7fd0d65bd2d",
+      "RemoteSha": "af6d7491770589b17d0d397f33fbc4ee9706e29a",
       "RemoteHost": "api.github.com",
       "Requirements": [
         "checkmate",
@@ -1446,6 +1477,7 @@
         "fs",
         "gert",
         "gh",
+        "languageserver",
         "lintr",
         "miniUI",
         "mockery",
@@ -1469,7 +1501,7 @@
         "xml2",
         "yaml"
       ],
-      "Hash": "51c362f653f18af09e10ce9839e92621"
+      "Hash": "62d267cce7597ecc4ff1f1b2e6b1a209"
     },
     "readxl": {
       "Package": "readxl",
