@@ -93,7 +93,7 @@ validate_risks <- local({
   return(validate_out)
 })
 
-estimates <- read_xlsx("data/prototype.xlsx", sheet = "Estimates") |>
+estimates <- read_xlsx("data/demo.xlsx", sheet = "Estimates") |>
   clean_names() |>
   rename(
     lambda = frequency_per_yer, p05 = low_5_percent, p95 = high_95_percent, p50 = most_likely

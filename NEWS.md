@@ -1,3 +1,7 @@
+# security 1.1.4
+
+* Bug fixes
+
 # security 1.1.3
 
 * Migrated `lnorm_param()` and `calc_risk()` functions to [quantrr](https://jabenninghoff.github.io/quantrr/), the (future) production version of the Risk Quantification Tool
