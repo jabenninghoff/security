@@ -34,12 +34,12 @@ Notebooks in this package:
   Demo](https://jabenninghoff.github.io/security/analysis/rq-demo.html)
   (2024-08-15): Risk Quantification demonstration for my SIRAcon 2024
   talk, “[UnFAIR: Simplifying and Expanding Technology Risk
-  Quantification](https://web.cvent.com/event/7f49b0a6-bca9-46fd-8245-a2deb671efee/websitePage:23d1376e-2723-411a-910a-0edf87b03015?session=956b9176-13ad-4dac-af3c-e8ccb30bae8a&shareLink=true).”
+  Quantification](https://www.information-safety.org/2024/08/29/siracon-2024/).”
 - [Risk Quantification
   Prototype](https://jabenninghoff.github.io/security/analysis/rq-prototype.html)
   (2024-07-23): Prototype Risk Quantification tool for my SIRAcon 2024
   talk, “[UnFAIR: Simplifying and Expanding Technology Risk
-  Quantification](https://web.cvent.com/event/7f49b0a6-bca9-46fd-8245-a2deb671efee/websitePage:23d1376e-2723-411a-910a-0edf87b03015?session=956b9176-13ad-4dac-af3c-e8ccb30bae8a&shareLink=true).”
+  Quantification](https://www.information-safety.org/2024/08/29/siracon-2024/).”
 
 ## Installation
 
