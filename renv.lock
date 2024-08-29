@@ -1378,21 +1378,21 @@
     },
     "quantrr": {
       "Package": "quantrr",
-      "Version": "0.1.0",
+      "Version": "1.0.0",
       "Source": "GitHub",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
       "RemoteUsername": "jabenninghoff",
       "RemoteRepo": "quantrr",
       "RemoteRef": "main",
-      "RemoteSha": "6ffcfa339d637051b19b37c67426616da15c08fb",
-      "Remotes": "jabenninghoff/rdev",
+      "RemoteSha": "3152a1adb4ea09ed55202c3ffd7a1acad5ab3857",
+      "Remotes": "jabenninghoff/jbplot, jabenninghoff/rdev",
       "Requirements": [
         "dplyr",
         "purrr",
         "tibble"
       ],
-      "Hash": "f034e806640ec94ca6e36aa5c9f74239"
+      "Hash": "607cf3c89a8792841ce6941c1dd70ade"
     },
     "quarto": {
       "Package": "quarto",
