@@ -297,7 +297,6 @@ Plot using percent rank and a log10 scale:
 ```{r risk_le_log}
 risk_le_log <- forecast |>
   group_by(risk) |>
-  arrange(losses, .by_group = TRUE) |>
   mutate(probability = 1 - percent_rank(losses)) |>
   filter(losses > 0) |>
   ggplot(aes(losses, probability)) +
@@ -346,7 +345,6 @@ Plot using percent rank and a log10 scale:
 combined_le_log <- forecast |>
   group_by(year) |>
   summarize(total_losses = sum(losses)) |>
-  arrange(total_losses) |>
   mutate(probability = 1 - percent_rank(total_losses)) |>
   filter(total_losses > 0) |>
   ggplot(aes(total_losses, probability)) +
