@@ -1,3 +1,9 @@
+# security 1.2.0
+
+* Added Risk Value Analysis: An exploration of the value of cybersecurity risk reduction
+
+* Updated Risk Quantification Prototype: added log scale loss exceedance curves
+
 # security 1.1.5
 
 * Updated links, content, to reference official quantrr version 1.0 release
