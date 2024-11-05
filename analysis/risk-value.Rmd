@@ -1,0 +1,88 @@
+---
+title: "Risk Value Analysis"
+author: "John Benninghoff"
+date: '2024-11-03'
+date-modified: '2024-11-03'
+categories: risk quantification
+order: 105
+output:
+  html_notebook:
+    theme:
+      version: 5
+      preset: bootstrap
+    css: assets/extra.css
+    pandoc_args: --shift-heading-level-by=1
+    toc: yes
+    toc_float:
+      collapsed: no
+      smooth_scroll: no
+---
+
+An exploration of the value of cybersecurity risk reduction.
+
+# Questions/TODO
+
+- [ ] Questions/TODO list here
+
+```{r setup, message = FALSE, warning = FALSE}
+library(poilog)
+library(tibble)
+library(dplyr)
+library(quantrr)
+```
+
+# Background
+
+What is the value of a cybersecurity program? Put another way, how much should an organization pay
+to reduce the likelihood of a breach or the expected impact? In this analysis, we compare two firms,
+one with typical breach rate and impact, and a second that makes investments to reduce their risk.
+Using Monte Carlo simulation, we can calculate the value of this risk reduction.
+
+# Baseline Risk
+
+We can model baseline risk for a typical firm using
+[quantrr](https://jabenninghoff.github.io/quantrr/) and data from the Cyentia 2022
+[Information Risk Insights Study (IRIS)](https://www.cyentia.com/wp-content/uploads/IRIS-2022_Cyentia.pdf).
+
+The 2022 IRIS found that the upper bound likelihood of a breach in the next year fit a Poisson
+log-normal distribution with a mean ($\mu$) of -2.284585 and and standard deviation
+($\sigma$) of 0.8690759.
+
+As was done in the [breach rate analysis](breach-rates.Rmd), we can use trial and error to find a
+reasonable value of $\lambda$ for a Poisson distribution that approximates these results:
+
+```{r breach_table}
+runs <- 1e6
+lambda <- 0.138
+
+breaches_poilog <- rpoilog(runs, mu = -2.284585, sig = 0.8690759, keep0 = TRUE)
+breaches_pois <- rpois(runs, lambda = lambda)
+
+breach_table <- function(breaches) {
+  years <- length(breaches)
+  tibble(
+    "One or more" = sum(breaches >= 1) / years,
+    "Two or more" = sum(breaches >= 2) / years,
+    "Three or more" = sum(breaches >= 3) / years
+  )
+}
+
+bind_rows(breach_table(breaches_poilog), breach_table(breaches_pois))
+```
+
+A Poisson distribution with a $\lambda$ of 0.138 approximates the Poisson log-normal model from the
+Cyentia IRIS report.
+
+```{r meanlog}
+meanlog <- 12.55949
+sdlog <- 3.068723
+```
+
+For the impact, we can use the log-normal loss model from IRIS, with a mean ($\mu$) of `r meanlog`
+and standard deviation($\sigma$) of `r sdlog`.
+
+Using the baseline parameters, we can simulate security events and losses over the next 10 years:
+
+```{r baseline}
+calc_risk("baseline", lambda, meanlog, sdlog, runs = 10)
+```
