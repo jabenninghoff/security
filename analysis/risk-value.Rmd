@@ -2,7 +2,7 @@
 title: "Risk Value Analysis"
 author: "John Benninghoff"
 date: '2024-11-03'
-date-modified: '2024-11-03'
+date-modified: '2024-11-22'
 categories: risk quantification
 order: 105
 output:
@@ -22,13 +22,17 @@ An exploration of the value of cybersecurity risk reduction.
 
 # Questions/TODO
 
-- [ ] Questions/TODO list here
+- [ ] Does `meanlog + log(0.5)` really reduce the log-normal mean by 50% as the simulation suggests?
 
 ```{r setup, message = FALSE, warning = FALSE}
 library(poilog)
 library(tibble)
 library(dplyr)
 library(quantrr)
+library(formattable)
+library(ggplot2)
+library(plotly)
+library(jbplot)
 ```
 
 # Background
@@ -86,3 +90,160 @@ Using the baseline parameters, we can simulate security events and losses over t
 ```{r baseline}
 calc_risk("baseline", lambda, meanlog, sdlog, runs = 10)
 ```
+
+# Net Present Value
+
+We can calculate the (negative) net present value of the baseline security risk over the next ten
+years by discounting future years. A discount rate of 5% is reasonable, and we use the formula
+$\mathrm{NPV} = \large \frac{R_t}{(1+i)^t}$, treating year 1 as $t = 0$:
+
+```{r baseline_value}
+rate <- 0.05
+baseline_value <- calc_risk("baseline", lambda, meanlog, sdlog, runs = 10) |>
+  mutate(discount = (1 + rate)^(year - 1)) |>
+  mutate(value = losses / discount)
+
+baseline_value
+
+baseline_value |>
+  group_by(risk) |>
+  summarize(npv = currency(sum(value)))
+```
+
+The baseline value is highly variable depending on how many breaches occur over the 10-year period.
+We can forecast this range by running the 10-year simulation 100,000 times:
+
+```{r baseline_forecast}
+baseline_forecast <- calc_risk("baseline", lambda, meanlog, sdlog, runs = 100000 * 10) |>
+  mutate(sim = ceiling(year / 10), .before = year) |>
+  mutate(year = year %% 10) |>
+  mutate(year = if_else(year == 0, 10, year)) |>
+  mutate(discount = (1 + rate)^(year - 1)) |>
+  mutate(value = losses / discount) |>
+  group_by(sim) |>
+  summarize(npv = sum(value))
+
+baseline_forecast |>
+  filter(npv != 0) |>
+  ggplot(aes(npv)) +
+  geom_hist_bw(bins = 100) +
+  scale_x_log10(labels = scales::label_currency(scale_cut = scales::cut_short_scale())) +
+  labs(x = NULL, y = NULL) +
+  theme_quo()
+```
+
+That's a broad range, from \$100 or less to \$10B or more, with the most common non-zero value
+around \$1M. But how many runs have no loss?
+
+```{r no_loss}
+baseline_forecast |>
+  mutate(no_loss = (npv == 0)) |>
+  count(no_loss)
+```
+
+About 25% of the time, there is no loss over the 10 year period.
+
+# Security NPV
+
+What is the NPV of a hypothetical security investment? The key ways we can reduce risk are by
+lowering the likelihood, by lowering the impact, or both.
+
+## Reduce Likelihood
+
+Let's first look at an investment that reduces the breach rate by half:
+
+```{r likelihood_forecast}
+likelihood_forecast <- calc_risk("likelihood", lambda / 2, meanlog, sdlog, runs = 100000 * 10) |>
+  mutate(sim = ceiling(year / 10), .before = year) |>
+  mutate(year = year %% 10) |>
+  mutate(year = if_else(year == 0, 10, year)) |>
+  mutate(discount = (1 + rate)^(year - 1)) |>
+  mutate(value = losses / discount) |>
+  group_by(sim) |>
+  summarize(npv = sum(value))
+```
+
+To measure the value of this investment, we calculate the difference between the baseline risk and
+the risk after reducing the likelihood:
+
+```{r likelihood_return}
+likelihood_return <-
+  full_join(baseline_forecast, likelihood_forecast, by = "sim", suffix = c("_base", "_reduced")) |>
+  mutate(return = npv_base - npv_reduced)
+
+likelihood_return |>
+  summary()
+```
+
+The NPV of the risk reduction (return) is highly variable. Since we can't plot negative numbers
+using a log scale, we can examine the data using the cumulative distribution function (CDF). We
+limit the x-axis to zoom in to the 1% to 99% quantiles:
+
+```{r likelihood_ecdf}
+(likelihood_return |>
+  ggplot(aes(return)) +
+  stat_ecdf() +
+  coord_cartesian(
+    xlim = c(quantile(likelihood_return$return, 0.01), quantile(likelihood_return$return, 0.99))
+  ) +
+  labs(x = NULL, y = NULL) +
+  theme_minimal()) |>
+  ggplotly()
+```
+
+Reviewing the data:
+
+- About 40% of the time, our security investment has a negative or zero return
+- About 15% of the time, the security investment has a negative return of over $1M
+- About 60% of the time, the security investment has a positive return
+- About 32% of the time, the security investment has a positive return of over $1M
+
+## Reduce Impact
+
+Now let's look at an investment that reduces the breach impact by half:
+
+```{r impact_forecast}
+impact_forecast <- calc_risk("impact", lambda, meanlog + log(0.5), sdlog, runs = 100000 * 10) |>
+  mutate(sim = ceiling(year / 10), .before = year) |>
+  mutate(year = year %% 10) |>
+  mutate(year = if_else(year == 0, 10, year)) |>
+  mutate(discount = (1 + rate)^(year - 1)) |>
+  mutate(value = losses / discount) |>
+  group_by(sim) |>
+  summarize(npv = sum(value))
+```
+
+To measure the value of this investment, we calculate the difference between the baseline risk and
+the risk after reducing the likelihood:
+
+```{r impact_return}
+impact_return <-
+  full_join(baseline_forecast, impact_forecast, by = "sim", suffix = c("_base", "_reduced")) |>
+  mutate(return = npv_base - npv_reduced)
+
+impact_return |>
+  summary()
+```
+
+Again, the NPV of the risk reduction (return) is highly variable. We again examine the data using
+the cumulative distribution function (CDF), limiting the x-axis:
+
+```{r impact_ecdf}
+(impact_return |>
+  ggplot(aes(return)) +
+  stat_ecdf() +
+  coord_cartesian(
+    xlim = c(quantile(impact_return$return, 0.01), quantile(impact_return$return, 0.99))
+  ) +
+  labs(x = NULL, y = NULL) +
+  theme_minimal()) |>
+  ggplotly()
+```
+
+
+Reviewing the data:
+
+- About 50% of the time, our security investment has a negative or zero return
+- About 22% of the time, the security investment has a negative return of over $1M
+- About 50% of the time, the security investment has a positive return
+- About 30% of the time, the security investment has a positive return of over $1M
