@@ -42,6 +42,11 @@ to reduce the likelihood of a breach or the expected impact? In this analysis, w
 one with typical breach rate and impact, and a second that makes investments to reduce their risk.
 Using Monte Carlo simulation, we can calculate the value of this risk reduction.
 
+For the analysis, we use a 10 year horizon to fit with the typical executive tenure of 5-10 years.
+(A 2023 [study](https://fortifyexperts.com/the-2023-fortune-500-cisos-analysis/) found that
+CISOs at Fortune 500 companies had served an average of 8.3 years at the company and 4.5 years as
+CISO)
+
 # Baseline Risk
 
 We can model baseline risk for a typical firm using
@@ -247,3 +252,65 @@ Reviewing the data:
 - About 22% of the time, the security investment has a negative return of over $1M
 - About 50% of the time, the security investment has a positive return
 - About 30% of the time, the security investment has a positive return of over $1M
+
+# Analysis
+
+What can we learn from these simulations? While a security investment is more likely than not to
+have a positive return, it's not a particularly good bet. Over a reasonable planning horizon for a
+typical executive, it's hard for an investment with a variable return to compete with investments
+that have a clear expected positive return. As a CISO, it's a reasonable choice to simply maintain
+the status quo of the baseline risk, as there's a good chance that there will be no breaches (25%)
+or breaches with lower impact:
+
+```{r quantile}
+baseline_forecast |>
+  pull(npv) |>
+  quantile(0.5) |>
+  currency()
+```
+
+Put another way, the analysis helps explain why firms don't invest more in security: the firms'
+managers are better off prioritizing non-security investments, and (potentially) blaming the CISO
+when breaches do occur, especially if they have limited their risk by purchasing cybersecurity
+insurance. A rational manager will minimize investments in security unless mandated by insurance or
+if increasing security spend is more than offset by reductions in premiums.
+
+For the most part, this is what we often see in practice: security leaders struggling to get funding
+to improve security beyond what is minimally expected by external stakeholders (clients, regulators,
+and insurers). However, we also see certain larger organizations invest more in security, like large
+banks and other financial institutions, why is this? Work done by VivoSecurity in
+[forecasting data breaches](https://www.vivosecurity.com/download-isaca-philly-talk-may-2023)
+suggests an answer. Vivo found a positive correlation between the size of an organization and the
+likelihood of a security breach (which has also been identified by others, like
+[Cyentia](https://www.cyentia.com/iris/)), and also found a negative correlation with the number of
+CISAs and CISSPs on staff. The correlation was stronger when looking at the effect on larger
+breaches.
+
+I believe what this correlation shows is that the overall level of security investment at
+a firm, as measured by the headcount of certified professionals, has a big impact on reducing the
+likelihood of the largest breaches of \$1M or higher. From the same presentation, the Vivo model
+predicts fairly frequent small breaches (under \$100K) at three of the largest Canadian banks, but
+large breaches are very rare (under 1% for breaches in the \$1M-\$10M range). The high level of
+investment at older banks may also be partly explained by the fact that their security programs
+predate commercial cyber insurance. This insight is not captured in the simple model presented here.
+
+# Implications
+
+What are the implications for security? At a macro level, I think this is an argument for
+regulation, either government regulation or private regulation through the insurance market.
+Historically we've seen both happen in fire safety: government regulation through building codes has
+reduced the risk of fire and loss of life over time, and insurance-driven regulations -
+[UL](https://en.wikipedia.org/wiki/UL_(safety_organization)), founded as Underwriters Laboratories,
+was initially funded by fire insurance companies.
+
+At the firm level, I think this means that security leaders shouldn't present security as an
+investment. As with safety, I think the main argument for better security is a moral or emotional
+case: we care about security because we care about our customers, partners, and other stakeholders.
+Also, people are typically loss-averse, so expressing security risk in those terms will better
+connect with decision makers. Using
+[Tail value at risk](https://en.wikipedia.org/wiki/Tail_value_at_risk) or
+[Loss Exceedance Curves](https://www.cyentia.com/communicating-risk-loss-exceedance-curves/) express
+loss in this way - "There's a 5% chance of losses exceeding $780,000 and a 1% of losses exceeding
+$25,000,000 over the next year." I also think it means security leaders should be mindful of *how*
+they spend their limited funds, by maximizing investments in
+[what works](https://doi.org/10.1080/23738871.2024.2335461).
