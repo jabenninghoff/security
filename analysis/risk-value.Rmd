@@ -2,7 +2,7 @@
 title: "Risk Value Analysis"
 author: "John Benninghoff"
 date: '2024-11-03'
-date-modified: '2024-11-22'
+date-modified: '2024-11-25'
 categories: risk quantification
 order: 105
 output:
