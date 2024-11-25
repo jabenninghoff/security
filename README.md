@@ -30,6 +30,10 @@ Notebooks in this package:
   Performance](https://jabenninghoff.github.io/security/analysis/constraints.html)
   (2024-04-30): Visualizations exploring the use of constraints vs
   performance improvements in risk management.
+- [Risk Value
+  Analysis](https://jabenninghoff.github.io/security/analysis/risk-value.html)
+  (2024-11-03): An exploration of the value of cybersecurity risk
+  reduction.
 - [Risk Quantification
   Demo](https://jabenninghoff.github.io/security/analysis/rq-demo.html)
   (2024-08-15): Risk Quantification demonstration for my SIRAcon 2024
