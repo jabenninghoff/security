@@ -314,3 +314,73 @@ loss in this way - "There's a 5% chance of cybersecurity losses exceeding \$780,
 of losses exceeding \$25,000,000 over the next year." I also think it means security leaders should
 be mindful of *how* they spend their limited funds, by maximizing investments in
 [what works](https://doi.org/10.1080/23738871.2024.2335461).
+
+# A Counterexample
+
+After completing my initial analysis, I remembered a counterexample: in one of his last
+presentations, Marcus Ranum described the layered security controls he helped put in place at an
+entertainment company that "didn't want to be next" after the
+[2014 Sony attack](https://en.wikipedia.org/wiki/2014_Sony_Pictures_hack). Marcus worked with their
+security team to implement a combination of encrypted drives, next-gen firewalls, and
+[whitelisting](https://en.wikipedia.org/wiki/Whitelist) products to dramatically reduce malware
+attacks against corporate endpoints. One of the surprising outcomes was that the investment in
+installing the new controls was more than offset by a reduction in operational costs responding to
+malware.
+
+So it's clear that security *can* be a good investment, but why? The conclusions in the initial
+analysis rely on the fact that security breaches are relatively infrequent, which was not the case
+for malware response at the company Marcus worked with. Additionally, these low-level infections
+aren't likely to make their way into the public dataset used by the Cyentia IRIS report.
+
+# High-Frequency Incidents
+
+We can repeat the analysis looking at malware with a hypothetical 50% reduction in frequency. In a
+large organization, we might expect to respond to clean up a malware infection once a week
+($\lambda = 52$) with 90% of incidents costing between \$200 and \$2000 to clean up, with a typical
+response cost of \$600. To simplify the analysis, we just look at the cost of the next year:
+
+```{r baseline_malware}
+lnorm_param(200, 2000, 600)
+
+baseline_malware <- calc_risk("baseline malware", lambda = 52, meanlog = 6.44961, sdlog = 0.6999362)
+
+baseline_malware |>
+  ggplot(aes(losses)) +
+  geom_hist_bw(bins = 100) +
+  scale_x_continuous(labels = scales::label_currency(scale_cut = scales::cut_short_scale())) +
+  labs(x = NULL, y = NULL) +
+  theme_quo()
+
+baseline_malware |>
+  summary()
+```
+
+In this case, the baseline risk is never 0, and falls within a range of about \$15K to \$80K, with a
+typical cost of \$40K/year.
+
+What is the value of reducing the likelihood of malware by 50%?
+
+```{r impact_malware}
+impact_malware <- calc_risk("impact malware", lambda = 26, meanlog = 6.44961, sdlog = 0.6999362)
+
+impact_malware_return <-
+  full_join(baseline_malware, impact_malware, by = "year", suffix = c("_base", "_reduced")) |>
+  select(c("year", "losses_base", "losses_reduced")) |>
+  mutate(return = losses_base - losses_reduced)
+
+impact_malware_return |>
+  summary()
+
+impact_malware_return |>
+  pull(return) |>
+  quantile(0.01)
+```
+
+While there are still cases where investing in security generates a negative return, over 99% of the
+time, the return is positive, with an average return of just over \$20,000. In this hypothetical
+example, \$20K/year isn't a big deal, which leads me to conclude that the entertainment company
+Marcus was working with had a much higher baseline rate of malware incidents, saw a much larger
+reduction, and probably spent more on typical response.
+
+So, security *can be* a good investment, if it reduces the likelihood and/or impact of frequent
+events, like malware response.
