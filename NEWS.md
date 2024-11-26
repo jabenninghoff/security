@@ -1,3 +1,7 @@
+# security 1.2.1
+
+* Updated Risk Value Analysis: minor content corrections
+
 # security 1.2.0
 
 * Added Risk Value Analysis: An exploration of the value of cybersecurity risk reduction
