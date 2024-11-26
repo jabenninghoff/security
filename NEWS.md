@@ -1,3 +1,7 @@
+# security 1.2.2
+
+* Updated Risk Value Analysis: add counterexample, frequent losses due to malware infection
+
 # security 1.2.1
 
 * Updated Risk Value Analysis: minor content corrections
