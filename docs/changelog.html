@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.57">
+<meta name="generator" content="quarto-1.6.37">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -35,12 +35,12 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-29e2c20b02301cfff04dc8050bf30c7e.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-43df0d6f53b733b42d37fa7808e17715.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-0ba0187b4a8fce8d1398c6dd11ce9fc2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-918336862249f8861f3b6c427817ab29.min.css" rel="prefetch" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -163,7 +163,8 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#security-1.2.0" id="toc-security-1.2.0" class="nav-link active" data-scroll-target="#security-1.2.0">security 1.2.0</a></li>
+  <li><a href="#security-1.2.1" id="toc-security-1.2.1" class="nav-link active" data-scroll-target="#security-1.2.1">security 1.2.1</a></li>
+  <li><a href="#security-1.2.0" id="toc-security-1.2.0" class="nav-link" data-scroll-target="#security-1.2.0">security 1.2.0</a></li>
   <li><a href="#security-1.1.5" id="toc-security-1.1.5" class="nav-link" data-scroll-target="#security-1.1.5">security 1.1.5</a></li>
   <li><a href="#security-1.1.4" id="toc-security-1.1.4" class="nav-link" data-scroll-target="#security-1.1.4">security 1.1.4</a></li>
   <li><a href="#security-1.1.3" id="toc-security-1.1.3" class="nav-link" data-scroll-target="#security-1.1.3">security 1.1.3</a></li>
@@ -203,6 +204,12 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<section id="security-1.2.1" class="level2">
+<h2 class="anchored" data-anchor-id="security-1.2.1">security 1.2.1</h2>
+<ul>
+<li>Updated Risk Value Analysis: minor content corrections</li>
+</ul>
+</section>
 <section id="security-1.2.0" class="level2">
 <h2 class="anchored" data-anchor-id="security-1.2.0">security 1.2.0</h2>
 <ul>
@@ -526,8 +533,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   });
   clipboard.on('success', onCopySuccess);
   if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    // For code content inside modals, clipBoardJS needs to be initialized with a container option
-    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
     const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
       text: getTextToCopy,
       container: window.document.getElementById('quarto-embedded-source-code-modal')
@@ -638,7 +643,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       if (window.Quarto?.typesetMath) {
         window.Quarto.typesetMath(note);
       }
-      // TODO in 1.5, we should make sure this works without a callout special case
       if (note.classList.contains("callout")) {
         return note.outerHTML;
       } else {
