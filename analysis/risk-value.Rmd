@@ -2,7 +2,7 @@
 title: "Risk Value Analysis"
 author: "John Benninghoff"
 date: '2024-11-03'
-date-modified: '2024-11-25'
+date-modified: '2024-11-26'
 categories: risk quantification
 order: 105
 output:
@@ -310,7 +310,7 @@ Also, people are typically loss-averse, so expressing security risk in those ter
 connect with decision makers. Using
 [Tail value at risk](https://en.wikipedia.org/wiki/Tail_value_at_risk) or
 [Loss Exceedance Curves](https://www.cyentia.com/communicating-risk-loss-exceedance-curves/) express
-loss in this way - "There's a 5% chance of losses exceeding $780,000 and a 1% of losses exceeding
-$25,000,000 over the next year." I also think it means security leaders should be mindful of *how*
-they spend their limited funds, by maximizing investments in
+loss in this way - "There's a 5% chance of cybersecurity losses exceeding \$780,000 and a 1% chance
+of losses exceeding \$25,000,000 over the next year." I also think it means security leaders should
+be mindful of *how* they spend their limited funds, by maximizing investments in
 [what works](https://doi.org/10.1080/23738871.2024.2335461).
