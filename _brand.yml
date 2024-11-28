@@ -1,0 +1,47 @@
+# https://quarto.org/docs/authoring/brand.html
+
+meta:
+  name: Security Differently
+  link: https://www.security-differently.com
+
+logo:
+  images:
+    icon:
+      path: icon.svg
+      alt: "Security Differently Icon"
+    full:
+      path: logo.svg
+      alt: "Security Differently Logo"
+  small: icon
+  medium: full
+  large: full
+
+# from jbplot::differently_palettes (primary, status)
+color:
+  palette:
+    blue: "#0D629C"
+    dark-gray: "#575757"
+    light-blue: "#3498DB"
+    light-gray: "#ECF0F1"
+    light-orange: "#FFBC50"
+    orange: "#FC7A00"
+    white: "#FFFFFF"
+    black: "#000000"
+  foreground: black
+  background: white
+  primary: blue
+  secondary: orange
+  tertiary: light-blue
+  success: "#1E8542"
+  info: blue
+  warning: "#EB7100"
+  danger: "#C83B31"
+  light: light-gray
+  dark: dark-gray
+
+typography:
+  fonts:
+  - family: Lato
+    source: google
+  base: Lato
+  headings: Lato
