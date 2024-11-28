@@ -21,6 +21,9 @@ website:
       - text: TODO
         file: TODO.md
     tools:
+      - icon: globe
+        href: https://www.security-differently.com
+        aria-label: website
       - icon: rss
         href: index.xml
         aria-label: rss
