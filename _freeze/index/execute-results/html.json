@@ -1,9 +1,11 @@
 {
-  "hash": "565718d6b2764dc33bbbefc639428777",
+  "hash": "fde02f0853e77bc60d5fcdf07516464f",
   "result": {
     "engine": "knitr",
-    "markdown": "---\ntitle: \"security\"\nlisting:\n  type: default\n  contents: analysis\n  sort-ui: true\n  filter-ui: true\n  max-description-length: 500\n  date-format: iso\n  categories: true\n  feed:\n    items: 100\n    language: en-us\n---\n\n\n\n**Security Differently:** A collection of notebooks for analyzing security differently.\n\nFeel free to use and/or fork this project!\n\n\n\n::: {.cell}\n\n:::\n\n\n\n## Notebooks\n\nNotebooks in this package:\n",
-    "supporting": [],
+    "markdown": "---\ntitle: \"security\"\nlisting:\n  type: default\n  contents: analysis\n  sort-ui: true\n  filter-ui: true\n  max-description-length: 500\n  date-format: iso\n  categories: true\n  feed:\n    items: 100\n    language: en-us\n---\n\n\n\n**Security Differently:** A collection of notebooks for analyzing security differently.\n\nFeel free to use and/or fork this project!\n\n[Visit our website!](https://www.security-differently.com)\n\n\n\n::: {.cell}\n\n:::\n\n\n\n## Notebooks\n\nNotebooks in this package:\n",
+    "supporting": [
+      "index_files"
+    ],
     "filters": [
       "rmarkdown/pagebreak.lua"
     ],
