@@ -4,14 +4,21 @@
     "href": "changelog.html",
     "title": "Changelog",
     "section": "",
-    "text": "Updated Risk Value Analysis: add counterexample, frequent losses due to malware infection"
+    "text": "Added Security Differently branding"
+  },
+  {
+    "objectID": "changelog.html#security-1.2.3",
+    "href": "changelog.html#security-1.2.3",
+    "title": "Changelog",
+    "section": "",
+    "text": "Added Security Differently branding"
   },
   {
     "objectID": "changelog.html#security-1.2.2",
     "href": "changelog.html#security-1.2.2",
     "title": "Changelog",
-    "section": "",
-    "text": "Updated Risk Value Analysis: add counterexample, frequent losses due to malware infection"
+    "section": "security 1.2.2",
+    "text": "security 1.2.2\n\nUpdated Risk Value Analysis: add counterexample, frequent losses due to malware infection"
   },
   {
     "objectID": "changelog.html#security-1.2.1",
@@ -582,16 +589,16 @@
   {
     "objectID": "NEWS.html",
     "href": "NEWS.html",
-    "title": "security 1.2.2",
+    "title": "security 1.2.3",
     "section": "",
-    "text": "security 1.2.2\n\nUpdated Risk Value Analysis: add counterexample, frequent losses due to malware infection\n\n\n\nsecurity 1.2.1\n\nUpdated Risk Value Analysis: minor content corrections\n\n\n\nsecurity 1.2.0\n\nAdded Risk Value Analysis: An exploration of the value of cybersecurity risk reduction\nUpdated Risk Quantification Prototype: added log scale loss exceedance curves\n\n\n\nsecurity 1.1.5\n\nUpdated links, content, to reference official quantrr version 1.0 release\n\n\n\nsecurity 1.1.4\n\nBug fixes\n\n\n\nsecurity 1.1.3\n\nMigrated lnorm_param() and calc_risk() functions to quantrr, the (future) production version of the Risk Quantification Tool\n\n\n\nsecurity 1.1.2\n\nUpdated Risk Quantification Demo: updated TODO from SIRAcon 2024 session feedback\n\n\n\nsecurity 1.1.1\n\nUpdated Risk Quantification Demo: added Environment Statement\n\n\n\nsecurity 1.1.0\n\nRenamed “Technology Risk Quantification” to “Risk Quantification Prototype”\nAdded Risk Quantification Demo: Risk Quantification demonstration for my SIRAcon 2024 talk, “UnFAIR: Simplifying and Expanding Technology Risk Quantification.”\n\n\n\nsecurity 1.0.7\n\nUpdated Technology Risk Quantification: update TODO\n\n\n\nsecurity 1.0.6\n\nUpdated Technology Risk Quantification: added summary histograms\n\n\n\nsecurity 1.0.5\n\nUpdated Technology Risk Quantification: added loss exceedance plots\n\n\n\nsecurity 1.0.4\n\nUpdated Technology Risk Quantification: added preliminary Forecast section\n\n\n\nsecurity 1.0.3\n\nAdded Technology Risk Quantification: Prototype Risk Quantification tool for my SIRAcon 2024 talk, “UnFAIR: Simplifying and Expanding Technology Risk Quantification”\n\n\n\nsecurity 1.0.2\n\nMinor updates\n\n\n\nsecurity 1.0.1\n\nAdded Measuring Changes in Breach Rates: A critical review of using breach frequency as a measure of security success, inspired by Incident Metrics in SRE: Critically Evaluating MTTR and Friends\n\n\n\nsecurity 1.0.0\nInitial release.\n\nMoved Constraints vs Performance from rtraining: Visualizations exploring the use of constraints vs performance improvements in risk management"
+    "text": "security 1.2.3\n\nAdded Security Differently branding\n\n\n\nsecurity 1.2.2\n\nUpdated Risk Value Analysis: add counterexample, frequent losses due to malware infection\n\n\n\nsecurity 1.2.1\n\nUpdated Risk Value Analysis: minor content corrections\n\n\n\nsecurity 1.2.0\n\nAdded Risk Value Analysis: An exploration of the value of cybersecurity risk reduction\nUpdated Risk Quantification Prototype: added log scale loss exceedance curves\n\n\n\nsecurity 1.1.5\n\nUpdated links, content, to reference official quantrr version 1.0 release\n\n\n\nsecurity 1.1.4\n\nBug fixes\n\n\n\nsecurity 1.1.3\n\nMigrated lnorm_param() and calc_risk() functions to quantrr, the (future) production version of the Risk Quantification Tool\n\n\n\nsecurity 1.1.2\n\nUpdated Risk Quantification Demo: updated TODO from SIRAcon 2024 session feedback\n\n\n\nsecurity 1.1.1\n\nUpdated Risk Quantification Demo: added Environment Statement\n\n\n\nsecurity 1.1.0\n\nRenamed “Technology Risk Quantification” to “Risk Quantification Prototype”\nAdded Risk Quantification Demo: Risk Quantification demonstration for my SIRAcon 2024 talk, “UnFAIR: Simplifying and Expanding Technology Risk Quantification.”\n\n\n\nsecurity 1.0.7\n\nUpdated Technology Risk Quantification: update TODO\n\n\n\nsecurity 1.0.6\n\nUpdated Technology Risk Quantification: added summary histograms\n\n\n\nsecurity 1.0.5\n\nUpdated Technology Risk Quantification: added loss exceedance plots\n\n\n\nsecurity 1.0.4\n\nUpdated Technology Risk Quantification: added preliminary Forecast section\n\n\n\nsecurity 1.0.3\n\nAdded Technology Risk Quantification: Prototype Risk Quantification tool for my SIRAcon 2024 talk, “UnFAIR: Simplifying and Expanding Technology Risk Quantification”\n\n\n\nsecurity 1.0.2\n\nMinor updates\n\n\n\nsecurity 1.0.1\n\nAdded Measuring Changes in Breach Rates: A critical review of using breach frequency as a measure of security success, inspired by Incident Metrics in SRE: Critically Evaluating MTTR and Friends\n\n\n\nsecurity 1.0.0\nInitial release.\n\nMoved Constraints vs Performance from rtraining: Visualizations exploring the use of constraints vs performance improvements in risk management"
   },
   {
     "objectID": "index.html",
     "href": "index.html",
     "title": "security",
     "section": "",
-    "text": "Security Differently: A collection of notebooks for analyzing security differently.\nFeel free to use and/or fork this project!"
+    "text": "Security Differently: A collection of notebooks for analyzing security differently.\nFeel free to use and/or fork this project!\nVisit our website!"
   },
   {
     "objectID": "index.html#notebooks",
