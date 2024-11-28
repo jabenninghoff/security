@@ -1,3 +1,7 @@
+# security 1.2.3
+
+* Added Security Differently branding
+
 # security 1.2.2
 
 * Updated Risk Value Analysis: add counterexample, frequent losses due to malware infection
