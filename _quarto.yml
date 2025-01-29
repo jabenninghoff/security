@@ -5,6 +5,7 @@ project:
 website:
   title: "security"
   site-url: "https://jabenninghoff.github.io/security/"
+  favicon: favicon.png
   description:
     "A collection of notebooks for analyzing security differently."
   repo-url: "https://github.com/jabenninghoff/security"
