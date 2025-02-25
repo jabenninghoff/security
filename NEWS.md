@@ -1,6 +1,6 @@
 # security 1.2.4
 
-* Added Visualizing Risk: An exploration of different approaches to communicating security breach risk informed by prior work
+* Added Visualizing Risk (Draft): An exploration of different approaches to communicating security breach risk informed by prior work
 
 # security 1.2.3
 
