@@ -120,7 +120,7 @@ We can forecast this range by running the 10-year simulation 100,000 times:
 ```{r baseline_forecast}
 baseline_forecast <- calc_risk("baseline", lambda, meanlog, sdlog, runs = 100000 * 10) |>
   mutate(
-    sim = ceiling(year / 10), .before = year,
+    sim = ceiling(year / 10),
     year = year %% 10,
     year = if_else(year == 0, 10, year),
     discount = (1 + rate)^(year - 1),
@@ -161,7 +161,7 @@ Let's first look at an investment that reduces the breach rate by half:
 ```{r likelihood_forecast}
 likelihood_forecast <- calc_risk("likelihood", lambda / 2, meanlog, sdlog, runs = 100000 * 10) |>
   mutate(
-    sim = ceiling(year / 10), .before = year,
+    sim = ceiling(year / 10),
     year = year %% 10,
     year = if_else(year == 0, 10, year),
     discount = (1 + rate)^(year - 1),
@@ -212,7 +212,7 @@ Now let's look at an investment that reduces the breach impact by half:
 ```{r impact_forecast}
 impact_forecast <- calc_risk("impact", lambda, meanlog + log(0.5), sdlog, runs = 100000 * 10) |>
   mutate(
-    sim = ceiling(year / 10), .before = year,
+    sim = ceiling(year / 10),
     year = year %% 10,
     year = if_else(year == 0, 10, year),
     discount = (1 + rate)^(year - 1),
