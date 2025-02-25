@@ -161,8 +161,7 @@ Risk descriptions:
 risks <- read_xlsx("data/prototype.xlsx", sheet = "Risks") |>
   clean_names()
 
-risks |>
-  formattable(align = "l")
+formattable(risks, align = "l")
 ```
 
 Risk estimates:

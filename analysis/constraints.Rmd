@@ -168,8 +168,10 @@ questionnaire <- tribble(
   2023,  "11-100",   0.616,
   2023,  "1-10",     0.030
 ) |>
-  mutate(year = as.factor(year)) |>
-  mutate(questions = factor(questions, levels = c("1-10", "11-100", "101-400", ">400")))
+  mutate(
+    year = as.factor(year),
+    questions = factor(questions, levels = c("1-10", "11-100", "101-400", ">400"))
+  )
 
 ggplot(questionnaire, aes(questions, percent, fill = year)) +
   geom_col(position = "dodge") +
@@ -189,10 +191,10 @@ Create a transparent donut plot showing an 80% reduction.
 ```{r custom_donut}
 # custom function based on ggplot_donut_percent()
 custom_donut <- function(p, text = "", accuracy = NULL, hsize = 4, size = 12, family = "Lato") {
-  data <- data.frame(group = c(TRUE, FALSE), n = c(p, 1 - p))
+  percent_true <- data.frame(group = c(TRUE, FALSE), n = c(p, 1 - p))
   label <- paste0(scales::label_percent(accuracy = accuracy)(p), "\n", text)
 
-  ggplot_donut(data, hsize = hsize) +
+  ggplot_donut(percent_true, hsize = hsize) +
     guides(fill = "none") +
     geom_text(x = 0, label = label, size = size, family = family) +
     scale_fill_grey() +

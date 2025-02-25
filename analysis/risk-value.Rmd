@@ -105,8 +105,7 @@ $\mathrm{NPV} = \large \frac{R_t}{(1+i)^t}$, treating year 1 as $t = 0$:
 ```{r baseline_value}
 rate <- 0.05
 baseline_value <- calc_risk("baseline", lambda, meanlog, sdlog, runs = 10) |>
-  mutate(discount = (1 + rate)^(year - 1)) |>
-  mutate(value = losses / discount)
+  mutate(discount = (1 + rate)^(year - 1), value = losses / discount)
 
 baseline_value
 
@@ -120,11 +119,13 @@ We can forecast this range by running the 10-year simulation 100,000 times:
 
 ```{r baseline_forecast}
 baseline_forecast <- calc_risk("baseline", lambda, meanlog, sdlog, runs = 100000 * 10) |>
-  mutate(sim = ceiling(year / 10), .before = year) |>
-  mutate(year = year %% 10) |>
-  mutate(year = if_else(year == 0, 10, year)) |>
-  mutate(discount = (1 + rate)^(year - 1)) |>
-  mutate(value = losses / discount) |>
+  mutate(
+    sim = ceiling(year / 10), .before = year,
+    year = year %% 10,
+    year = if_else(year == 0, 10, year),
+    discount = (1 + rate)^(year - 1),
+    value = losses / discount
+  ) |>
   group_by(sim) |>
   summarize(npv = sum(value))
 
@@ -159,11 +160,13 @@ Let's first look at an investment that reduces the breach rate by half:
 
 ```{r likelihood_forecast}
 likelihood_forecast <- calc_risk("likelihood", lambda / 2, meanlog, sdlog, runs = 100000 * 10) |>
-  mutate(sim = ceiling(year / 10), .before = year) |>
-  mutate(year = year %% 10) |>
-  mutate(year = if_else(year == 0, 10, year)) |>
-  mutate(discount = (1 + rate)^(year - 1)) |>
-  mutate(value = losses / discount) |>
+  mutate(
+    sim = ceiling(year / 10), .before = year,
+    year = year %% 10,
+    year = if_else(year == 0, 10, year),
+    discount = (1 + rate)^(year - 1),
+    value = losses / discount
+  ) |>
   group_by(sim) |>
   summarize(npv = sum(value))
 ```
@@ -176,8 +179,7 @@ likelihood_return <-
   full_join(baseline_forecast, likelihood_forecast, by = "sim", suffix = c("_base", "_reduced")) |>
   mutate(return = npv_base - npv_reduced)
 
-likelihood_return |>
-  summary()
+summary(likelihood_return)
 ```
 
 The NPV of the risk reduction (return) is highly variable. Since we can't plot negative numbers
@@ -209,11 +211,13 @@ Now let's look at an investment that reduces the breach impact by half:
 
 ```{r impact_forecast}
 impact_forecast <- calc_risk("impact", lambda, meanlog + log(0.5), sdlog, runs = 100000 * 10) |>
-  mutate(sim = ceiling(year / 10), .before = year) |>
-  mutate(year = year %% 10) |>
-  mutate(year = if_else(year == 0, 10, year)) |>
-  mutate(discount = (1 + rate)^(year - 1)) |>
-  mutate(value = losses / discount) |>
+  mutate(
+    sim = ceiling(year / 10), .before = year,
+    year = year %% 10,
+    year = if_else(year == 0, 10, year),
+    discount = (1 + rate)^(year - 1),
+    value = losses / discount
+  ) |>
   group_by(sim) |>
   summarize(npv = sum(value))
 ```
@@ -226,8 +230,7 @@ impact_return <-
   full_join(baseline_forecast, impact_forecast, by = "sim", suffix = c("_base", "_reduced")) |>
   mutate(return = npv_base - npv_reduced)
 
-impact_return |>
-  summary()
+summary(impact_return)
 ```
 
 Again, the NPV of the risk reduction (return) is highly variable. We again examine the data using
@@ -351,8 +354,7 @@ baseline_malware |>
   labs(x = NULL, y = NULL) +
   theme_quo()
 
-baseline_malware |>
-  summary()
+summary(baseline_malware)
 ```
 
 In this case, the baseline risk is never 0, and falls within a range of about \$15K to \$80K, with a
@@ -368,8 +370,7 @@ impact_malware_return <-
   select(c("year", "losses_base", "losses_reduced")) |>
   mutate(return = losses_base - losses_reduced)
 
-impact_malware_return |>
-  summary()
+summary(impact_malware_return)
 
 impact_malware_return |>
   pull(return) |>

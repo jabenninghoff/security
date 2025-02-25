@@ -74,20 +74,21 @@ validate_risks <- local({
   validate_rules <- validator(
     risk_char = is.character(risk),
     risk_not_na = !is.na(risk),
-    risk_not_blank = nchar(risk) > 0,
+    # TODO: update after https://github.com/r-lib/lintr/issues/2790 is resolved
+    risk_not_blank = nchar(risk) > 0, # nolint: nzchar_linter. validate doesn't recognize nzchar.
     desc_char = is.character(description),
     desc_not_na = !is.na(description),
-    desc_not_blank = nchar(description) > 0
+    desc_not_blank = nchar(description) > 0 # nolint: nzchar_linter.
   )
   validate_out <- confront(risks, validate_rules)
   validate_summary <- summary(validate_out)
 
   # end processing on any failures, disallow NA
   stopifnot(
-    all(validate_summary$fails == 0),
-    all(validate_summary$nNA == 0),
-    !all(validate_summary$error),
-    !all(validate_summary$warning)
+    validate_summary$fails == 0,
+    validate_summary$nNA == 0,
+    !validate_summary$error,
+    !validate_summary$warning
   )
 
   return(validate_out)
@@ -105,7 +106,7 @@ validate_estimates <- local({
     risk_match = risk %in% risks$risk,
     expert_char = is.character(expert),
     expert_not_na = !is.na(expert),
-    expert_not_blank = nchar(expert) > 0,
+    expert_not_blank = nchar(expert) > 0, # nolint: nzchar_linter.
     lambda_num = is.numeric(lambda),
     lambda_pos = lambda > 0,
     p05_num = is.numeric(p05),
@@ -121,9 +122,9 @@ validate_estimates <- local({
 
   # end processing on any failures, allow NA
   stopifnot(
-    all(validate_summary$fails == 0),
-    !all(validate_summary$error),
-    !all(validate_summary$warning)
+    validate_summary$fails == 0,
+    !validate_summary$error,
+    !validate_summary$warning
   )
 
   return(validate_out)
@@ -135,8 +136,7 @@ validate_estimates <- local({
 Risk descriptions:
 
 ```{r risks}
-risks |>
-  formattable(align = "l")
+formattable(risks, align = "l")
 ```
 
 # Forecast
@@ -293,8 +293,7 @@ magnitude. The p50 estimate is used to calculate the percentage difference from 
 
 ```{r consensus_params}
 consensus_params |>
-  mutate(across(p05:p50, ~ currency(.x, digits = 0L))) |>
-  mutate(mdiff = percent(mdiff)) |>
+  mutate(across(p05:p50, ~ currency(.x, digits = 0L)), mdiff = percent(mdiff)) |>
   formattable(align = "l")
 ```
 
