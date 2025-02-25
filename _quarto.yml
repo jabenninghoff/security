@@ -5,6 +5,8 @@ project:
 website:
   title: "security"
   site-url: "https://jabenninghoff.github.io/security/"
+  # TODO: remove favicon after quarto 1.7 released
+  #   see: https://github.com/quarto-dev/quarto-cli/blob/main/news/changelog-1.7.md#website-projects
   favicon: favicon.png
   description:
     "A collection of notebooks for analyzing security differently."
