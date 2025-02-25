@@ -46,6 +46,10 @@ Notebooks in this package:
   (2024-07-23): Prototype Risk Quantification tool for my SIRAcon 2024
   talk, “[UnFAIR: Simplifying and Expanding Technology Risk
   Quantification](https://www.information-safety.org/2024/08/29/siracon-2024/).”
+- [Visualizing Risk
+  (Draft)](https://jabenninghoff.github.io/security/analysis/visualizing-risk.html)
+  (2024-12-06): An exploration of different approaches to communicating
+  security breach risk informed by prior work.
 
 ## Installation
 
