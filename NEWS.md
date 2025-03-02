@@ -1,3 +1,7 @@
+# security 1.2.5
+
+* Minor updates
+
 # security 1.2.4
 
 * Added Visualizing Risk (Draft): An exploration of different approaches to communicating security breach risk informed by prior work
