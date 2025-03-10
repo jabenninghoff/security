@@ -43,6 +43,7 @@ library(purrr)
 library(ggplot2)
 library(jbplot)
 library(plotly)
+library(fs)
 
 # TODO: workaround for https://github.com/r-lib/lintr/issues/2790, update when
 #   https://github.com/data-cleaning/validate/pull/197 is resolved
@@ -306,4 +307,34 @@ A `summary()` of the forecast results.
 
 ```{r summary}
 summary(forecast)
+```
+
+# Individual Histograms
+
+Plot Cybersecurity and Outage histograms independently, for a new talk, [Is the S in SRE for “Security”?](https://www.usenix.org/conference/srecon25americas/presentation/benninghoff). **Not** included in the original SIRAcon 2024 talk.
+
+```{r save_png, warning = FALSE}
+save_png <- function(filename) {
+  ggsave(filename = path("rendered", filename), width = 16 * 0.6, height = 9 * 0.6, bg = "white")
+}
+
+forecast |>
+  filter(risk == "Cybersecurity Breach") |>
+  ggplot(aes(losses)) +
+  geom_hist_bw(bins = 100) +
+  scale_x_log10(labels = scales::label_currency(scale_cut = scales::cut_short_scale())) +
+  labs(x = NULL, y = NULL, title = "Cybersecurity Losses") +
+  theme_quo()
+
+save_png("cyber-losses.png")
+
+forecast |>
+  filter(risk == "Technology Outage") |>
+  ggplot(aes(losses)) +
+  geom_hist_bw(bins = 100) +
+  scale_x_log10(labels = scales::label_currency(scale_cut = scales::cut_short_scale())) +
+  labs(x = NULL, y = NULL, title = "Outage Losses") +
+  theme_quo()
+
+save_png("outage-losses.png")
 ```

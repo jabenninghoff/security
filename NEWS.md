@@ -1,3 +1,7 @@
+# security 1.2.6
+
+* Updated Risk Quantification Demo: add Individual Histograms for SREcon 2025 talk
+
 # security 1.2.5
 
 * Minor updates
