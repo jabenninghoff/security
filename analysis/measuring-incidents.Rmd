@@ -25,7 +25,7 @@ Analysis to determine thresholds of sample size to reliably detect changes in in
 - [ ] Questions/TODO list here
 
 ```{r setup, message = FALSE, warning = FALSE}
-# no libraries
+library(quantrr)
 ```
 
 # Background
@@ -91,3 +91,55 @@ qualitatively different may not be lognormal, and that could well be what was ha
 report, but we lack the context to know for sure. To simplify the analysis, the incident frequency
 will be held constant. (Side note: Cyentia found that cybersecurity breach frequency followed a
 Poisson lognormal distribution)
+
+## Approach
+
+To determine the threshold of incidents needed to detect changes in duration, follow a similar
+methodology as the Google paper:
+
+1. Randomly sample from an artificial but representative lognormal distribution of incident duration
+2. Adjust the duration of one of the populations by a set percentage to simulate improvement
+3. Determine if there is a statistically significant improvement in incident duration
+
+For step 3, use the geometric mean and
+[Student's t-test](https://en.wikipedia.org/wiki/Student's_t-test) on the samples, after
+log-transforming the data. From my research and understanding, this is a reasonable approach if the
+underlying distributions are truly lognormal, which is true by design.
+
+To determine a representative distribution, we can borrow data from the Google report, which lists
+the p95 and p50 for three companies - we'll infer p05 and the lognormal parameters using data from
+Company B:
+
+```{r company_b}
+lnorm_param(9, 528, 67)
+```
+
+Using trial and error, we find that 9 minutes is the closest match to p05 when the median is 67
+minutes. From this, we can create a representative distribution:
+
+```{r meanlog}
+meanlog <- 4.25
+sdlog <- 1.25
+qlnorm(c(0.05, 0.5, 0.95), meanlog = meanlog, sdlog = sdlog)
+```
+
+This is reasonably close to the Company B data, and passes the sniff test: 5% of incidents resolved
+in less than 9 minutes, 50% resolved in 70 minutes or less, and 95% resolved under 548 minutes (9
+hours 8 minutes).
+
+First, test at the 10% improvement level, with a sample size of 100, which is about 1 year's worth.
+A single test is successful if the experimental group has a lower geometric mean and a positive
+t-test (p < 0.05) on the log-transformed data.
+
+```{r single_test}
+single_test <- function(runs, improvement) {
+  control <- rlnorm(runs, meanlog = meanlog, sdlog = sdlog)
+  experiment <- rlnorm(runs, meanlog = meanlog, sdlog = sdlog) * (1 - improvement)
+
+  list(gmean(control), gmean(experiment), t.test(log(control), log(experiment)))
+}
+
+single_test(100, 0.1)
+```
+
+For most tests, the p-value is well above 0.05.
