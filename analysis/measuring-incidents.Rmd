@@ -1,0 +1,93 @@
+---
+title: "Measuring Incident Duration"
+author: "John Benninghoff"
+date: '2025-03-19'
+date-modified: '2024-03-19'
+categories: SRE
+order: 107
+output:
+  html_notebook:
+    theme:
+      version: 5
+      preset: bootstrap
+    css: assets/extra.css
+    pandoc_args: --shift-heading-level-by=1
+    toc: yes
+    toc_float:
+      collapsed: no
+      smooth_scroll: no
+---
+
+Analysis to determine thresholds of sample size to reliably detect changes in incident impact (duration) using Monte Carlo simulation.
+
+# Questions/TODO
+
+- [ ] Questions/TODO list here
+
+```{r setup, message = FALSE, warning = FALSE}
+# no libraries
+```
+
+# Background
+
+In 2021, Google published a report exploring the limitations of using Mean Time to Resolve (MTTR), [Incident Metrics in SRE: Critically Evaluating MTTR and Friends](https://sre.google/resources/practices-and-processes/incident-metrics-in-sre/). Since then,
+additional articles and reports have been published that are also critical of MTTR and TTR in
+general, explicitly advocating that
+"[organizations should stop using MTTX, or TTx data in general](https://resilienceinsoftware.org/news/1157532)". From my experience with cybersecurity
+incident data, I believe it is a mistake to abandon measurements of incidents entirely, and instead
+ask the question, *under what conditions does incident duration indicate improvement?*
+
+Key observations and arguments from the 2021 Google paper include:
+
+- Incident duration appears to be lognormal (the paper did not test if the lognormal distribution
+  was the best fit)
+- A Monte Carlo simulation comparing two samples of incidents, one with no change in duration, and
+  a second with a 10% reduction in duration, MTTR did not reliably indicate the improvement
+- Improvements in MTTR can be observed even when there is no change in the underlying distribution
+- Larger sample sizes (more incidents) make detecting the change more reliable - in the original
+  simulation, the sample sizes ranged from approximately 50-300
+- Median and 95th percentile don't work well either
+- Geometric mean does just work, but only with a sample size of 500+
+- Measuring incident duration doesn't account for changes in incident frequency
+
+The article also calls out some exceptions where measuring duration is effective: first, when your
+data is large enough, as with Backblaze statistics on hard disk reliability, and second, when the
+change in duration is large enough, such as an 80% reduction in duration.
+
+Subsequent reports from [VOID](https://www.thevoid.community) referenced the Google paper and argued:
+
+- Incident duration is long-tailed and appear lognormal (2021, 2022)
+- "MTTx are Shallow Data", an oversimplification of a complex, messy event (2021)
+- Organizations should stop using MTTx and TTx data (2021, 2022, 2024)
+- Incident duration appears lognormal for some organizations, but not for others (2022)
+- Replicated the Monte Carlo simulation from the Google paper (2022)
+
+In the cybersecurity domain, the [Cyentia Institute](https://www.cyentia.com) has published reports
+analyzing breach data, looking at both frequency and impact (cost). Their
+[IRIS 2022](https://www.cyentia.com/wp-content/uploads/IRIS-2022_Cyentia.pdf) report found that,
+like outage incident duration, security breach losses closely follow a lognormal distribution. Like
+the Google and VOID reports, the IRIS also points out that the mean is a poor indicator of a
+'typical' loss, the median or geometric mean are better summaries, and organizations should also be
+concerned with tail risk - extreme events at the 90, 95, and 99th percentile.
+
+Additionally, despite the challenges with using lognormal data, the
+[2024 Ransomware Report](https://www.cyentia.com/iris-ransomware/) showed that losses from
+ransomware have significantly increased between 2019 and 2023.
+
+# Analysis
+
+While I agree that the mean (average) is misleading and should not be used with incident impact data
+(duration or costs), I believe it is a mistake to stop using impact data entirely. A Monte Carlo
+simulation can help answer the underlying question raised by the Google research, "under what
+conditions does incident duration indicate improvement?" Put differently, how large of a sample size
+is needed to detect a given level of improvement (reduction) in incident duration?
+
+## Assumptions
+
+While the 2022 VOID Report challenged the notion that incident duration is lognormal, the Google
+report and my own experience suggest otherwise: similar to cybersecurity impact, incident duration
+closely follows a lognormal distribution. In my own work, I have found that incidents that are
+qualitatively different may not be lognormal, and that could well be what was happening in the VOID
+report, but we lack the context to know for sure. To simplify the analysis, the incident frequency
+will be held constant. (Side note: Cyentia found that cybersecurity breach frequency followed a
+Poisson lognormal distribution)
