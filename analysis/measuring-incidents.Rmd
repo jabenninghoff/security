@@ -216,4 +216,45 @@ detectable over two years of data.
 
 # Discussion
 
-Discuss results here.
+So, what does this analysis tell us?
+
+1. MTTR (Mean Time to Resolve) is a misleading metric, and organizations should stop using it.
+
+The Google, VOID and Cyentia research all agree that the mean (average) is a poor summary metric for
+lognormal and other long-tail distributions. I also agree and that assumption is built-in to the
+analysis. However, I agree with the Cyentia research that the geometric mean is a reasonable value
+for the 'typical' incident - this is suggested in the Google paper.
+
+2. Large samples are required to detect changes in underlying incident duration, making it less
+   useful at an organizational level.
+
+The Google paper found that sample sizes of 500+ were needed to detect a 10% reduction in the
+underlying distribution; this analysis suggested 4000 is a better threshold. Even at organizations
+with high levels of incidents, this represents several years of data, enough that only large changes
+(50% or greater reduction in underlying TTR) will be detected in a reasonable time frame.
+
+3. TTR (incident duration) can be a useful measure at a larger scale, including comparisons across
+   different organizations.
+
+While at an individual organization level, incident duration (TTR) is noisy, it becomes meaningful
+at large scales. Some organizations *do* experience repeatable failures at scale, including the
+Backblaze hard drive failure example cited in the Google paper, but TTR is more useful for
+comparisons across organizations. I believe this explains why the Accelerate State of DevOps Report
+([DORA](https://dora.dev)) research is able to find meaningful correlations between "Failed
+deployment recovery time", the other 3 key DORA metrics, and other measures of performance. The 2024
+report surveyed 3,000 people, which should represent hundreds (or more) different organizations.
+This would appear to be above a threshold to detect differences, especially given the range of
+possible responses (1 hour, 1 day, 1 week, 1 month, 6 months, 1 year).
+
+In the cybersecurity space, large (public) incidents happen relatively infrequently, about once
+every 3-10 years, depending on the size of the organization, according to the Cyentia IRIS report.
+Because of this, metrics on breaches gathered at the organizational level don't provide meaningful
+insights, as I argued in [Measuring Changes in Breach Rates](breach-rates.Rmd). However, we've also
+learned that looking at data across organizations can and does provide useful learning. We can
+accomplish the same thing in the reliability/resilience space by using similar measures.
+
+TTR is a useful measure for cross-company comparison *because* it is a shallow measure, and reflects
+the external consumer/user experience. One study I'd like to see is a deep-dive analysis on data
+from [Downdetector](https://downdetector.com), examining differences in groups or clusters of
+organizations (perhaps this has already been done!) which could identify common factors that
+contribute to success.
