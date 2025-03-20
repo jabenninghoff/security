@@ -32,6 +32,11 @@ Notebooks in this package:
   Performance](https://jabenninghoff.github.io/security/analysis/constraints.html)
   (2024-04-30): Visualizations exploring the use of constraints vs
   performance improvements in risk management.
+- [Measuring Incident
+  Duration](https://jabenninghoff.github.io/security/analysis/measuring-incidents.html)
+  (2025-03-19): Analysis to determine thresholds of sample size to
+  reliably detect changes in incident impact (duration) using Monte
+  Carlo simulation.
 - [Risk Value
   Analysis](https://jabenninghoff.github.io/security/analysis/risk-value.html)
   (2024-11-03): An exploration of the value of cybersecurity risk
