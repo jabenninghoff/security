@@ -26,6 +26,9 @@ Analysis to determine thresholds of sample size to reliably detect changes in in
 
 ```{r setup, message = FALSE, warning = FALSE}
 library(quantrr)
+library(purrr)
+library(tibble)
+library(dplyr)
 ```
 
 # Background
@@ -94,14 +97,14 @@ Poisson lognormal distribution)
 
 ## Approach
 
-To determine the threshold of incidents needed to detect changes in duration, follow a similar
+To determine the threshold of incidents needed to detect changes in duration, we follow a similar
 methodology as the Google paper:
 
 1. Randomly sample from an artificial but representative lognormal distribution of incident duration
 2. Adjust the duration of one of the populations by a set percentage to simulate improvement
 3. Determine if there is a statistically significant improvement in incident duration
 
-For step 3, use the geometric mean and
+For step 3, we use the geometric mean and
 [Student's t-test](https://en.wikipedia.org/wiki/Student's_t-test) on the samples, after
 log-transforming the data. From my research and understanding, this is a reasonable approach if the
 underlying distributions are truly lognormal, which is true by design.
@@ -127,14 +130,16 @@ This is reasonably close to the Company B data, and passes the sniff test: 5% of
 in less than 9 minutes, 50% resolved in 70 minutes or less, and 95% resolved under 548 minutes (9
 hours 8 minutes).
 
-First, test at the 10% improvement level, with a sample size of 100, which is about 1 year's worth.
-A single test is successful if the experimental group has a lower geometric mean and a positive
-t-test (p < 0.05) on the log-transformed data.
+## Simulations
+
+First, test at the 10% improvement level, with a sample size ($N$) of 100, which is about 1 year's
+worth of incidents. A single test is successful if the experimental group has a lower geometric mean
+and a positive t-test (p < 0.05) on the log-transformed data.
 
 ```{r single_test}
-single_test <- function(runs, improvement) {
-  control <- rlnorm(runs, meanlog = meanlog, sdlog = sdlog)
-  experiment <- rlnorm(runs, meanlog = meanlog, sdlog = sdlog) * (1 - improvement)
+single_test <- function(n, improvement) {
+  control <- rlnorm(n, meanlog = meanlog, sdlog = sdlog)
+  experiment <- rlnorm(n, meanlog = meanlog, sdlog = sdlog) * (1 - improvement)
 
   list(gmean(control), gmean(experiment), t.test(log(control), log(experiment)))
 }
@@ -142,4 +147,73 @@ single_test <- function(runs, improvement) {
 single_test(100, 0.1)
 ```
 
-For most tests, the p-value is well above 0.05.
+For most tests, the p-value is well above 0.05. How often does the test succeed? We'll set the bar
+slightly higher than the Google paper and target a 95% success rate.
+
+We'll use a slightly different function that is more easily converted into a data frame, and run
+only 10,000 trials to speed things up:
+
+```{r simulate_test}
+test_change <- function(n, improvement) {
+  control <- rlnorm(n, meanlog = meanlog, sdlog = sdlog)
+  experiment <- rlnorm(n, meanlog = meanlog, sdlog = sdlog) * (1 - improvement)
+
+  c(
+    control_gmean = gmean(control), experiment_gmean = gmean(experiment),
+    p_value = t.test(log(control), log(experiment))$p.value
+  )
+}
+
+simulate_test <- function(n, improvement, trials = 10000, p_value_target = 0.05) {
+  map(1:trials, \(i) as_tibble_row(test_change(n, improvement))) |>
+    list_rbind() |>
+    mutate(
+      success = (.data$control_gmean > .data$experiment_gmean) & (.data$p_value < p_value_target)
+    )
+}
+
+results <- simulate_test(100, 0.1)
+head(results, 10)
+mean(results$success)
+```
+
+For a sample size of 100, we successfully detect a statistically significant change about 8% of the
+time. We can try larger sample sizes:
+
+```{r larger_samples}
+simulate_test(1000, 0.1) |>
+  pull(success) |>
+  mean()
+
+simulate_test(2000, 0.1) |>
+  pull(success) |>
+  mean()
+
+simulate_test(4000, 0.1) |>
+  pull(success) |>
+  mean()
+```
+
+A sample size of 4000 is needed to detect a significant change. For a single organization, it would
+take about 80 years (40 before, 40 after) to gather the data. However, the same volume of data could
+be gathered from 80 different organizations (40 in each group) in a year.
+
+We can also try larger changes:
+
+```{r larger_change}
+simulate_test(100, 0.25) |>
+  pull(success) |>
+  mean()
+
+simulate_test(100, 0.50) |>
+  pull(success) |>
+  mean()
+```
+
+Interestingly, while the Google paper notes that it would take a very large change (80% reduction)
+to be detected through measuring incident duration, we find that a 50% reduction is clearly
+detectable over two years of data.
+
+# Discussion
+
+Discuss results here.
