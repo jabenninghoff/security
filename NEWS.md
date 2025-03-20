@@ -1,6 +1,6 @@
 # security 1.3.0
 
-* Added Measuring Incident Duration: Analysis to determine thresholds of sample size to reliably detect changes in incident impact (duration) using Monte Carlo simulation.
+* Added Measuring Incident Duration: Analysis to determine thresholds of sample size to reliably detect changes in incident impact (duration) using Monte Carlo simulation
 
 # security 1.2.6
 
