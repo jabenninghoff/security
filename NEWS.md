@@ -1,3 +1,7 @@
+# security 1.3.1
+
+* Updated Measuring Incident Duration: explore the range of observed improvements for a 50% reduction
+
 # security 1.3.0
 
 * Added Measuring Incident Duration: Analysis to determine thresholds of sample size to reliably detect changes in incident impact (duration) using Monte Carlo simulation

@@ -2,7 +2,7 @@
 title: "Measuring Incident Duration"
 author: "John Benninghoff"
 date: '2025-03-19'
-date-modified: '2024-03-19'
+date-modified: '2025-04-03'
 categories: SRE
 order: 107
 output:
@@ -213,6 +213,17 @@ simulate_test(100, 0.50) |>
 Interestingly, while the Google paper notes that it would take a very large change (80% reduction)
 to be detected through measuring incident duration, we find that a 50% reduction is clearly
 detectable over two years of data.
+
+For the 50% reduction, what is the range of the observed improvements?
+
+```{r range}
+simulate_test(100, 0.50) |>
+  mutate(change = experiment_gmean / control_gmean) |>
+  summary()
+```
+
+The observed improvements range from a small increase/decrease to a 75% reduction, with half falling
+within 6% of the true decrease (44-56%).
 
 # Discussion
 
