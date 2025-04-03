@@ -292,7 +292,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">March 19, 2024</p>
+      <p class="date-modified">April 3, 2025</p>
     </div>
   </div>
     
@@ -396,23 +396,23 @@ $mdiff
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="fu">single_test</span>(<span class="dv">100</span>, <span class="fl">0.1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[[1]]
-[1] 71.63025
+[1] 59.03588
 
 [[2]]
-[1] 40.19705
+[1] 61.86311
 
 [[3]]
 
     Welch Two Sample t-test
 
 data:  log(control) and log(experiment)
-t = 3.2797, df = 198, p-value = 0.001228
+t = -0.24151, df = 197.93, p-value = 0.8094
 alternative hypothesis: true difference in means is not equal to 0
 95 percent confidence interval:
- 0.2303507 0.9250973
+ -0.4287449  0.3351876
 sample estimates:
 mean of x mean of y 
- 4.271518  3.693794 </code></pre>
+ 4.078145  4.124924 </code></pre>
 </div>
 </div>
 <p>For most tests, the p-value is well above 0.05. How often does the test succeed? We’ll set the bar slightly higher than the Google paper and target a 95% success rate.</p>
@@ -442,20 +442,20 @@ mean of x mean of y
 <pre><code># A tibble: 10 × 4
    control_gmean experiment_gmean p_value success
            &lt;dbl&gt;            &lt;dbl&gt;   &lt;dbl&gt; &lt;lgl&gt;  
- 1          77.9             60.3  0.151  FALSE  
- 2          63.2             73.3  0.390  FALSE  
- 3          81.7             57.5  0.0488 TRUE   
- 4          70.2             49.4  0.0459 TRUE   
- 5          54.1             59.9  0.562  FALSE  
- 6          64.7             62.8  0.873  FALSE  
- 7          74.3             63.5  0.362  FALSE  
- 8          68.8             68.6  0.982  FALSE  
- 9          71.2             73.8  0.848  FALSE  
-10          76.7             77.7  0.948  FALSE  </code></pre>
+ 1          89.5             68.8  0.132  FALSE  
+ 2          69.3             53.4  0.136  FALSE  
+ 3          80.3             68.9  0.389  FALSE  
+ 4          88.2             56.9  0.0141 TRUE   
+ 5          64.7             60.6  0.706  FALSE  
+ 6          63.7             78.1  0.250  FALSE  
+ 7          75.1             75.8  0.959  FALSE  
+ 8          83.3             69.3  0.266  FALSE  
+ 9          68.4             67.8  0.963  FALSE  
+10          72.6             60.2  0.289  FALSE  </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(results<span class="sc">$</span>success)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.0842</code></pre>
+<pre><code>[1] 0.0846</code></pre>
 </div>
 </div>
 <p>For a sample size of 100, we successfully detect a statistically significant change about 8% of the time. We can try larger sample sizes:</p>
@@ -464,19 +464,19 @@ mean of x mean of y
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(success) <span class="sc">|&gt;</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.4683</code></pre>
+<pre><code>[1] 0.4682</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">simulate_test</span>(<span class="dv">2000</span>, <span class="fl">0.1</span>) <span class="sc">|&gt;</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(success) <span class="sc">|&gt;</span></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.7589</code></pre>
+<pre><code>[1] 0.7617</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">simulate_test</span>(<span class="dv">4000</span>, <span class="fl">0.1</span>) <span class="sc">|&gt;</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(success) <span class="sc">|&gt;</span></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.9617</code></pre>
+<pre><code>[1] 0.9644</code></pre>
 </div>
 </div>
 <p>A sample size of 4000 is needed to detect a significant change. For a single organization, it would take about 80 years (40 before, 40 after) to gather the data. However, the same volume of data could be gathered from 80 different organizations (40 in each group) in a year.</p>
@@ -486,16 +486,39 @@ mean of x mean of y
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(success) <span class="sc">|&gt;</span></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.3752</code></pre>
+<pre><code>[1] 0.3584</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">simulate_test</span>(<span class="dv">100</span>, <span class="fl">0.50</span>) <span class="sc">|&gt;</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(success) <span class="sc">|&gt;</span></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.9729</code></pre>
+<pre><code>[1] 0.9752</code></pre>
 </div>
 </div>
 <p>Interestingly, while the Google paper notes that it would take a very large change (80% reduction) to be detected through measuring incident duration, we find that a 50% reduction is clearly detectable over two years of data.</p>
+<p>For the 50% reduction, what is the range of the observed improvements?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">simulate_test</span>(<span class="dv">100</span>, <span class="fl">0.50</span>) <span class="sc">|&gt;</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">change =</span> experiment_gmean <span class="sc">/</span> control_gmean) <span class="sc">|&gt;</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summary</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> control_gmean    experiment_gmean    p_value           success       
+ Min.   : 43.80   Min.   :19.51    Min.   :0.0000000   Mode :logical  
+ 1st Qu.: 64.42   1st Qu.:32.26    1st Qu.:0.0000068   FALSE:264      
+ Median : 70.17   Median :35.12    Median :0.0001205   TRUE :9736     
+ Mean   : 70.71   Mean   :35.34    Mean   :0.0056374                  
+ 3rd Qu.: 76.24   3rd Qu.:38.14    3rd Qu.:0.0014284                  
+ Max.   :114.56   Max.   :57.94    Max.   :0.6738022                  
+     change      
+ Min.   :0.2616  
+ 1st Qu.:0.4435  
+ Median :0.5001  
+ Mean   :0.5078  
+ 3rd Qu.:0.5641  
+ Max.   :0.9259  </code></pre>
+</div>
+</div>
+<p>The observed improvements range from a small increase/decrease to a 75% reduction, with half falling within 6% of the true decrease (44-56%).</p>
 </section>
 </section>
 <section id="discussion" class="level2">
