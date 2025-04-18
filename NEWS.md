@@ -1,3 +1,7 @@
+# security 1.3.2
+
+* Updated for R 4.5.0
+
 # security 1.3.1
 
 * Updated Measuring Incident Duration: explore the range of observed improvements for a 50% reduction
