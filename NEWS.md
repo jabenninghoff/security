@@ -1,3 +1,7 @@
+# security 1.3.4
+
+* Risk Value Analysis: Validate approach for 50% impact reduction
+
 # security 1.3.3
 
 * Corrected GitHub language stats
