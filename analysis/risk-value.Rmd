@@ -22,7 +22,7 @@ An exploration of the value of cybersecurity risk reduction.
 
 # Questions/TODO
 
-- [ ] Does `meanlog + log(0.5)` really reduce the log-normal mean by 50% as the simulation suggests?
+- [x] Does `meanlog + log(0.5)` really reduce the log-normal mean by 50% as the simulation suggests? Trial and error with hints from Google AI suggest that the correct approach is `meanlog - log(2)` (see [Appendix](#appendix)).
 
 ```{r setup, message = FALSE, warning = FALSE}
 library(poilog)
@@ -210,7 +210,7 @@ Reviewing the data:
 Now let's look at an investment that reduces the breach impact by half:
 
 ```{r impact_forecast}
-impact_forecast <- calc_risk("impact", lambda, meanlog + log(0.5), sdlog, runs = 100000 * 10) |>
+impact_forecast <- calc_risk("impact", lambda, meanlog - log(2), sdlog, runs = 100000 * 10) |>
   mutate(
     sim = ceiling(year / 10),
     year = year %% 10,
@@ -385,3 +385,22 @@ reduction, and probably spent more on typical response.
 
 So, security *can be* a good investment, if it reduces the likelihood and/or impact of frequent
 events, like malware response.
+
+# Appendix
+
+Work out how to reduce impact by 50% through trial and error, with hints from Google AI:
+
+```{r impact_test}
+base <- rlnorm(1e7, meanlog, sdlog)
+reduced <- rlnorm(1e7, meanlog - log(2), sdlog)
+
+base_sum <- summary(base)
+reduced_sum <- summary(reduced)
+
+base_sum
+reduced_sum
+base_sum / reduced_sum
+```
+
+`meanlog - log(2)` does appear to be the best way of cutting impact in "half"; the first quartile,
+median, mean, and 3rd quartile are all reduced by approximately half.
