@@ -2,7 +2,7 @@
 title: "Risk Value Analysis"
 author: "John Benninghoff"
 date: '2024-11-03'
-date-modified: '2025-02-25'
+date-modified: '2025-08-14'
 categories: risk quantification
 order: 105
 output:
@@ -22,7 +22,7 @@ An exploration of the value of cybersecurity risk reduction.
 
 # Questions/TODO
 
-- [x] Does `meanlog + log(0.5)` really reduce the log-normal mean by 50% as the simulation suggests? Trial and error with hints from Google AI suggest that the correct approach is `meanlog - log(2)` (see [Appendix](#appendix)).
+- [x] Does `meanlog + log(0.5)` really reduce the log-normal mean by 50% as the simulation suggests? Trial and error with hints from Google AI suggest that the correct approach is `meanlog - log(2)` (see [Appendix](#appendix)), which is equivalent to `meanlog + log(0.5)`.
 
 ```{r setup, message = FALSE, warning = FALSE}
 library(poilog)
@@ -58,7 +58,9 @@ log-normal distribution with a mean ($\mu$) of -2.284585 and and standard deviat
 ($\sigma$) of 0.8690759.
 
 As was done in the [breach rate analysis](breach-rates.Rmd), we can use trial and error to find a
-reasonable value of $\lambda$ for a Poisson distribution that approximates these results:
+reasonable value of $\lambda$ for a Poisson distribution that approximates these results without
+increasing the number of breaches (it underestimates the number of multiple breaches but replicates
+the number of single breaches):
 
 ```{r breach_table}
 runs <- 1e6
@@ -93,7 +95,8 @@ and standard deviation($\sigma$) of `r sdlog`.
 Using the baseline parameters, we can simulate security events and losses over the next 10 years:
 
 ```{r baseline}
-calc_risk("baseline", lambda, meanlog, sdlog, runs = 10)
+calc_risk("baseline", lambda, meanlog, sdlog, runs = 10) |>
+  mutate(losses = currency(losses, digits = 0))
 ```
 
 # Net Present Value
@@ -105,13 +108,16 @@ $\mathrm{NPV} = \large \frac{R_t}{(1+i)^t}$, treating year 1 as $t = 0$:
 ```{r baseline_value}
 rate <- 0.05
 baseline_value <- calc_risk("baseline", lambda, meanlog, sdlog, runs = 10) |>
-  mutate(discount = (1 + rate)^(year - 1), value = losses / discount)
+  mutate(
+    losses = currency(losses, digits = 0), discount = (1 + rate)^(year - 1),
+    value = losses / discount
+  )
 
 baseline_value
 
 baseline_value |>
   group_by(risk) |>
-  summarize(npv = currency(sum(value)))
+  summarize(npv = sum(value))
 ```
 
 The baseline value is highly variable depending on how many breaches occur over the 10-year period.
@@ -179,12 +185,15 @@ likelihood_return <-
   full_join(baseline_forecast, likelihood_forecast, by = "sim", suffix = c("_base", "_reduced")) |>
   mutate(return = npv_base - npv_reduced)
 
+head(likelihood_return, 10)
 summary(likelihood_return)
 ```
 
-The NPV of the risk reduction (return) is highly variable. Since we can't plot negative numbers
-using a log scale, we can examine the data using the cumulative distribution function (CDF). We
-limit the x-axis to zoom in to the 1% to 99% quantiles:
+The NPV of the risk reduction (return) is highly variable, and sometimes negative, because even
+though we've reduced the overall risk, in a given 10 year period we might be unlucky and experience
+a larger breach than in the baseline scenario. Since we can't plot negative numbers using a log
+scale, we can examine the data using the cumulative distribution function (CDF). We limit the
+x-axis to zoom in to the 1% to 99% quantiles:
 
 ```{r likelihood_ecdf}
 (likelihood_return |>
@@ -204,6 +213,7 @@ Reviewing the data:
 - About 15% of the time, the security investment has a negative return of over $1M
 - About 60% of the time, the security investment has a positive return
 - About 32% of the time, the security investment has a positive return of over $1M
+- The median (50%) return is about $60,000
 
 ## Reduce Impact
 
@@ -255,6 +265,7 @@ Reviewing the data:
 - About 22% of the time, the security investment has a negative return of over $1M
 - About 50% of the time, the security investment has a positive return
 - About 30% of the time, the security investment has a positive return of over $1M
+- The median (50%) return is about $1,000
 
 # Analysis
 
@@ -403,4 +414,6 @@ base_sum / reduced_sum
 ```
 
 `meanlog - log(2)` does appear to be the best way of cutting impact in "half"; the first quartile,
-median, mean, and 3rd quartile are all reduced by approximately half.
+median, mean, and 3rd quartile are all reduced by approximately half. This is identical to the
+original approach since `-log(2) == log(0.5)`, but is a bit clearer (divide by 2 vs multiply by
+0.5).
