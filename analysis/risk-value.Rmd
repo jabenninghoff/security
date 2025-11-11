@@ -23,6 +23,7 @@ An exploration of the value of cybersecurity risk reduction.
 # Questions/TODO
 
 - [x] Does `meanlog + log(0.5)` really reduce the log-normal mean by 50% as the simulation suggests? Trial and error with hints from Google AI suggest that the correct approach is `meanlog - log(2)` (see [Appendix](#appendix)), which is equivalent to `meanlog + log(0.5)`.
+- [ ] Use [Gordon–Loeb model](https://en.wikipedia.org/wiki/Gordon–Loeb_model) to determine optimal investment, see discussion on [SiRA Slack](https://sira.slack.com/archives/C016MJSJDGV/p1762546400851609)
 
 ```{r setup, message = FALSE, warning = FALSE}
 library(poilog)
