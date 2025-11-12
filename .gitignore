@@ -60,3 +60,4 @@ analysis/*-figure/
 analysis/import
 analysis/rendered
 /.quarto/
+**/*.quarto_ipynb

@@ -2,6 +2,8 @@
 
 * Risk Value Analysis: update Questions/TODO
 
+* Initial upkeep using `use_upkeep_issue()`
+
 # security 1.3.4
 
 * Risk Value Analysis: Validate approach for 50% impact reduction
