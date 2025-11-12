@@ -31,7 +31,7 @@ website:
         url: https://github.com/jabenninghoff/security
         aria-label: github
   page-footer:
-    left: "Copyright 2024, John Benninghoff"
+    left: "Copyright 2025, John Benninghoff"
     center:
       - text: License
         file: LICENSE.md
@@ -45,6 +45,9 @@ execute:
 
 format:
   html:
+    theme:
+      light: flatly
+      dark: darkly
     toc: true
     fig-width: 8.5
     grid:
