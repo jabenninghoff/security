@@ -204,7 +204,7 @@ differential of the most likely outcome (50th percentile) to provide insight int
 lnorm_param
 
 consensus_params <- consensus |>
-  mutate(as_tibble(lnorm_param(.data$p05, .data$p95, .data$p50)))
+  mutate(as_tibble(lnorm_param(p05 = .data$p05, p95 = .data$p95, p50 = .data$p50)))
 
 consensus_params |>
   mutate(across(p05:p50, ~ currency(.x, digits = 0L))) |>

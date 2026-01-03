@@ -114,7 +114,7 @@ the p95 and p50 for three companies - we'll infer p05 and the lognormal paramete
 Company B:
 
 ```{r company_b}
-lnorm_param(9, 528, 67)
+lnorm_param(p05 = 9, p95 = 528, p50 = 67)
 ```
 
 Using trial and error, we find that 9 minutes is the closest match to p05 when the median is 67

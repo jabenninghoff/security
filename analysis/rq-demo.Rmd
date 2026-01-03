@@ -44,10 +44,6 @@ library(ggplot2)
 library(jbplot)
 library(plotly)
 library(fs)
-
-# TODO: workaround for https://github.com/r-lib/lintr/issues/2790, update when
-#   https://github.com/data-cleaning/validate/pull/197 is released (1.1.6+)
-is.nzchar <- nzchar # nolint: object_name_linter.
 ```
 
 # Environment Statement
@@ -79,10 +75,10 @@ validate_risks <- local({
   validate_rules <- validator(
     risk_char = is.character(risk),
     risk_not_na = !is.na(risk),
-    risk_not_blank = is.nzchar(risk),
+    risk_not_blank = nzchar(risk),
     desc_char = is.character(description),
     desc_not_na = !is.na(description),
-    desc_not_blank = is.nzchar(description)
+    desc_not_blank = nzchar(description)
   )
   validate_out <- confront(risks, validate_rules)
   validate_summary <- summary(validate_out)
@@ -110,7 +106,7 @@ validate_estimates <- local({
     risk_match = risk %in% risks$risk,
     expert_char = is.character(expert),
     expert_not_na = !is.na(expert),
-    expert_not_blank = is.nzchar(expert),
+    expert_not_blank = nzchar(expert),
     lambda_num = is.numeric(lambda),
     lambda_pos = lambda > 0,
     p05_num = is.numeric(p05),
@@ -154,7 +150,7 @@ consensus <- estimates |>
   summarize(across(lambda:p50, ~ mean(.x, na.rm = TRUE)))
 
 consensus_params <- consensus |>
-  mutate(as_tibble(lnorm_param(.data$p05, .data$p95, .data$p50)))
+  mutate(as_tibble(lnorm_param(p05 = .data$p05, p95 = .data$p95, p50 = .data$p50)))
 
 forecast <- consensus_params |>
   select(c("risk", "lambda", "meanlog", "sdlog")) |>
