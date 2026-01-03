@@ -133,6 +133,8 @@ We can forecast this range by running the 10-year simulation 100,000 times:
 
 ```{r}
 #| label: baseline_forecast
+#| fig-alt: "A histogram showing number of losses by dollar value on a log10 scale. The curve is
+#|          normally shaped."
 baseline_forecast <- calc_risk("baseline", lambda, meanlog, sdlog, runs = 100000 * 10) |>
   mutate(
     sim = ceiling(year / 10),
@@ -209,6 +211,8 @@ x-axis to zoom in to the 1% to 99% quantiles:
 
 ```{r}
 #| label: likelihood_ecdf
+#| fig-alt: "An interactive plot showing the empirical CDF for the NPV of risk reduction. Most
+#|          values are close to 0."
 (likelihood_return |>
   ggplot(aes(return)) +
   stat_ecdf() +
@@ -263,6 +267,8 @@ the cumulative distribution function (CDF), limiting the x-axis:
 
 ```{r}
 #| label: impact_ecdf
+#| fig-alt: "An interactive plot showing the empirical CDF for the NPV of risk reduction. Most
+#|          values are close to 0."
 (impact_return |>
   ggplot(aes(return)) +
   stat_ecdf() +
@@ -372,6 +378,7 @@ response cost of \$600. To simplify the analysis, we just look at the cost of th
 
 ```{r}
 #| label: baseline_malware
+#| fig-alt: "A histogram showing number of losses by dollar value."
 lnorm_param(p05 = 200, p95 = 2000, p50 = 600)
 
 baseline_malware <- calc_risk("baseline malware", lambda = 52, meanlog = 6.44961, sdlog = 0.6999362)

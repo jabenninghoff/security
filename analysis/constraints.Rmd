@@ -39,6 +39,8 @@ with help from <https://ggplot2tor.com/tutorials/sampling_distributions>:
 
 ```{r}
 #| label: background
+#| fig-alt: "A normal curve of height 0.4 and mean of 0 with the area under the curve between -2
+#|          and -3 colored red."
 xmin <- -5
 xmax <- 5
 
@@ -63,6 +65,8 @@ The plot above shows "bad" outcomes in red. Let's add in "good" outcomes (>1) in
 
 ```{r}
 #| label: good
+#| fig-alt: "A normal curve of height 0.4 and mean of 0 with the area under the curve between -2
+#|          and -3 colored red and the area under the curve between 1 and 3 colored green."
 good <- stat_function(fun = dnorm, geom = "area", fill = "green", xlim = c(1, xmax))
 
 background + bad + good + baseline
@@ -77,6 +81,9 @@ deviation.
 
 ```{r}
 #| label: constrained
+#| fig-alt: "A taller normal curve of height just under 0.6 and mean of 0 with the area under the
+#|          curve between -2 and -3 colored red and the area under the curve between 1 and 3 colored
+#|          green. The colored areas are smaller than in the previous plot."
 constrained <- stat_function(fun = dnorm, args = list(sd = 0.7), geom = "line", color = "blue")
 taller <- scale_y_continuous(limits = c(0, 0.6))
 
@@ -97,6 +104,8 @@ Plotting both on the same grid shows the reduction in both "bad" and "good" outc
 
 ```{r}
 #| label: overlay
+#| fig-alt: "A plot showing both the first normal curve overlaid with the taller, narrower normal
+#|          curve."
 background +
   bad +
   good +
@@ -113,6 +122,8 @@ Another way of reducing bad outcomes is by improving performance - shifting the 
 
 ```{r}
 #| label: performance
+#| fig-alt: "A normal curve of height 0.4 and mean of 1 with the area under the curve between -2
+#|          and -3 colored red."
 performance <- stat_function(fun = dnorm, args = list(mean = 1), geom = "line", color = "blue")
 improved <- stat_function(
   fun = dnorm, args = list(mean = 1), geom = "area", fill = "green", xlim = c(1, xmax)
@@ -132,6 +143,8 @@ Plotting both together shows a reduction in "bad" and an increase in "good" outc
 
 ```{r}
 #| label: overlay_perf
+#| fig-alt: "A plot showing both the first normal curve with a mean of 0 overlaid with the
+#|          right-shifted normal curve with a mean of 1."
 background +
   bad +
   improved +
@@ -145,6 +158,8 @@ Comparing all three:
 
 ```{r}
 #| label: overlay_all
+#| fig-alt: "A plot showing the first normal curve overlaid with the taller, narrower normal curve
+#|          and the right-shifted normal curve."
 background +
   bad +
   improved +
@@ -168,6 +183,8 @@ Source:
 
 ```{r}
 #| label: questionnaire
+#| fig-alt: "A bar plot comparing questionnaire length in 2020 and 2023. Questionnaires of length
+#|          101-400 questions increased and other lengths decreased between 2020 and 2023."
 questionnaire <- tribble(
   ~year, ~questions, ~percent,
   2020,  ">400",     0.041,
@@ -201,6 +218,9 @@ Create a transparent donut plot showing an 80% reduction.
 
 ```{r}
 #| label: custom_donut
+#| fig-alt:
+#|   - "A donut plot with 80% gray and 20% black area with text '80% reduction' inside the donut"
+#|   - "A donut plot with 80% gray and 20% black area with text '80% reduction?' inside the donut"
 # custom function based on ggplot_donut_percent()
 custom_donut <- function(p, text = "", accuracy = NULL, hsize = 4, size = 12, family = "Lato") {
   percent_true <- data.frame(group = c(TRUE, FALSE), n = c(p, 1 - p))

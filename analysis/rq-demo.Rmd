@@ -177,6 +177,9 @@ Losses by risk separately and in aggregate:
 ```{r}
 #| label: risk_hist
 #| warning: false
+#| fig-alt:
+#|   - "Stacked histograms of number of losses by value for each risk."
+#|   - "Histogram combining all risks using different colors."
 forecast |>
   ggplot(aes(losses)) +
   facet_grid(vars(risk)) +
@@ -214,6 +217,7 @@ Plot loss exceedance curves for each risk:
 
 ```{r}
 #| label: risk_le
+#| fig-alt: "Stacked empirical cumulative distribution functions for each risk."
 risk_le <- forecast |>
   ggplot(aes(losses)) +
   facet_grid(vars(risk)) +
@@ -231,6 +235,7 @@ Interactive plot:
 
 ```{r}
 #| label: risk_le_plotly
+#| fig-alt: "Interactive stacked empirical cumulative distribution functions for each risk."
 ggplotly(risk_le + theme_minimal())
 ```
 
@@ -240,6 +245,7 @@ Plot loss exceedance curve for combined risk:
 
 ```{r}
 #| label: combined_le
+#| fig-alt: "Empirical cumulative distribution function for combined risk."
 combined_le <- forecast |>
   group_by(year) |>
   summarize(total_losses = sum(losses)) |>
@@ -258,6 +264,7 @@ Interactive plot:
 
 ```{r}
 #| label: combined_le_plotly
+#| fig-alt: "Interactive empirical cumulative distribution function for combined risk."
 ggplotly(combined_le + theme_minimal())
 ```
 
@@ -271,6 +278,8 @@ Data validation results for Risks tab:
 
 ```{r}
 #| label: validate_risks
+#| fig-alt: "Plot showing percentage of values validated by rule, with passing values in green,
+#|           failing values in red, and missing values in gray."
 plot(validate_risks)
 ```
 
@@ -278,6 +287,8 @@ Data validation results for Estimates tab:
 
 ```{r}
 #| label: validate_estimates
+#| fig-alt: "Plot showing percentage of values validated by rule, with passing values in green,
+#|           failing values in red, and missing values in gray."
 plot(validate_estimates)
 ```
 
@@ -331,6 +342,11 @@ Plot Cybersecurity and Outage histograms independently, for a new talk, [Is the 
 ```{r}
 #| label: save_png
 #| warning: false
+#| fig-alt:
+#|   - "A histogram showing number of losses by dollar value on a log10 scale. The curve is roughly
+#|     normally shaped with a mean near $1M."
+#|   - "A histogram showing number of losses by dollar value on a log10 scale. The curve is roughly
+#|     normally shaped with a mean near $100K."
 save_png <- function(filename) {
   ggsave(filename = path("rendered", filename), width = 16 * 0.6, height = 9 * 0.6, bg = "white")
 }
