@@ -355,7 +355,7 @@ large organization, we might expect to respond to clean up a malware infection o
 response cost of \$600. To simplify the analysis, we just look at the cost of the next year:
 
 ```{r baseline_malware}
-lnorm_param(200, 2000, 600)
+lnorm_param(p05 = 200, p95 = 2000, p50 = 600)
 
 baseline_malware <- calc_risk("baseline malware", lambda = 52, meanlog = 6.44961, sdlog = 0.6999362)
 
