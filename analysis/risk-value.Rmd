@@ -294,7 +294,7 @@ For the most part, this is what we often see in practice: security leaders strug
 to improve security beyond what is minimally expected by external stakeholders (clients, regulators,
 and insurers). However, we also see certain larger organizations invest more in security, like large
 banks and other financial institutions, why is this? Work done by VivoSecurity in
-[forecasting data breaches](https://www.vivosecurity.com/download-isaca-philly-talk-may-2023)
+[forecasting data breaches](https://web.archive.org/web/20251108062852/https://www.vivosecurity.com/download-isaca-philly-talk-may-2023)
 suggests an answer. Vivo found a positive correlation between the size of an organization and the
 likelihood of a security breach (which has also been identified by others, like
 [Cyentia](https://www.cyentia.com/iris/)), and also found a negative correlation with the number of
