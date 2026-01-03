@@ -20,7 +20,10 @@ output:
 
 Visualizations exploring the use of constraints vs performance improvements in risk management.
 
-```{r setup, message = FALSE, warning = FALSE}
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
 library(ggplot2)
 library(jbplot)
 library(fs)
@@ -34,7 +37,8 @@ Replicate a version of Figure 9 from the
 [Safety-II White Paper](https://www.england.nhs.uk/signuptosafety/wp-content/uploads/sites/16/2015/10/safety-1-safety-2-whte-papr.pdf),
 with help from <https://ggplot2tor.com/tutorials/sampling_distributions>:
 
-```{r background}
+```{r}
+#| label: background
 xmin <- -5
 xmax <- 5
 
@@ -57,7 +61,8 @@ save_png("01-baseline-bad.png")
 
 The plot above shows "bad" outcomes in red. Let's add in "good" outcomes (>1) in green:
 
-```{r good}
+```{r}
+#| label: good
 good <- stat_function(fun = dnorm, geom = "area", fill = "green", xlim = c(1, xmax))
 
 background + bad + good + baseline
@@ -70,7 +75,8 @@ save_png("02-baseline-bad-good.png")
 One way of reducing "bad" outcomes is by constraining performance - reducing the standard
 deviation.
 
-```{r constrained}
+```{r}
+#| label: constrained
 constrained <- stat_function(fun = dnorm, args = list(sd = 0.7), geom = "line", color = "blue")
 taller <- scale_y_continuous(limits = c(0, 0.6))
 
@@ -89,7 +95,8 @@ save_png("03-constrained.png")
 
 Plotting both on the same grid shows the reduction in both "bad" and "good" outcomes:
 
-```{r overlay}
+```{r}
+#| label: overlay
 background +
   bad +
   good +
@@ -104,7 +111,8 @@ save_png("04-baseline-constrained.png")
 
 Another way of reducing bad outcomes is by improving performance - shifting the mean.
 
-```{r performance}
+```{r}
+#| label: performance
 performance <- stat_function(fun = dnorm, args = list(mean = 1), geom = "line", color = "blue")
 improved <- stat_function(
   fun = dnorm, args = list(mean = 1), geom = "area", fill = "green", xlim = c(1, xmax)
@@ -122,7 +130,8 @@ save_png("05-improved.png")
 
 Plotting both together shows a reduction in "bad" and an increase in "good" outcomes:
 
-```{r overlay_perf}
+```{r}
+#| label: overlay_perf
 background +
   bad +
   improved +
@@ -134,7 +143,8 @@ save_png("06-baseline-improved.png")
 
 Comparing all three:
 
-```{r overlay_all}
+```{r}
+#| label: overlay_all
 background +
   bad +
   improved +
@@ -156,7 +166,8 @@ Source:
 - 2020 data: <https://www.riskrecon.com/state-of-third-party-risk-management-report>
 - 2023 data: <https://www.riskrecon.com/state-of-third-party-risk-management-2024>
 
-```{r questionnaire}
+```{r}
+#| label: questionnaire
 questionnaire <- tribble(
   ~year, ~questions, ~percent,
   2020,  ">400",     0.041,
@@ -188,7 +199,8 @@ save_png("08-questionnaire-length.png")
 
 Create a transparent donut plot showing an 80% reduction.
 
-```{r custom_donut}
+```{r}
+#| label: custom_donut
 # custom function based on ggplot_donut_percent()
 custom_donut <- function(p, text = "", accuracy = NULL, hsize = 4, size = 12, family = "Lato") {
   percent_true <- data.frame(group = c(TRUE, FALSE), n = c(p, 1 - p))

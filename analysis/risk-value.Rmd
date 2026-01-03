@@ -25,7 +25,10 @@ An exploration of the value of cybersecurity risk reduction.
 - [x] Does `meanlog + log(0.5)` really reduce the log-normal mean by 50% as the simulation suggests? Trial and error with hints from Google AI suggest that the correct approach is `meanlog - log(2)` (see [Appendix](#appendix)), which is equivalent to `meanlog + log(0.5)`.
 - [ ] Use [Gordon–Loeb model](https://en.wikipedia.org/wiki/Gordon–Loeb_model) to determine optimal investment, see discussion on [SiRA Slack](https://sira.slack.com/archives/C016MJSJDGV/p1762546400851609)
 
-```{r setup, message = FALSE, warning = FALSE}
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
 library(poilog)
 library(tibble)
 library(dplyr)
@@ -63,7 +66,8 @@ reasonable value of $\lambda$ for a Poisson distribution that approximates these
 increasing the number of breaches (it underestimates the number of multiple breaches but replicates
 the number of single breaches):
 
-```{r breach_table}
+```{r}
+#| label: breach_table
 runs <- 1e6
 lambda <- 0.138
 
@@ -85,7 +89,8 @@ bind_rows(breach_table(breaches_poilog), breach_table(breaches_pois))
 A Poisson distribution with a $\lambda$ of 0.138 approximates the Poisson log-normal model from the
 Cyentia IRIS report.
 
-```{r meanlog}
+```{r}
+#| label: meanlog
 meanlog <- 12.55949
 sdlog <- 3.068723
 ```
@@ -95,7 +100,8 @@ and standard deviation($\sigma$) of `r sdlog`.
 
 Using the baseline parameters, we can simulate security events and losses over the next 10 years:
 
-```{r baseline}
+```{r}
+#| label: baseline
 calc_risk("baseline", lambda, meanlog, sdlog, runs = 10) |>
   mutate(losses = currency(losses, digits = 0))
 ```
@@ -106,7 +112,8 @@ We can calculate the (negative) net present value of the baseline security risk 
 years by discounting future years. A discount rate of 5% is reasonable, and we use the formula
 $\mathrm{NPV} = \large \frac{R_t}{(1+i)^t}$, treating year 1 as $t = 0$:
 
-```{r baseline_value}
+```{r}
+#| label: baseline_value
 rate <- 0.05
 baseline_value <- calc_risk("baseline", lambda, meanlog, sdlog, runs = 10) |>
   mutate(
@@ -124,7 +131,8 @@ baseline_value |>
 The baseline value is highly variable depending on how many breaches occur over the 10-year period.
 We can forecast this range by running the 10-year simulation 100,000 times:
 
-```{r baseline_forecast}
+```{r}
+#| label: baseline_forecast
 baseline_forecast <- calc_risk("baseline", lambda, meanlog, sdlog, runs = 100000 * 10) |>
   mutate(
     sim = ceiling(year / 10),
@@ -148,7 +156,8 @@ baseline_forecast |>
 That's a broad range, from \$100 or less to \$10B or more, with the most common non-zero value
 around \$1M. But how many runs have no loss?
 
-```{r no_loss}
+```{r}
+#| label: no_loss
 baseline_forecast |>
   mutate(no_loss = (npv == 0)) |>
   count(no_loss)
@@ -165,7 +174,8 @@ lowering the likelihood, by lowering the impact, or both.
 
 Let's first look at an investment that reduces the breach rate by half:
 
-```{r likelihood_forecast}
+```{r}
+#| label: likelihood_forecast
 likelihood_forecast <- calc_risk("likelihood", lambda / 2, meanlog, sdlog, runs = 100000 * 10) |>
   mutate(
     sim = ceiling(year / 10),
@@ -181,7 +191,8 @@ likelihood_forecast <- calc_risk("likelihood", lambda / 2, meanlog, sdlog, runs 
 To measure the value of this investment, we calculate the difference between the baseline risk and
 the risk after reducing the likelihood:
 
-```{r likelihood_return}
+```{r}
+#| label: likelihood_return
 likelihood_return <-
   full_join(baseline_forecast, likelihood_forecast, by = "sim", suffix = c("_base", "_reduced")) |>
   mutate(return = npv_base - npv_reduced)
@@ -196,7 +207,8 @@ a larger breach than in the baseline scenario. Since we can't plot negative numb
 scale, we can examine the data using the cumulative distribution function (CDF). We limit the
 x-axis to zoom in to the 1% to 99% quantiles:
 
-```{r likelihood_ecdf}
+```{r}
+#| label: likelihood_ecdf
 (likelihood_return |>
   ggplot(aes(return)) +
   stat_ecdf() +
@@ -220,7 +232,8 @@ Reviewing the data:
 
 Now let's look at an investment that reduces the breach impact by half:
 
-```{r impact_forecast}
+```{r}
+#| label: impact_forecast
 impact_forecast <- calc_risk("impact", lambda, meanlog - log(2), sdlog, runs = 100000 * 10) |>
   mutate(
     sim = ceiling(year / 10),
@@ -236,7 +249,8 @@ impact_forecast <- calc_risk("impact", lambda, meanlog - log(2), sdlog, runs = 1
 To measure the value of this investment, we calculate the difference between the baseline risk and
 the risk after reducing the likelihood:
 
-```{r impact_return}
+```{r}
+#| label: impact_return
 impact_return <-
   full_join(baseline_forecast, impact_forecast, by = "sim", suffix = c("_base", "_reduced")) |>
   mutate(return = npv_base - npv_reduced)
@@ -247,7 +261,8 @@ summary(impact_return)
 Again, the NPV of the risk reduction (return) is highly variable. We again examine the data using
 the cumulative distribution function (CDF), limiting the x-axis:
 
-```{r impact_ecdf}
+```{r}
+#| label: impact_ecdf
 (impact_return |>
   ggplot(aes(return)) +
   stat_ecdf() +
@@ -277,7 +292,8 @@ that have a clear expected positive return. As a CISO, it's a reasonable choice 
 the status quo of the baseline risk, as there's a good chance that there will be no breaches (25%)
 or breaches with lower impact:
 
-```{r quantile}
+```{r}
+#| label: quantile
 baseline_forecast |>
   pull(npv) |>
   quantile(0.5) |>
@@ -354,7 +370,8 @@ large organization, we might expect to respond to clean up a malware infection o
 ($\lambda = 52$) with 90% of incidents costing between \$200 and \$2000 to clean up, with a typical
 response cost of \$600. To simplify the analysis, we just look at the cost of the next year:
 
-```{r baseline_malware}
+```{r}
+#| label: baseline_malware
 lnorm_param(p05 = 200, p95 = 2000, p50 = 600)
 
 baseline_malware <- calc_risk("baseline malware", lambda = 52, meanlog = 6.44961, sdlog = 0.6999362)
@@ -374,7 +391,8 @@ typical cost of \$40K/year.
 
 What is the value of reducing the likelihood of malware by 50%?
 
-```{r impact_malware}
+```{r}
+#| label: impact_malware
 impact_malware <- calc_risk("impact malware", lambda = 26, meanlog = 6.44961, sdlog = 0.6999362)
 
 impact_malware_return <-
@@ -402,7 +420,8 @@ events, like malware response.
 
 Work out how to reduce impact by 50% through trial and error, with hints from Google AI:
 
-```{r impact_test}
+```{r}
+#| label: impact_test
 base <- rlnorm(1e7, meanlog, sdlog)
 reduced <- rlnorm(1e7, meanlog - log(2), sdlog)
 

@@ -25,7 +25,10 @@ Prototype Risk Quantification tool for my SIRAcon 2024 talk, "[UnFAIR: Simplifyi
 - [x] Figure out how to calculate log normal `meanlog` and `sdlog` from expert estimation (see [Calculating SD for normal distribution with only mean and 5% and 95% quantile values](https://stats.stackexchange.com/questions/158110/calculating-sd-for-normal-distribution-with-only-mean-and-5-and-95-quantile-va))
 - [x] Log Scale Loss Exceedance Curves: add a log10 scale LEC plot using `dplyr::percent_rank()` instead of `ggplot2::stat_ecdf()`, see examples from [Elliot Murphy](https://rpubs.com/emurphy77/fair-example) and [David Severski](https://github.com/davidski/evaluator/blob/main/R/common_graphs.R#L286)
 
-```{r setup, message = FALSE, warning = FALSE}
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
 library(quantrr)
 library(ggplot2)
 library(jbplot)
@@ -57,7 +60,8 @@ is between 0.2 and 0.33.
 From my own experience, an unstable system might experience between 1-4 technology outages per year;
 a $\lambda$ of 2 fits this nicely:
 
-```{r outage_freq}
+```{r}
+#| label: outage_freq
 ggplot(data.frame(x = rpois(1e5, 2)), aes(x)) +
   geom_hist_bw(binwidth = 1) +
   scale_x_continuous(breaks = scales::breaks_width(1, offset = 1)) +
@@ -76,7 +80,8 @@ report, the loss magnitude of a cybersecurity breach follows a log-normal distri
 ($\mu$) of 12.56 and a standard deviation ($\sigma$) of 3.07, which gives a log-transformed
 lognormal curve of:
 
-```{r breach_impact_dist}
+```{r}
+#| label: breach_impact_dist
 ggplot(data.frame(x = c(0, 25)), aes(x)) +
   stat_function(fun = dnorm, args = list(mean = 12.56, sd = 3.07)) +
   labs(x = NULL, y = NULL) +
@@ -92,7 +97,8 @@ Note: from
 An expert estimate matching this outcome for a breach would have low (5%), high (95%) and most
 likely values of:
 
-```{r breach_impact}
+```{r}
+#| label: breach_impact
 qlnorm(c(0.05, 0.95, 0.5), meanlog = 12.56, sdlog = 3.07)
 ```
 
@@ -100,7 +106,8 @@ For a technology outage, a mean of 0.1 and a standard deviation of 1.7 are reaso
 parameters that fit the data for outage duration from the
 [2022 VOID Report](https://mcusercontent.com/ad9b3a31c069c03a14227a79c/files/29e138f4-05b7-f560-a7d5-c337538a93eb/2022_Void_Report.pdf):
 
-```{r outage_duration_dist}
+```{r}
+#| label: outage_duration_dist
 ggplot(data.frame(x = rlnorm(1e3, meanlog = 0.1, sdlog = 1.7)), aes(x)) +
   geom_hist_bw(binwidth = 1) +
   coord_cartesian(xlim = c(0, 80)) +
@@ -110,7 +117,8 @@ ggplot(data.frame(x = rlnorm(1e3, meanlog = 0.1, sdlog = 1.7)), aes(x)) +
 
 This gives low (5%), high (95%) and most likely values of:
 
-```{r outage_duration}
+```{r}
+#| label: outage_duration
 qlnorm(c(0.05, 0.95, 0.5), meanlog = 0.1, sdlog = 1.7)
 ```
 
@@ -119,7 +127,8 @@ in 18 hours or less. From this, we can calculate a reasonable outage cost by mul
 per-hour rate. We assume that the main cost is caused by response and overtime paid out to catch up
 after the system is restored, $10K/hour.
 
-```{r outage_impact}
+```{r}
+#| label: outage_impact
 qlnorm(c(0.05, 0.95, 0.5), meanlog = 0.1, sdlog = 1.7) * 10000
 ```
 
@@ -131,7 +140,8 @@ approach from this
 
 The mean is calculated using: $\mu = \large \frac{\log(high) - \log(low)}{2}$
 
-```{r meanlog_customer}
+```{r}
+#| label: meanlog_customer
 meanlog_customer <- ((log(20000000) - log(100000)) / 2) + log(100000)
 meanlog_customer
 ```
@@ -139,14 +149,16 @@ meanlog_customer
 The standard deviation is calculated using:
 $\DeclareMathOperator{\qnorm}{qnorm} \large \sigma = \frac{\log(high) - \log(low)}{2 \times \qnorm(0.95)}$
 
-```{r sdlog_customer}
+```{r}
+#| label: sdlog_customer
 sdlog_customer <- (log(20000000) - log(100000)) / (2 * qnorm(0.95))
 sdlog_customer
 ```
 
 From this we get a customer impact range of:
 
-```{r customer_impact}
+```{r}
+#| label: customer_impact
 qlnorm(c(0.05, 0.95, 0.5), meanlog = meanlog_customer, sdlog = sdlog_customer)
 ```
 
@@ -157,7 +169,8 @@ Import data from Excel template, loading each tab into its own data frame. The d
 
 Risk descriptions:
 
-```{r risks}
+```{r}
+#| label: risks
 risks <- read_xlsx("data/prototype.xlsx", sheet = "Risks") |>
   clean_names()
 
@@ -166,7 +179,8 @@ formattable(risks, align = "l")
 
 Risk estimates:
 
-```{r estimates}
+```{r}
+#| label: estimates
 estimates <- read_xlsx("data/prototype.xlsx", sheet = "Estimates") |>
   clean_names() |>
   rename(
@@ -183,7 +197,8 @@ estimates |>
 Using a simple average of all experts that provided an estimate (not blank/NA), this gives us a
 consensus estimate for the three risks of:
 
-```{r consensus}
+```{r}
+#| label: consensus
 consensus <- estimates |>
   group_by(risk) |>
   summarize(across(lambda:p50, ~ mean(.x, na.rm = TRUE)))
@@ -200,7 +215,8 @@ Forecast risk using Monte Carlo simulation.
 First calculate the parameters of the log normal distributions for each risk. Also calculate the
 differential of the most likely outcome (50th percentile) to provide insight into estimate accuracy:
 
-```{r consensus_params}
+```{r}
+#| label: consensus_params
 lnorm_param
 
 consensus_params <- consensus |>
@@ -213,7 +229,8 @@ consensus_params |>
 
 Run the simulation:
 
-```{r forecast}
+```{r}
+#| label: forecast
 calc_risk
 
 forecast <- consensus_params |>
@@ -232,7 +249,8 @@ forecast |>
 
 Use histograms to compare risks and visualize overall risk.
 
-```{r risk_hist}
+```{r}
+#| label: risk_hist
 forecast |>
   ggplot(aes(losses)) +
   facet_grid(vars(risk)) +
@@ -244,7 +262,8 @@ forecast |>
 
 Combined risk:
 
-```{r combined_hist}
+```{r}
+#| label: combined_hist
 forecast |>
   ggplot(aes(losses, fill = risk)) +
   geom_histogram(bins = 100) +
@@ -259,7 +278,8 @@ Plot loss exceedance curves for all risks and combined risk.
 
 First calculate the largest p95 (95% quantile), to limit the x-axis for static plots:
 
-```{r p95_max}
+```{r}
+#| label: p95_max
 p95_max <- forecast |>
   group_by(risk) |>
   summarize(p95 = quantile(losses, 0.95)) |>
@@ -271,7 +291,8 @@ p95_max <- forecast |>
 
 Plot loss exceedance curves for each risk:
 
-```{r risk_le}
+```{r}
+#| label: risk_le
 risk_le <- forecast |>
   ggplot(aes(losses)) +
   facet_grid(vars(risk)) +
@@ -287,13 +308,15 @@ risk_le +
 
 Interactive plot:
 
-```{r risk_le_plotly}
+```{r}
+#| label: risk_le_plotly
 ggplotly(risk_le + theme_minimal())
 ```
 
 Plot using percent rank and a log10 scale:
 
-```{r risk_le_log}
+```{r}
+#| label: risk_le_log
 risk_le_log <- forecast |>
   group_by(risk) |>
   mutate(probability = 1 - percent_rank(losses)) |>
@@ -317,7 +340,8 @@ Both methods calculate the same probability of a loss exceeding a given value, b
 
 Plot loss exceedance curves for combined risk:
 
-```{r combined_le}
+```{r}
+#| label: combined_le
 combined_le <- forecast |>
   group_by(year) |>
   summarize(total_losses = sum(losses)) |>
@@ -334,13 +358,15 @@ combined_le +
 
 Interactive plot:
 
-```{r combined_le_plotly}
+```{r}
+#| label: combined_le_plotly
 ggplotly(combined_le + theme_minimal())
 ```
 
 Plot using percent rank and a log10 scale:
 
-```{r combined_le_log}
+```{r}
+#| label: combined_le_log
 combined_le_log <- forecast |>
   group_by(year) |>
   summarize(total_losses = sum(losses)) |>
