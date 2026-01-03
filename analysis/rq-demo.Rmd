@@ -32,7 +32,10 @@ to name it "qrisk", but that's already [trademarked](https://qrisk.org)).
 - [ ] Add before and after: baseline risk vs after investment, which allows calculation of ROI.
 - [x] Investigate use of [mc2d](https://cran.r-project.org/package=mc2d)
 
-```{r setup, message = FALSE, warning = FALSE}
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
 library(quantrr)
 library(readxl)
 library(janitor)
@@ -67,7 +70,8 @@ Import and validate data from Excel. The data in `demo.xlsx` is based on the exa
 SME with experience in both. Experts were calibrated, informed by historical and industry data, and
 only gave estimates for areas in which they were confident in answering.
 
-```{r import}
+```{r}
+#| label: import
 risks <- read_xlsx("data/demo.xlsx", sheet = "Risks") |>
   clean_names()
 
@@ -135,7 +139,8 @@ validate_estimates <- local({
 
 Risk descriptions:
 
-```{r risks}
+```{r}
+#| label: risks
 formattable(risks, align = "l")
 ```
 
@@ -144,7 +149,8 @@ formattable(risks, align = "l")
 Forecast risk using Monte Carlo simulation. The average events and losses for each risk are
 summarized below:
 
-```{r forecast}
+```{r}
+#| label: forecast
 consensus <- estimates |>
   group_by(risk) |>
   summarize(across(lambda:p50, ~ mean(.x, na.rm = TRUE)))
@@ -168,7 +174,9 @@ forecast |>
 
 Losses by risk separately and in aggregate:
 
-```{r risk_hist, warning = FALSE}
+```{r}
+#| label: risk_hist
+#| warning: false
 forecast |>
   ggplot(aes(losses)) +
   facet_grid(vars(risk)) +
@@ -190,7 +198,8 @@ forecast |>
 
 Plot loss exceedance curves for all risks and combined risk.
 
-```{r p95_max}
+```{r}
+#| label: p95_max
 # calculate the largest p95 (95% quantile), to limit the x-axis for static plots
 p95_max <- forecast |>
   group_by(risk) |>
@@ -203,7 +212,8 @@ p95_max <- forecast |>
 
 Plot loss exceedance curves for each risk:
 
-```{r risk_le}
+```{r}
+#| label: risk_le
 risk_le <- forecast |>
   ggplot(aes(losses)) +
   facet_grid(vars(risk)) +
@@ -219,7 +229,8 @@ risk_le +
 
 Interactive plot:
 
-```{r risk_le_plotly}
+```{r}
+#| label: risk_le_plotly
 ggplotly(risk_le + theme_minimal())
 ```
 
@@ -227,7 +238,8 @@ ggplotly(risk_le + theme_minimal())
 
 Plot loss exceedance curve for combined risk:
 
-```{r combined_le}
+```{r}
+#| label: combined_le
 combined_le <- forecast |>
   group_by(year) |>
   summarize(total_losses = sum(losses)) |>
@@ -244,7 +256,8 @@ combined_le +
 
 Interactive plot:
 
-```{r combined_le_plotly}
+```{r}
+#| label: combined_le_plotly
 ggplotly(combined_le + theme_minimal())
 ```
 
@@ -256,13 +269,15 @@ Additional details on the risk quantification analysis.
 
 Data validation results for Risks tab:
 
-```{r validate_risks}
+```{r}
+#| label: validate_risks
 plot(validate_risks)
 ```
 
 Data validation results for Estimates tab:
 
-```{r validate_estimates}
+```{r}
+#| label: validate_estimates
 plot(validate_estimates)
 ```
 
@@ -270,7 +285,8 @@ plot(validate_estimates)
 
 All risk estimates:
 
-```{r estimates}
+```{r}
+#| label: estimates
 estimates |>
   mutate(across(p05:p50, ~ currency(.x, digits = 0L))) |>
   formattable(align = "l")
@@ -281,7 +297,8 @@ estimates |>
 Using a simple average of all experts that provided an estimate (not blank/NA), this gives us a
 consensus estimate for the three risks of:
 
-```{r consensus}
+```{r}
+#| label: consensus
 consensus |>
   mutate(across(p05:p50, ~ currency(.x, digits = 0L))) |>
   formattable(align = "l")
@@ -291,7 +308,8 @@ The consensus estimates for p05 and p95 result in the following parameters for l
 magnitude. The p50 estimate is used to calculate the percentage difference from the actual median
 (`mdiff`), a measure of estimate accuracy:
 
-```{r consensus_params}
+```{r}
+#| label: consensus_params
 consensus_params |>
   mutate(across(p05:p50, ~ currency(.x, digits = 0L)), mdiff = percent(mdiff)) |>
   formattable(align = "l")
@@ -301,7 +319,8 @@ consensus_params |>
 
 A `summary()` of the forecast results.
 
-```{r summary}
+```{r}
+#| label: summary
 summary(forecast)
 ```
 
@@ -309,7 +328,9 @@ summary(forecast)
 
 Plot Cybersecurity and Outage histograms independently, for a new talk, [Is the S in SRE for “Security”?](https://www.usenix.org/conference/srecon25americas/presentation/benninghoff). **Not** included in the original SIRAcon 2024 talk.
 
-```{r save_png, warning = FALSE}
+```{r}
+#| label: save_png
+#| warning: false
 save_png <- function(filename) {
   ggsave(filename = path("rendered", filename), width = 16 * 0.6, height = 9 * 0.6, bg = "white")
 }

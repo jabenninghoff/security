@@ -24,7 +24,10 @@ Analysis to determine thresholds of sample size to reliably detect changes in in
 
 - [ ] Questions/TODO list here
 
-```{r setup, message = FALSE, warning = FALSE}
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
 library(quantrr)
 library(purrr)
 library(tibble)
@@ -113,14 +116,16 @@ To determine a representative distribution, we can borrow data from the Google r
 the p95 and p50 for three companies - we'll infer p05 and the lognormal parameters using data from
 Company B:
 
-```{r company_b}
+```{r}
+#| label: company_b
 lnorm_param(p05 = 9, p95 = 528, p50 = 67)
 ```
 
 Using trial and error, we find that 9 minutes is the closest match to p05 when the median is 67
 minutes. From this, we can create a representative distribution:
 
-```{r meanlog}
+```{r}
+#| label: meanlog
 meanlog <- 4.25
 sdlog <- 1.25
 qlnorm(c(0.05, 0.5, 0.95), meanlog = meanlog, sdlog = sdlog)
@@ -136,7 +141,8 @@ First, test at the 10% improvement level, with a sample size ($N$) of 100, which
 worth of incidents. A single test is successful if the experimental group has a lower geometric mean
 and a positive t-test (p < 0.05) on the log-transformed data.
 
-```{r single_test}
+```{r}
+#| label: single_test
 single_test <- function(n, improvement) {
   control <- rlnorm(n, meanlog = meanlog, sdlog = sdlog)
   experiment <- rlnorm(n, meanlog = meanlog, sdlog = sdlog) * (1 - improvement)
@@ -153,7 +159,8 @@ slightly higher than the Google paper and target a 95% success rate.
 We'll use a slightly different function that is more easily converted into a data frame, and run
 only 10,000 trials to speed things up:
 
-```{r simulate_test}
+```{r}
+#| label: simulate_test
 test_change <- function(n, improvement) {
   control <- rlnorm(n, meanlog = meanlog, sdlog = sdlog)
   experiment <- rlnorm(n, meanlog = meanlog, sdlog = sdlog) * (1 - improvement)
@@ -180,7 +187,8 @@ mean(results$success)
 For a sample size of 100, we successfully detect a statistically significant change about 8% of the
 time. We can try larger sample sizes:
 
-```{r larger_samples}
+```{r}
+#| label: larger_samples
 simulate_test(1000, 0.1) |>
   pull(success) |>
   mean()
@@ -200,7 +208,8 @@ be gathered from 80 different organizations (40 in each group) in a year.
 
 We can also try larger changes:
 
-```{r larger_change}
+```{r}
+#| label: larger_change
 simulate_test(100, 0.25) |>
   pull(success) |>
   mean()
@@ -216,7 +225,8 @@ detectable over two years of data.
 
 For the 50% reduction, what is the range of the observed improvements?
 
-```{r range}
+```{r}
+#| label: range
 simulate_test(100, 0.50) |>
   mutate(change = experiment_gmean / control_gmean) |>
   summary()

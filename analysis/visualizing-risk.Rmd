@@ -28,7 +28,10 @@ An exploration of different approaches to communicating security breach risk inf
   - [ ] [Calculating Reserves for Cyber Risk: Integrating Cyber Risk with Financial Risk](https://riskgenesis.com/wp-content/uploads/2022/02/OG-Doc-w215.pdf)
   - [ ] [Calculating Reserves for Cyber Risk: An Open FAIR Approach](https://www.opengroup.org/sites/default/files/pdf/Cyber_Risk_Capital_Requirements_Project_Charter_-_V1.0.pdf)
 
-```{r setup, message = FALSE, warning = FALSE}
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
 # no libraries
 ```
 

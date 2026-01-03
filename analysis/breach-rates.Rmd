@@ -20,7 +20,10 @@ output:
 
 A critical review of using breach frequency as a measure of security success, inspired by [Incident Metrics in SRE: Critically Evaluating MTTR and Friends](https://sre.google/resources/practices-and-processes/incident-metrics-in-sre/).
 
-```{r setup, message = FALSE, warning = FALSE}
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
 library(poilog)
 library(tibble)
 library(dplyr)
@@ -55,7 +58,8 @@ size in Table 2, since larger firms are more likely to experience a breach.
 
 Using the provided parameters from Table 1, we get:
 
-```{r breach_poilog}
+```{r}
+#| label: breach_poilog
 breach_poilog <- function(mu, sig, runs = 1e6) {
   breaches <- rpoilog(runs, mu, sig)
   tibble(
@@ -81,7 +85,8 @@ which has a single parameter for average arrival rate, $\lambda$.
 
 We can find a reasonable value for $\lambda$ using trial and error:
 
-```{r breach_pois}
+```{r}
+#| label: breach_pois
 breach_pois <- function(lambda, runs = 1e6) {
   breaches <- rpois(runs, lambda)
   tibble(
@@ -107,7 +112,8 @@ Let's assume that the firm implements a new security control that reduces the li
 by 25%, and compares the number of breaches in the 5 years before and after implementing that
 control. We then simulate this scenario 100,000 times:    
 
-```{r simulation}
+```{r}
+#| label: simulation
 simulation <- function(years, reduction, runs = 1e5) {
   tibble(
     base = replicate(runs, sum(rpois(years, base_lambda))),
@@ -125,7 +131,8 @@ head(results, 10)
 
 OK, what are the results?
 
-```{r summarize_results}
+```{r}
+#| label: summarize_results
 summarize_results <- function(data) {
   data |>
     summarize(
@@ -147,7 +154,8 @@ To improve the likelihood of detecting the improvement, we can adjust the scenar
 sample of years before and after implementing the new control. How many years would we need to get
 a confident measurement of improvement?
 
-```{r larger_sample}
+```{r}
+#| label: larger_sample
 simulation(10, 0.25) |>
   summarize_results()
 
