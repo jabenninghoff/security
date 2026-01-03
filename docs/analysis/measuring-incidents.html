@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.25">
+<meta name="generator" content="quarto-1.8.26">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -76,9 +76,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-707d8167ce6003fca903bfe2be84ab7f.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-b758ccaa5987ceb1b75504551e579abf.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../site_libs/bootstrap/bootstrap-f7539336ebfbdb62ea5dc127cdd1b7a9.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
@@ -532,7 +532,7 @@ window.Quarto = {
 <p>For step 3, we use the geometric mean and <a href="https://en.wikipedia.org/wiki/Student's_t-test">Student’s t-test</a> on the samples, after log-transforming the data. From my research and understanding, this is a reasonable approach if the underlying distributions are truly lognormal, which is true by design.</p>
 <p>To determine a representative distribution, we can borrow data from the Google report, which lists the p95 and p50 for three companies - we’ll infer p05 and the lognormal parameters using data from Company B:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lnorm_param</span>(<span class="dv">9</span>, <span class="dv">528</span>, <span class="dv">67</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lnorm_param</span>(<span class="at">p05 =</span> <span class="dv">9</span>, <span class="at">p95 =</span> <span class="dv">528</span>, <span class="at">p50 =</span> <span class="dv">67</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>$meanlog
 [1] 4.23316
@@ -569,23 +569,23 @@ $mdiff
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="fu">single_test</span>(<span class="dv">100</span>, <span class="fl">0.1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[[1]]
-[1] 78.3658
+[1] 62.2113
 
 [[2]]
-[1] 64.23196
+[1] 62.20182
 
 [[3]]
 
     Welch Two Sample t-test
 
 data:  log(control) and log(experiment)
-t = 1.0723, df = 197.86, p-value = 0.2849
+t = 0.00088771, df = 197.64, p-value = 0.9993
 alternative hypothesis: true difference in means is not equal to 0
 95 percent confidence interval:
- -0.1668624  0.5646358
+ -0.3385153  0.3388202
 sample estimates:
 mean of x mean of y 
- 4.361388  4.162501 </code></pre>
+ 4.130537  4.130384 </code></pre>
 </div>
 </div>
 <p>For most tests, the p-value is well above 0.05. How often does the test succeed? We’ll set the bar slightly higher than the Google paper and target a 95% success rate.</p>
@@ -615,20 +615,20 @@ mean of x mean of y
 <pre><code># A tibble: 10 × 4
    control_gmean experiment_gmean p_value success
            &lt;dbl&gt;            &lt;dbl&gt;   &lt;dbl&gt; &lt;lgl&gt;  
- 1          63.3             60.5 0.789   FALSE  
- 2          55.4             60.7 0.605   FALSE  
- 3          72.2             58.7 0.235   FALSE  
- 4          67.8             67.8 0.997   FALSE  
- 5          73.7             74.5 0.949   FALSE  
- 6          66.4             63.5 0.783   FALSE  
- 7          73.6             61.4 0.284   FALSE  
- 8          76.1             61.7 0.250   FALSE  
- 9          88.7             52.5 0.00218 TRUE   
-10          64.6             63.7 0.935   FALSE  </code></pre>
+ 1          76.2             53.3  0.0333 TRUE   
+ 2          58.2             71.8  0.256  FALSE  
+ 3          70.3             58.1  0.269  FALSE  
+ 4          69.2             61.0  0.493  FALSE  
+ 5          77.7             65.0  0.268  FALSE  
+ 6          75.0             70.9  0.738  FALSE  
+ 7          68.5             56.4  0.301  FALSE  
+ 8          83.0             65.8  0.217  FALSE  
+ 9          65.1             69.4  0.735  FALSE  
+10          81.5             57.8  0.0578 FALSE  </code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(results<span class="sc">$</span>success)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.0873</code></pre>
+<pre><code>[1] 0.0884</code></pre>
 </div>
 </div>
 <p>For a sample size of 100, we successfully detect a statistically significant change about 8% of the time. We can try larger sample sizes:</p>
@@ -637,19 +637,19 @@ mean of x mean of y
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(success) <span class="sc">|&gt;</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.4675</code></pre>
+<pre><code>[1] 0.4743</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">simulate_test</span>(<span class="dv">2000</span>, <span class="fl">0.1</span>) <span class="sc">|&gt;</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(success) <span class="sc">|&gt;</span></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.7589</code></pre>
+<pre><code>[1] 0.763</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">simulate_test</span>(<span class="dv">4000</span>, <span class="fl">0.1</span>) <span class="sc">|&gt;</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(success) <span class="sc">|&gt;</span></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.967</code></pre>
+<pre><code>[1] 0.9636</code></pre>
 </div>
 </div>
 <p>A sample size of 4000 is needed to detect a significant change. For a single organization, it would take about 80 years (40 before, 40 after) to gather the data. However, the same volume of data could be gathered from 80 different organizations (40 in each group) in a year.</p>
@@ -659,13 +659,13 @@ mean of x mean of y
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(success) <span class="sc">|&gt;</span></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.3715</code></pre>
+<pre><code>[1] 0.3754</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">simulate_test</span>(<span class="dv">100</span>, <span class="fl">0.50</span>) <span class="sc">|&gt;</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(success) <span class="sc">|&gt;</span></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.9748</code></pre>
+<pre><code>[1] 0.9736</code></pre>
 </div>
 </div>
 <p>Interestingly, while the Google paper notes that it would take a very large change (80% reduction) to be detected through measuring incident duration, we find that a 50% reduction is clearly detectable over two years of data.</p>
@@ -676,19 +676,19 @@ mean of x mean of y
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summary</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> control_gmean    experiment_gmean    p_value           success       
- Min.   : 45.14   Min.   :20.67    Min.   :0.000e+00   Mode :logical  
- 1st Qu.: 64.45   1st Qu.:32.21    1st Qu.:7.380e-06   FALSE:296      
- Median : 70.04   Median :35.02    Median :1.188e-04   TRUE :9704     
- Mean   : 70.61   Mean   :35.35    Mean   :6.080e-03                  
- 3rd Qu.: 76.01   3rd Qu.:38.14    3rd Qu.:1.376e-03                  
- Max.   :108.17   Max.   :59.82    Max.   :7.226e-01                  
+ Min.   : 45.22   Min.   :22.94    Min.   :0.000e+00   Mode :logical  
+ 1st Qu.: 64.39   1st Qu.:32.27    1st Qu.:8.480e-06   FALSE:254      
+ Median : 69.96   Median :35.11    Median :1.262e-04   TRUE :9746     
+ Mean   : 70.52   Mean   :35.38    Mean   :5.762e-03                  
+ 3rd Qu.: 76.12   3rd Qu.:38.22    3rd Qu.:1.462e-03                  
+ Max.   :118.80   Max.   :53.70    Max.   :9.338e-01                  
      change      
- Min.   :0.2576  
- 1st Qu.:0.4446  
- Median :0.5000  
- Mean   :0.5085  
- 3rd Qu.:0.5628  
- Max.   :0.9358  </code></pre>
+ Min.   :0.2770  
+ 1st Qu.:0.4468  
+ Median :0.5007  
+ Mean   :0.5094  
+ 3rd Qu.:0.5644  
+ Max.   :1.0987  </code></pre>
 </div>
 </div>
 <p>The observed improvements range from a small increase/decrease to a 75% reduction, with half falling within 6% of the true decrease (44-56%).</p>
@@ -1142,7 +1142,7 @@ mean of x mean of y
 <footer class="footer">
   <div class="nav-footer">
     <div class="nav-footer-left">
-<p>Copyright 2025, John Benninghoff</p>
+<p>Copyright 2026, John Benninghoff</p>
 </div>   
     <div class="nav-footer-center">
       <ul class="footer-items list-unstyled">

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.25">
+<meta name="generator" content="quarto-1.8.26">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -77,9 +77,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-707d8167ce6003fca903bfe2be84ab7f.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-b758ccaa5987ceb1b75504551e579abf.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../site_libs/bootstrap/bootstrap-f7539336ebfbdb62ea5dc127cdd1b7a9.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
@@ -507,7 +507,7 @@ window.Quarto = {
 <pre><code># A tibble: 1 × 3
   `One or more` `Two or more` `Three or more`
           &lt;dbl&gt;         &lt;dbl&gt;           &lt;dbl&gt;
-1         0.130        0.0163         0.00249</code></pre>
+1         0.129        0.0161         0.00243</code></pre>
 </div>
 </div>
 <p>These values are close to the upper bound for a firm in the $100M to $1B range on Table 2.</p>
@@ -532,7 +532,7 @@ window.Quarto = {
 <pre><code># A tibble: 1 × 3
   `One or more` `Two or more` `Three or more`
           &lt;dbl&gt;         &lt;dbl&gt;           &lt;dbl&gt;
-1         0.294        0.0481         0.00541</code></pre>
+1         0.294        0.0480         0.00544</code></pre>
 </div>
 </div>
 <p>A Poisson model with a <span class="math inline">\(\lambda\)</span> of 0.347 (a little more than once every three years) gives similar results to the Poisson log-normal model for the largest firms for one or more breaches, but underestimates the likelihood for 2+ and 3+.</p>
@@ -559,16 +559,16 @@ window.Quarto = {
 <pre><code># A tibble: 10 × 5
     base   new better worse same 
    &lt;int&gt; &lt;int&gt; &lt;lgl&gt;  &lt;lgl&gt; &lt;lgl&gt;
- 1     5     3 TRUE   FALSE FALSE
- 2     3     0 TRUE   FALSE FALSE
- 3     1     2 FALSE  TRUE  FALSE
+ 1     2     1 TRUE   FALSE FALSE
+ 2     0     1 FALSE  TRUE  FALSE
+ 3     0     1 FALSE  TRUE  FALSE
  4     0     2 FALSE  TRUE  FALSE
- 5     1     1 FALSE  FALSE TRUE 
- 6     3     1 TRUE   FALSE FALSE
- 7     1     3 FALSE  TRUE  FALSE
- 8     1     1 FALSE  FALSE TRUE 
- 9     1     2 FALSE  TRUE  FALSE
-10     0     3 FALSE  TRUE  FALSE</code></pre>
+ 5     2     0 TRUE   FALSE FALSE
+ 6     2     0 TRUE   FALSE FALSE
+ 7     3     1 TRUE   FALSE FALSE
+ 8     3     0 TRUE   FALSE FALSE
+ 9     4     1 TRUE   FALSE FALSE
+10     1     0 TRUE   FALSE FALSE</code></pre>
 </div>
 </div>
 <p>OK, what are the results?</p>
@@ -586,7 +586,7 @@ window.Quarto = {
 <pre><code># A tibble: 1 × 3
   better worse  same
    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-1  0.478 0.290 0.233</code></pre>
+1  0.476 0.287 0.237</code></pre>
 </div>
 </div>
 <p>For this scenario, even though the true rate of breaches has been reduced by 25%, the number of breaches in the 5 years after implementing the control is better less than 50% of the time, and is actually worse nearly 30% of the time!</p>
@@ -601,7 +601,7 @@ window.Quarto = {
 <pre><code># A tibble: 1 × 3
   better worse  same
    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-1  0.557 0.288 0.154</code></pre>
+1  0.556 0.288 0.157</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">simulation</span>(<span class="dv">50</span>, <span class="fl">0.25</span>) <span class="sc">|&gt;</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_results</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -609,7 +609,7 @@ window.Quarto = {
 <pre><code># A tibble: 1 × 3
   better worse   same
    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;
-1  0.756 0.191 0.0536</code></pre>
+1  0.757 0.189 0.0543</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">simulation</span>(<span class="dv">250</span>, <span class="fl">0.25</span>) <span class="sc">|&gt;</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_results</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -617,7 +617,7 @@ window.Quarto = {
 <pre><code># A tibble: 1 × 3
   better  worse    same
    &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;
-1  0.957 0.0361 0.00674</code></pre>
+1  0.957 0.0363 0.00656</code></pre>
 </div>
 </div>
 <p>Only the simulation which tests 250 years before and after (a total of 500 years!) gives a somewhat reasonable indication of improvement - and keep in mind that “better” is a reduction of <em>any</em> amount. Running metrics for a period this long at a single firm is impractical, which leads to our conclusion…</p>
@@ -1060,7 +1060,7 @@ window.Quarto = {
 <footer class="footer">
   <div class="nav-footer">
     <div class="nav-footer-left">
-<p>Copyright 2025, John Benninghoff</p>
+<p>Copyright 2026, John Benninghoff</p>
 </div>   
     <div class="nav-footer-center">
       <ul class="footer-items list-unstyled">
