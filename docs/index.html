@@ -2,17 +2,23 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.26">
+<meta name="generator" content="quarto-1.10.18">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
 <title>security</title>
 <style>
-code{white-space: pre-wrap;}
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
@@ -35,19 +41,18 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-listing/quarto-listing.js"></script>
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-b758ccaa5987ceb1b75504551e579abf.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-b85bc7c33db8c58e0ec93c3465666fed.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-f7539336ebfbdb62ea5dc127cdd1b7a9.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-800c0a046c622cbd3a9b3d8b6eb91bfe.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="site_libs/bootstrap/bootstrap-f7539336ebfbdb62ea5dc127cdd1b7a9.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-5153d5f168354b7d150f5f610f953d84.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-0e8df7e1a0fdbc0ebd5f1c1aa2cb52bb.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-5153d5f168354b7d150f5f610f953d84.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -106,7 +111,7 @@ ul.task-list li input[type="checkbox"] {
   </script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -478,10 +483,10 @@ window.Quarto = {
     </div>
 </div>
 <div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="c2VjdXJpdHklMjBkaWZmZXJlbnRseQ==" data-listing-date-sort="1714453200000" data-listing-file-modified-sort="1767463349524" data-listing-date-modified-sort="1740463200000" data-listing-reading-time-sort="6" data-listing-word-count-sort="1025">
+<div class="quarto-post image-right" data-index="0" data-categories="c2VjdXJpdHklMjBkaWZmZXJlbnRseQ==" data-listing-date-sort="1714453200000" data-listing-file-modified-sort="1767465812233" data-listing-date-modified-sort="1740463200000" data-listing-reading-time-sort="6" data-listing-word-count-sort="1025">
 <div class="thumbnail"><a href="./analysis/constraints.html" class="no-external">
 
-<p class="card-img-top"><img src="analysis/constraints_files/figure-html/background-1.png" alt="A normal curve of height 0.4 and mean of 0 with the area under the curve between -2 and -3 colored red."  class="thumbnail-image card-img"/></p>
+<p class="card-img-top"><img loading='lazy' src="analysis/constraints_files/figure-html/background-1.png" alt="A normal curve of height 0.4 and mean of 0 with the area under the curve between -2 and -3 colored red."  class="thumbnail-image card-img"/></p>
 
 </a></div>
 <div class="body">
@@ -508,7 +513,7 @@ John Benninghoff
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="1" data-categories="c2VjdXJpdHklMjBkaWZmZXJlbnRseQ==" data-listing-date-sort="1717563600000" data-listing-file-modified-sort="1767461046697" data-listing-date-modified-sort="1717650000000" data-listing-reading-time-sort="5" data-listing-word-count-sort="936">
+<div class="quarto-post image-right" data-index="1" data-categories="c2VjdXJpdHklMjBkaWZmZXJlbnRseQ==" data-listing-date-sort="1717563600000" data-listing-file-modified-sort="1787080894742" data-listing-date-modified-sort="1717650000000" data-listing-reading-time-sort="5" data-listing-word-count-sort="936">
 <div class="thumbnail"><a href="./analysis/breach-rates.html" class="no-external">
 
 <div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
@@ -538,10 +543,10 @@ John Benninghoff
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="2" data-categories="cmlzayUyMHF1YW50aWZpY2F0aW9u" data-listing-date-sort="1721710800000" data-listing-file-modified-sort="1767463894994" data-listing-date-modified-sort="1740463200000" data-listing-reading-time-sort="8" data-listing-word-count-sort="1445">
+<div class="quarto-post image-right" data-index="2" data-categories="cmlzayUyMHF1YW50aWZpY2F0aW9u" data-listing-date-sort="1721710800000" data-listing-file-modified-sort="1787081396064" data-listing-date-modified-sort="1740463200000" data-listing-reading-time-sort="8" data-listing-word-count-sort="1445">
 <div class="thumbnail"><a href="./analysis/rq-prototype.html" class="no-external">
 
-<p class="card-img-top"><img src="analysis/rq-prototype_files/figure-html/outage_freq-1.png" alt="A histogram showing the count of event occurences for whole numbers from 0 to 10."  class="thumbnail-image card-img"/></p>
+<p class="card-img-top"><img loading='lazy' src="analysis/rq-prototype_files/figure-html/outage_freq-1.png" alt="A histogram showing the count of event occurences for whole numbers from 0 to 10."  class="thumbnail-image card-img"/></p>
 
 </a></div>
 <div class="body">
@@ -568,10 +573,10 @@ John Benninghoff
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="3" data-categories="cmlzayUyMHF1YW50aWZpY2F0aW9u" data-listing-date-sort="1723698000000" data-listing-file-modified-sort="1767464254529" data-listing-date-modified-sort="1709359200000" data-listing-reading-time-sort="7" data-listing-word-count-sort="1348">
+<div class="quarto-post image-right" data-index="3" data-categories="cmlzayUyMHF1YW50aWZpY2F0aW9u" data-listing-date-sort="1723698000000" data-listing-file-modified-sort="1767465812234" data-listing-date-modified-sort="1709359200000" data-listing-reading-time-sort="7" data-listing-word-count-sort="1348">
 <div class="thumbnail"><a href="./analysis/rq-demo.html" class="no-external">
 
-<p class="card-img-top"><img src="analysis/rq-demo_files/figure-html/risk_hist-1.png" alt="Stacked histograms of number of losses by value for each risk."  class="thumbnail-image card-img"/></p>
+<p class="card-img-top"><img loading='lazy' src="analysis/rq-demo_files/figure-html/risk_hist-1.png" alt="Stacked histograms of number of losses by value for each risk."  class="thumbnail-image card-img"/></p>
 
 </a></div>
 <div class="body">
@@ -598,10 +603,10 @@ John Benninghoff
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="4" data-categories="cmlzayUyMHF1YW50aWZpY2F0aW9u" data-listing-date-sort="1730610000000" data-listing-file-modified-sort="1767462951225" data-listing-date-modified-sort="1755147600000" data-listing-reading-time-sort="13" data-listing-word-count-sort="2412">
+<div class="quarto-post image-right" data-index="4" data-categories="cmlzayUyMHF1YW50aWZpY2F0aW9u" data-listing-date-sort="1730610000000" data-listing-file-modified-sort="1787083550587" data-listing-date-modified-sort="1755147600000" data-listing-reading-time-sort="13" data-listing-word-count-sort="2412">
 <div class="thumbnail"><a href="./analysis/risk-value.html" class="no-external">
 
-<p class="card-img-top"><img src="analysis/risk-value_files/figure-html/baseline_forecast-1.png" alt="A histogram showing number of losses by dollar value on a log10 scale. The curve is normally shaped."  class="thumbnail-image card-img"/></p>
+<p class="card-img-top"><img loading='lazy' src="analysis/risk-value_files/figure-html/baseline_forecast-1.png" alt="A histogram showing number of losses by dollar value on a log10 scale. The curve is normally shaped."  class="thumbnail-image card-img"/></p>
 
 </a></div>
 <div class="body">
@@ -628,7 +633,7 @@ John Benninghoff
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="5" data-categories="cmlzayUyMHF1YW50aWZpY2F0aW9u" data-listing-date-sort="1733464800000" data-listing-file-modified-sort="1767463074615" data-listing-date-modified-sort="1740463200000" data-listing-reading-time-sort="2" data-listing-word-count-sort="266">
+<div class="quarto-post image-right" data-index="5" data-categories="cmlzayUyMHF1YW50aWZpY2F0aW9u" data-listing-date-sort="1733464800000" data-listing-file-modified-sort="1767465812234" data-listing-date-modified-sort="1740463200000" data-listing-reading-time-sort="2" data-listing-word-count-sort="266">
 <div class="thumbnail"><a href="./analysis/visualizing-risk.html" class="no-external">
 
 <div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
@@ -658,7 +663,7 @@ John Benninghoff
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="6" data-categories="U1JF" data-listing-date-sort="1742360400000" data-listing-file-modified-sort="1767462485807" data-listing-date-modified-sort="1743656400000" data-listing-reading-time-sort="9" data-listing-word-count-sort="1668">
+<div class="quarto-post image-right" data-index="6" data-categories="U1JF" data-listing-date-sort="1742360400000" data-listing-file-modified-sort="1787081326998" data-listing-date-modified-sort="1743656400000" data-listing-reading-time-sort="9" data-listing-word-count-sort="1668">
 <div class="thumbnail"><a href="./analysis/measuring-incidents.html" class="no-external">
 
 <div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>

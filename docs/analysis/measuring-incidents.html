@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.26">
+<meta name="generator" content="quarto-1.10.18">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -11,10 +11,16 @@
 
 <title>Measuring Incident Duration – security</title>
 <style>
-code{white-space: pre-wrap;}
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
@@ -71,19 +77,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../icon.svg" rel="icon" type="image/svg+xml">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-b758ccaa5987ceb1b75504551e579abf.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-b85bc7c33db8c58e0ec93c3465666fed.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-f7539336ebfbdb62ea5dc127cdd1b7a9.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark-800c0a046c622cbd3a9b3d8b6eb91bfe.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../site_libs/bootstrap/bootstrap-f7539336ebfbdb62ea5dc127cdd1b7a9.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-5153d5f168354b7d150f5f610f953d84.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-0e8df7e1a0fdbc0ebd5f1c1aa2cb52bb.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-5153d5f168354b7d150f5f610f953d84.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -113,7 +118,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -511,8 +516,8 @@ window.Quarto = {
 <li>Incident duration appears lognormal for some organizations, but not for others (2022)</li>
 <li>Replicated the Monte Carlo simulation from the Google paper (2022)</li>
 </ul>
-<p>In the cybersecurity domain, the <a href="https://www.cyentia.com">Cyentia Institute</a> has published reports analyzing breach data, looking at both frequency and impact (cost). Their <a href="https://www.cyentia.com/wp-content/uploads/IRIS-2022_Cyentia.pdf">IRIS 2022</a> report found that, like outage incident duration, security breach losses closely follow a lognormal distribution. Like the Google and VOID reports, the IRIS also points out that the mean is a poor indicator of a ‘typical’ loss, the median or geometric mean are better summaries, and organizations should also be concerned with tail risk - extreme events at the 90, 95, and 99th percentile.</p>
-<p>Additionally, despite the challenges with using lognormal data, the <a href="https://www.cyentia.com/iris-ransomware/">2024 Ransomware Report</a> showed that losses from ransomware have significantly increased between 2019 and 2023.</p>
+<p>In the cybersecurity domain, the <a href="https://www.cyentia.com">Cyentia Institute</a> has published reports analyzing breach data, looking at both frequency and impact (cost). Their <a href="https://www.cyentia.com/wp-content/uploads/2026/03/IRIS-2022_Cyentia.pdf">IRIS 2022</a> report found that, like outage incident duration, security breach losses closely follow a lognormal distribution. Like the Google and VOID reports, the IRIS also points out that the mean is a poor indicator of a ‘typical’ loss, the median or geometric mean are better summaries, and organizations should also be concerned with tail risk - extreme events at the 90, 95, and 99th percentile.</p>
+<p>Additionally, despite the challenges with using lognormal data, the <a href="https://www.cyentia.com/publication/iris-ransomware/">2024 Ransomware Report</a> showed that losses from ransomware have significantly increased between 2019 and 2023.</p>
 </section>
 <section id="analysis" class="level2">
 <h2 class="anchored" data-anchor-id="analysis">Analysis</h2>
@@ -569,23 +574,23 @@ $mdiff
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="fu">single_test</span>(<span class="dv">100</span>, <span class="fl">0.1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[[1]]
-[1] 62.2113
+[1] 69.53726
 
 [[2]]
-[1] 62.20182
+[1] 49.00274
 
 [[3]]
 
     Welch Two Sample t-test
 
 data:  log(control) and log(experiment)
-t = 0.00088771, df = 197.64, p-value = 0.9993
+t = 1.9633, df = 196.75, p-value = 0.05102
 alternative hypothesis: true difference in means is not equal to 0
 95 percent confidence interval:
- -0.3385153  0.3388202
+ -0.001569463  0.701542399
 sample estimates:
 mean of x mean of y 
- 4.130537  4.130384 </code></pre>
+ 4.241863  3.891876 </code></pre>
 </div>
 </div>
 <p>For most tests, the p-value is well above 0.05. How often does the test succeed? We’ll set the bar slightly higher than the Google paper and target a 95% success rate.</p>
@@ -615,20 +620,20 @@ mean of x mean of y
 <pre><code># A tibble: 10 × 4
    control_gmean experiment_gmean p_value success
            &lt;dbl&gt;            &lt;dbl&gt;   &lt;dbl&gt; &lt;lgl&gt;  
- 1          76.2             53.3  0.0333 TRUE   
- 2          58.2             71.8  0.256  FALSE  
- 3          70.3             58.1  0.269  FALSE  
- 4          69.2             61.0  0.493  FALSE  
- 5          77.7             65.0  0.268  FALSE  
- 6          75.0             70.9  0.738  FALSE  
- 7          68.5             56.4  0.301  FALSE  
- 8          83.0             65.8  0.217  FALSE  
- 9          65.1             69.4  0.735  FALSE  
-10          81.5             57.8  0.0578 FALSE  </code></pre>
+ 1          50.1             79.6 0.00557 FALSE  
+ 2          60.8             47.7 0.200   FALSE  
+ 3          75.3             58.2 0.140   FALSE  
+ 4          72.0             55.6 0.172   FALSE  
+ 5          72.2             64.6 0.517   FALSE  
+ 6          59.3             64.4 0.630   FALSE  
+ 7          67.6             80.4 0.336   FALSE  
+ 8          68.0             70.3 0.863   FALSE  
+ 9          74.4             57.0 0.139   FALSE  
+10          67.3             67.0 0.985   FALSE  </code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(results<span class="sc">$</span>success)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.0884</code></pre>
+<pre><code>[1] 0.085</code></pre>
 </div>
 </div>
 <p>For a sample size of 100, we successfully detect a statistically significant change about 8% of the time. We can try larger sample sizes:</p>
@@ -637,19 +642,19 @@ mean of x mean of y
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(success) <span class="sc">|&gt;</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.4743</code></pre>
+<pre><code>[1] 0.4742</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">simulate_test</span>(<span class="dv">2000</span>, <span class="fl">0.1</span>) <span class="sc">|&gt;</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(success) <span class="sc">|&gt;</span></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.763</code></pre>
+<pre><code>[1] 0.7568</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">simulate_test</span>(<span class="dv">4000</span>, <span class="fl">0.1</span>) <span class="sc">|&gt;</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(success) <span class="sc">|&gt;</span></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.9636</code></pre>
+<pre><code>[1] 0.9642</code></pre>
 </div>
 </div>
 <p>A sample size of 4000 is needed to detect a significant change. For a single organization, it would take about 80 years (40 before, 40 after) to gather the data. However, the same volume of data could be gathered from 80 different organizations (40 in each group) in a year.</p>
@@ -659,13 +664,13 @@ mean of x mean of y
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(success) <span class="sc">|&gt;</span></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.3754</code></pre>
+<pre><code>[1] 0.3669</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">simulate_test</span>(<span class="dv">100</span>, <span class="fl">0.50</span>) <span class="sc">|&gt;</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(success) <span class="sc">|&gt;</span></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.9736</code></pre>
+<pre><code>[1] 0.9774</code></pre>
 </div>
 </div>
 <p>Interestingly, while the Google paper notes that it would take a very large change (80% reduction) to be detected through measuring incident duration, we find that a 50% reduction is clearly detectable over two years of data.</p>
@@ -676,19 +681,19 @@ mean of x mean of y
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summary</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> control_gmean    experiment_gmean    p_value           success       
- Min.   : 45.22   Min.   :22.94    Min.   :0.000e+00   Mode :logical  
- 1st Qu.: 64.39   1st Qu.:32.27    1st Qu.:8.480e-06   FALSE:254      
- Median : 69.96   Median :35.11    Median :1.262e-04   TRUE :9746     
- Mean   : 70.52   Mean   :35.38    Mean   :5.762e-03                  
- 3rd Qu.: 76.12   3rd Qu.:38.22    3rd Qu.:1.462e-03                  
- Max.   :118.80   Max.   :53.70    Max.   :9.338e-01                  
+ Min.   : 43.11   Min.   :20.77    Min.   :0.000e+00   Mode :logical  
+ 1st Qu.: 64.50   1st Qu.:32.22    1st Qu.:6.720e-06   FALSE:279      
+ Median : 70.25   Median :35.04    Median :1.091e-04   TRUE :9721     
+ Mean   : 70.71   Mean   :35.31    Mean   :6.169e-03                  
+ 3rd Qu.: 76.38   3rd Qu.:38.05    3rd Qu.:1.332e-03                  
+ Max.   :118.70   Max.   :57.32    Max.   :8.169e-01                  
      change      
- Min.   :0.2770  
- 1st Qu.:0.4468  
- Median :0.5007  
- Mean   :0.5094  
- 3rd Qu.:0.5644  
- Max.   :1.0987  </code></pre>
+ Min.   :0.2361  
+ 1st Qu.:0.4425  
+ Median :0.4979  
+ Mean   :0.5074  
+ 3rd Qu.:0.5628  
+ Max.   :0.9593  </code></pre>
 </div>
 </div>
 <p>The observed improvements range from a small increase/decrease to a 75% reduction, with half falling within 6% of the true decrease (44-56%).</p>
