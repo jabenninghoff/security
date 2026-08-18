@@ -50,7 +50,7 @@ a useful metric?"
 # Poisson Log-Normal Model
 
 The 2022
-[Information Risk Insights Study (IRIS)](https://www.cyentia.com/wp-content/uploads/IRIS-2022_Cyentia.pdf)
+[Information Risk Insights Study (IRIS)](https://www.cyentia.com/wp-content/uploads/2026/03/IRIS-2022_Cyentia.pdf)
 found that a Poisson log-normal distribution fits the data and provides realistic forecasts for
 years with multiple breaches, and provides suggested values for mean ($\mu$) and standard deviation
 ($\sigma$) in Table 1, along with the likelihood of a breach with models that are adjusted for firm

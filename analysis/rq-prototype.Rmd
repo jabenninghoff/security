@@ -76,10 +76,10 @@ increase. For loss of customer we also choose a $\lambda$ of 2.
 
 ## Impact
 
-Drawing from the [IRIS 2022](https://www.cyentia.com/wp-content/uploads/IRIS-2022_Cyentia.pdf)
-report, the loss magnitude of a cybersecurity breach follows a log-normal distribution with a mean
-($\mu$) of 12.56 and a standard deviation ($\sigma$) of 3.07, which gives a log-transformed
-lognormal curve of:
+Drawing from the
+[IRIS 2022](https://www.cyentia.com/wp-content/uploads/2026/03/IRIS-2022_Cyentia.pdf) report, the
+loss magnitude of a cybersecurity breach follows a log-normal distribution with a mean ($\mu$) of
+12.56 and a standard deviation ($\sigma$) of 3.07, which gives a log-transformed lognormal curve of:
 
 ```{r}
 #| label: breach_impact_dist
