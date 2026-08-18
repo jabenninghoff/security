@@ -1,3 +1,7 @@
+# security 1.3.7
+
+* 2026-08 Upkeep
+
 # security 1.3.6
 
 * Added alt text to plots in examples and template to improve accessibility
