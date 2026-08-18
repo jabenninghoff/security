@@ -55,7 +55,7 @@ CISO)
 
 We can model baseline risk for a typical firm using
 [quantrr](https://jabenninghoff.github.io/quantrr/) and data from the Cyentia 2022
-[Information Risk Insights Study (IRIS)](https://www.cyentia.com/wp-content/uploads/IRIS-2022_Cyentia.pdf).
+[Information Risk Insights Study (IRIS)](https://www.cyentia.com/wp-content/uploads/2026/03/IRIS-2022_Cyentia.pdf).
 
 The 2022 IRIS found that the upper bound likelihood of a breach in the next year fit a Poisson
 log-normal distribution with a mean ($\mu$) of -2.284585 and and standard deviation

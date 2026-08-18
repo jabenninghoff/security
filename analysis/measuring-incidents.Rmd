@@ -70,15 +70,15 @@ Subsequent reports from [VOID](https://www.thevoid.community) referenced the Goo
 
 In the cybersecurity domain, the [Cyentia Institute](https://www.cyentia.com) has published reports
 analyzing breach data, looking at both frequency and impact (cost). Their
-[IRIS 2022](https://www.cyentia.com/wp-content/uploads/IRIS-2022_Cyentia.pdf) report found that,
-like outage incident duration, security breach losses closely follow a lognormal distribution. Like
-the Google and VOID reports, the IRIS also points out that the mean is a poor indicator of a
+[IRIS 2022](https://www.cyentia.com/wp-content/uploads/2026/03/IRIS-2022_Cyentia.pdf) report found
+that, like outage incident duration, security breach losses closely follow a lognormal distribution.
+Like the Google and VOID reports, the IRIS also points out that the mean is a poor indicator of a
 'typical' loss, the median or geometric mean are better summaries, and organizations should also be
 concerned with tail risk - extreme events at the 90, 95, and 99th percentile.
 
 Additionally, despite the challenges with using lognormal data, the
-[2024 Ransomware Report](https://www.cyentia.com/iris-ransomware/) showed that losses from
-ransomware have significantly increased between 2019 and 2023.
+[2024 Ransomware Report](https://www.cyentia.com/publication/iris-ransomware/) showed that losses
+from ransomware have significantly increased between 2019 and 2023.
 
 # Analysis
 
