@@ -45,6 +45,9 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 
+# RStudio 2026.04.0+526
+.positai
+
 # macOS, vim
 .DS_Store
 *.swp
@@ -61,5 +64,3 @@ analysis/import
 analysis/rendered
 /.quarto/
 **/*.quarto_ipynb
-# RStudio 2026.04.0+526
-.positai
