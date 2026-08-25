@@ -12,7 +12,7 @@
 
 * Risk Value Analysis: update Questions/TODO
 
-* Initial upkeep using `use_upkeep_issue()`
+* Initial upkeep using `rdev::use_upkeep_issue()`
 
 # security 1.3.4
 
