@@ -1,3 +1,7 @@
+# security 1.4.0
+
+* Added MFA Deployment Analysis: Analysis of the impact of Multi-Factor Authentication (MFA) deployment rate on the likelihood of compromise
+
 # security 1.3.7
 
 * 2026-08 Upkeep

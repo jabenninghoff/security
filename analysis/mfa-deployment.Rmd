@@ -1,0 +1,218 @@
+---
+title: "MFA Deployment Analysis"
+author: "John Benninghoff"
+date: '2026-09-11'
+date-modified: '2026-09-11'
+categories: [risk quantification, security differently]
+order: 108
+output:
+  html_notebook:
+    theme:
+      version: 5
+      preset: bootstrap
+    css: assets/extra.css
+    pandoc_args: --shift-heading-level-by=1
+    toc: yes
+    toc_float:
+      collapsed: no
+      smooth_scroll: no
+---
+
+Analysis of the impact of Multi-Factor Authentication (MFA) deployment rate on the likelihood of compromise.
+
+# Questions/TODO
+
+- [ ] Questions/TODO list here
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+library(purrr)
+library(formattable)
+library(ggplot2)
+library(plotly)
+library(jbplot)
+```
+
+# Background
+
+Daniel Woods' research on the empirical effectiveness of security controls shows that Multi-Factor
+Authentication (MFA) appears to reduce the likelihood of compromise by as much as 99% for
+individuals, but implementing MFA doesn't show the same reduction for organizations, discussed in
+his paper,
+[Evidence-based cybersecurity policy? A meta-review of security control effectiveness](https://doi.org/10.1080/23738871.2024.2335461),
+and his LinkedIn article, 
+[What Works in Cybersecurity: MFA](https://www.linkedin.com/pulse/what-works-cybersecurity-mfa-daniel-woods-e7mke/).
+
+In particular, research from [Microsoft](https://arxiv.org/abs/2305.00945) found that MFA reduced
+the risk of compromise by 99%, and a similar study from
+[Google](https://dl.acm.org/doi/abs/10.1145/3308558.3313481) reported that MFA "prevents 94% of
+attacks rooted in phishing and 76% of targeted attacks", while cyber insurance claims data offer
+conflicting evidence:
+[Marsh (2023)](https://www.marsh.com/en/services/cyber-risk/insights/using-cybersecurity-analytics-to-prioritize-cybersecurity-investments.html)
+found MFA to be the least effective control, and
+[Marsh (2024)](https://www.guycarp.com/insights/2024/07/cyber-sleeper-threat-business-email-compromise.html)
+found MFA to be the most effective control.
+
+One aspect of MFA that Daniel discusses (briefly) is the idea that MFA deployment rate may explain
+the contradictory results, as organizations may have a policy requiring MFA and still have gaps in
+coverage, allowing credential attacks against accounts that don't have MFA enabled. This analysis
+models how coverage affects the effectiveness of MFA using Monte Carlo simulation.
+
+# Analysis
+
+To model the impact of deployment rate on attack likelihood, we can simulate an attack against a
+random user in the organization. If the user doesn't have MFA, the attack always succeeds (the base
+rate). If the user has MFA, the attack has a 1% success rate (as I found in my
+[MFA Risk Analysis](https://jabenninghoff.github.io/quantrr/example/analysis/mfa.html), a 99%
+reduction in likelihood leads to dramatically lower expected losses).
+
+## Simple Model
+
+We can use the uniform distribution to determine if a user has MFA; if a randomly generated number
+between 0 and 1 exceeds the MFA deployment rate, $r$, the user doesn't have MFA. (This will always
+be true if $r = 0$ and never true if $r = 1$). For users with MFA, the attack succeeds if a second
+random uniform number is less than or equal to 0.01.
+
+```{r}
+#| label: attack_succeeds
+attack_succeeds <- function(deployment_rate) {
+  if (runif(1) > deployment_rate) {
+    # no MFA
+    TRUE
+  } else {
+    # has MFA
+    runif(1) <= 0.01
+  }
+}
+```
+
+Attacks with $r = 0$ should always succeed, and attacks with $r = 1$ should succeed about 1% of the
+time:
+
+```{r}
+#| label: attack_success_test
+attack_succeeds(0)
+attack_succeeds(1)
+sum(replicate(10000, attack_succeeds(1))) # should be close to 100
+```
+
+Instead of using `replicate()` for repeated trials, we can take advantage of R vectors, which are
+faster (allowing more trials):
+
+```{r}
+#| label: attack_success_rate
+attack_success_rate <- function(deployment_rate, runs = 1e5) {
+  has_mfa <- runif(runs) <= deployment_rate
+  attack_fails <- runif(runs) <= (has_mfa * 0.99)
+  sum(!attack_fails) / runs
+}
+```
+
+We should expect an attack success rate of 100% with 0% deployment and approximately 1% with 100%
+deployment:
+
+```{r}
+#| label: attack_success_rate_test
+attack_success_rate(0)
+attack_success_rate(1)
+```
+
+## Effect of Deployment Rate
+
+Model the effects of deployment rate on attack success using `purrr:map_dbl()`:
+
+```{r}
+#| label: deployment_success
+deployment <- (1:100) / 100
+success_rate <- map_dbl(deployment, attack_success_rate)
+deployment_success <- data.frame(deployment, success_rate)
+```
+
+Plot the results:
+
+```{r}
+#| label: deployment_success_plot
+#| fig-alt: "Plot of attacker success rate against MFA deployment rate, showing that attacker
+#|          success rate decreases linearly as deployment rate increases."
+deployment_success |>
+  ggplot(aes(deployment, success_rate)) +
+  geom_point() +
+  scale_x_continuous(labels = scales::label_percent()) +
+  scale_y_continuous(labels = scales::label_percent()) +
+  labs(title = "Effects of MFA deployment rate on attacker success rate") +
+  labs(x = "MFA deployment rate", y = "Attacker success rate") +
+  theme_quo()
+```
+
+## Economic Impact of Deployment Rate
+
+Perhaps unsurprisingly in retrospect, there is a clear linear relationship between deployment rate
+and attacker success rate. However, as the earlier
+[MFA Analysis](https://jabenninghoff.github.io/quantrr/example/analysis/mfa.html) shows, expected
+losses drop dramatically as the likelihood of an attack approaches 0. A plot from that analysis
+compares baseline risk (no treatment) against a pessimistic estimate of MFA attack success rate
+reduction (76%) and an optimistic reduction (99%):
+
+```{r}
+#| label: risk_le
+#| fig-alt: "Plot showing likelihood of experiencing a loss exceeding a given dollar value by risk,
+#|          comparing treatments."
+load("objects/mfa-exports.RData")
+risk_le
+```
+
+Interactive plot:
+
+```{r}
+#| label: risk_le_plotly
+#| fig-alt: "Interactive plot showing likelihood of experiencing a loss exceeding a given dollar
+#|          value by risk, comparing treatments."
+ggplotly(risk_le + guides(color = "none"))
+```
+
+In the base case, the firm has a 3.2% chance of a loss exceeding $1M (about once every 30 years),
+which drops to 0.80% with a 76% lower attack success rate (once every 125 years), and 0.04% with a
+99% reduction (once every 2500 years).
+
+## Successful Attack Frequency
+
+Instead of expressing attacker success as a percentage (rate), we can instead express it in terms
+of frequency; about how many attacks does it take before an attacker is successful?
+
+```{r}
+#| label: frequency_plot
+#| fig-alt: "Plot of attacker success frequency against MFA deployment rate, showing that the number
+#|          of attacks before success increases exponentially with deployment rate"
+frequency_plot <- deployment_success |>
+  mutate(
+    deployment = percent(deployment, 0), success_rate = percent(success_rate),
+    frequency = 1 / success_rate
+  ) |>
+  ggplot(aes(deployment, frequency, text = paste0("success_rate: ", success_rate))) +
+  geom_point() +
+  scale_x_continuous(labels = scales::label_percent()) +
+  labs(title = "Effects of MFA deployment rate on frequency of succesful attacks") +
+  labs(x = "MFA deployment rate", y = "Frequency (attacker succeeds every n tries)") +
+  theme_quo()
+
+ggplotly(frequency_plot)
+```
+
+This plot more clearly explains the effect of deployment rate on how often attacks succeed; at 50%
+deployment, the attack succeeds about every 2 tries. At a deployment rate of 91%, the attack
+succeeds every 10 tries. A 100% deployment rate (every 100 days) is about twice as effective as a
+99% deployment rate (every 50 days) - this is true on both plots, but easier to see with the second.
+
+<!--
+Also look at the effectiveness of control coverage vs defense-in-depth. How do two partially
+deployed controls compare to a single widely deployed control?
+-->
+
+# Discussion
+
+<!--
+Discuss how this could be done with probability math, how use of Monte Carlo helps, importance of
+intuitive visualizations in understanding risk (rate vs frequency).
+-->
