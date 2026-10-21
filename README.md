@@ -37,6 +37,10 @@ Notebooks in this package:
   (2025-03-19): Analysis to determine thresholds of sample size to
   reliably detect changes in incident impact (duration) using Monte
   Carlo simulation.
+- [MFA Deployment
+  Analysis](https://jabenninghoff.github.io/security/analysis/mfa-deployment.html)
+  (2026-09-11): Analysis of the impact of Multi-Factor Authentication
+  (MFA) deployment rate on the likelihood of compromise.
 - [Risk Value
   Analysis](https://jabenninghoff.github.io/security/analysis/risk-value.html)
   (2024-11-03): An exploration of the value of cybersecurity risk

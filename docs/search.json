@@ -4,14 +4,21 @@
     "href": "changelog.html",
     "title": "Changelog",
     "section": "",
-    "text": "2026-08 Upkeep"
+    "text": "Added MFA Deployment Analysis: Analysis of the impact of Multi-Factor Authentication (MFA) deployment rate on the likelihood of compromise"
+  },
+  {
+    "objectID": "changelog.html#security-1.4.0",
+    "href": "changelog.html#security-1.4.0",
+    "title": "Changelog",
+    "section": "",
+    "text": "Added MFA Deployment Analysis: Analysis of the impact of Multi-Factor Authentication (MFA) deployment rate on the likelihood of compromise"
   },
   {
     "objectID": "changelog.html#security-1.3.7",
     "href": "changelog.html#security-1.3.7",
     "title": "Changelog",
-    "section": "",
-    "text": "2026-08 Upkeep"
+    "section": "security 1.3.7",
+    "text": "security 1.3.7\n\n2026-08 Upkeep"
   },
   {
     "objectID": "changelog.html#security-1.3.6",
@@ -25,7 +32,7 @@
     "href": "changelog.html#security-1.3.5",
     "title": "Changelog",
     "section": "security 1.3.5",
-    "text": "security 1.3.5\n\nRisk Value Analysis: update Questions/TODO\nInitial upkeep using use_upkeep_issue()"
+    "text": "security 1.3.5\n\nRisk Value Analysis: update Questions/TODO\nInitial upkeep using rdev::use_upkeep_issue()"
   },
   {
     "objectID": "changelog.html#security-1.3.4",
@@ -338,6 +345,354 @@
     ]
   },
   {
+    "objectID": "analysis/mfa-deployment.html",
+    "href": "analysis/mfa-deployment.html",
+    "title": "MFA Deployment Analysis",
+    "section": "",
+    "text": "Analysis of the impact of Multi-Factor Authentication (MFA) deployment rate on the likelihood of compromise.",
+    "crumbs": [
+      "Changelog",
+      "MFA Deployment Analysis"
+    ]
+  },
+  {
+    "objectID": "analysis/mfa-deployment.html#questionstodo",
+    "href": "analysis/mfa-deployment.html#questionstodo",
+    "title": "MFA Deployment Analysis",
+    "section": "Questions/TODO",
+    "text": "Questions/TODO\n\nCompare the effectiveness of control coverage compare vs defense-in-depth. How do two partially deployed controls compare to a single widely deployed control?\n\n\nlibrary(purrr)\nlibrary(formattable)\nlibrary(ggplot2)\nlibrary(plotly)\nlibrary(jbplot)",
+    "crumbs": [
+      "Changelog",
+      "MFA Deployment Analysis"
+    ]
+  },
+  {
+    "objectID": "analysis/mfa-deployment.html#background",
+    "href": "analysis/mfa-deployment.html#background",
+    "title": "MFA Deployment Analysis",
+    "section": "Background",
+    "text": "Background\nDaniel Woods’ research on the empirical effectiveness of security controls shows that Multi-Factor Authentication (MFA) appears to reduce the likelihood of compromise by as much as 99% for individuals, but implementing MFA doesn’t show the same reduction for organizations, discussed in his paper, Evidence-based cybersecurity policy? A meta-review of security control effectiveness, and his LinkedIn article, What Works in Cybersecurity: MFA.\nIn particular, research from Microsoft found that MFA reduced the risk of compromise by 99%, and a similar study from Google reported that MFA “prevents 94% of attacks rooted in phishing and 76% of targeted attacks”, while cyber insurance claims data offer conflicting evidence: Marsh (2023) found MFA to be the least effective control, and Marsh (2024) found MFA to be the most effective control.\nOne aspect of MFA that Daniel discusses (briefly) is the idea that MFA deployment rate may explain the contradictory results, as organizations may have a policy requiring MFA and still have gaps in coverage, allowing credential attacks against accounts that don’t have MFA enabled. This analysis models how coverage affects the effectiveness of MFA using Monte Carlo simulation.",
+    "crumbs": [
+      "Changelog",
+      "MFA Deployment Analysis"
+    ]
+  },
+  {
+    "objectID": "analysis/mfa-deployment.html#analysis",
+    "href": "analysis/mfa-deployment.html#analysis",
+    "title": "MFA Deployment Analysis",
+    "section": "Analysis",
+    "text": "Analysis\nTo model the impact of deployment rate on attack likelihood, we can simulate an attack against a random user in the organization. If the user doesn’t have MFA, the attack always succeeds (the base rate). If the user has MFA, the attack has a 1% success rate (as I found in my MFA Risk Analysis, a 99% reduction in likelihood leads to dramatically lower expected losses).\n\nSimple Model\nWe can use the uniform distribution to determine if a user has MFA; if a randomly generated number between 0 and 1 exceeds the MFA deployment rate, \\(r\\), the user doesn’t have MFA. (This will always be true if \\(r = 0\\) and never true if \\(r = 1\\)). For users with MFA, the attack succeeds if a second random uniform number is less than or equal to 0.01.\n\nattack_succeeds &lt;- function(deployment_rate) {\n  if (runif(1) &gt; deployment_rate) {\n    # no MFA\n    TRUE\n  } else {\n    # has MFA\n    runif(1) &lt;= 0.01\n  }\n}\n\nAttacks with \\(r = 0\\) should always succeed, and attacks with \\(r = 1\\) should succeed about 1% of the time:\n\nattack_succeeds(0)\n\n[1] TRUE\n\nattack_succeeds(1)\n\n[1] FALSE\n\nsum(replicate(10000, attack_succeeds(1))) # should be close to 100\n\n[1] 107\n\n\nInstead of using replicate() for repeated trials, we can take advantage of R vectors, which are faster (allowing more trials):\n\nattack_success_rate &lt;- function(deployment_rate, runs = 1e5) {\n  has_mfa &lt;- runif(runs) &lt;= deployment_rate\n  attack_fails &lt;- runif(runs) &lt;= (has_mfa * 0.99)\n  sum(!attack_fails) / runs\n}\n\nWe should expect an attack success rate of 100% with 0% deployment and approximately 1% with 100% deployment:\n\nattack_success_rate(0)\n\n[1] 1\n\nattack_success_rate(1)\n\n[1] 0.01001\n\n\n\n\nEffect of Deployment Rate\nModel the effects of deployment rate on attack success using purrr:map_dbl():\n\ndeployment &lt;- (1:100) / 100\nsuccess_rate &lt;- map_dbl(deployment, attack_success_rate)\ndeployment_success &lt;- data.frame(deployment, success_rate)\n\nPlot the results:\n\ndeployment_success |&gt;\n  ggplot(aes(deployment, success_rate)) +\n  geom_point() +\n  scale_x_continuous(labels = scales::label_percent()) +\n  scale_y_continuous(labels = scales::label_percent()) +\n  labs(title = \"Effects of MFA deployment rate on attacker success rate\") +\n  labs(x = \"MFA deployment rate\", y = \"Attacker success rate\") +\n  theme_quo()\n\n\n\n\n\n\n\n\n\n\nEconomic Impact of Deployment Rate\nPerhaps unsurprisingly in retrospect, there is a clear linear relationship between deployment rate and attacker success rate. However, as the earlier MFA Analysis shows, expected losses drop dramatically as the likelihood of an attack approaches 0. A plot from that analysis compares baseline risk (no treatment) against a pessimistic estimate of MFA attack success rate reduction (76%) and an optimistic reduction (99%):\n\nload(\"objects/mfa-exports.RData\")\nrisk_le\n\n\n\n\n\n\n\nggsave(\"rendered/mfa-loss-exceedance.png\", width = 16 * 0.6, height = 9 * 0.6, create.dir = TRUE)\n\nInteractive plot:\n\nggplotly(risk_le + guides(color = \"none\"))\n\n\n\n\n\nIn the base case, the firm has a 3.2% chance of a loss exceeding $1M (about once every 30 years), which drops to 0.80% with a 76% lower attack success rate (once every 125 years), and 0.04% with a 99% reduction (once every 2500 years).\n\n\nSuccessful Attack Frequency\nInstead of expressing attacker success as a percentage (rate), we can instead express it in terms of frequency; about how many attacks does it take before an attacker is successful?\n\nfrequency_plot &lt;- deployment_success |&gt;\n  mutate(\n    deployment = percent(deployment, 0), success_rate = percent(success_rate),\n    frequency = 1 / success_rate\n  ) |&gt;\n  ggplot(aes(deployment, frequency, text = paste0(\"success_rate: \", success_rate))) +\n  geom_point() +\n  scale_x_continuous(labels = scales::label_percent()) +\n  labs(title = \"Effects of MFA deployment rate on frequency of succesful attacks\") +\n  labs(x = \"MFA deployment rate\", y = \"Frequency (attacker succeeds every n tries)\") +\n  theme_quo()\n\nggplotly(frequency_plot)\n\n\n\n\nggsave(\"rendered/mfa-deployment-rate.png\", width = 16 * 0.6, height = 9 * 0.6)\n\nThis plot more clearly explains the effect of deployment rate on how often attacks succeed; at 50% deployment, the attack succeeds about every 2 tries. At a deployment rate of 91%, the attack succeeds every 10 tries. A 100% deployment rate (every 100 tries) is about twice as effective as a 99% deployment rate (every 50 tries) - this is true on both plots, but easier to see with the second.",
+    "crumbs": [
+      "Changelog",
+      "MFA Deployment Analysis"
+    ]
+  },
+  {
+    "objectID": "analysis/mfa-deployment.html#discussion",
+    "href": "analysis/mfa-deployment.html#discussion",
+    "title": "MFA Deployment Analysis",
+    "section": "Discussion",
+    "text": "Discussion\nWhile this analysis could have been easily accomplished with probability math, I have found that using models and Monte Carlo simulations helps me understand the results.",
+    "crumbs": [
+      "Changelog",
+      "MFA Deployment Analysis"
+    ]
+  },
+  {
+    "objectID": "analysis/constraints.html",
+    "href": "analysis/constraints.html",
+    "title": "Constraints vs Performance",
+    "section": "",
+    "text": "Visualizations exploring the use of constraints vs performance improvements in risk management.\nlibrary(ggplot2)\nlibrary(jbplot)\nlibrary(fs)\nlibrary(tibble)\nlibrary(dplyr)",
+    "crumbs": [
+      "Changelog",
+      "Constraints vs Performance"
+    ]
+  },
+  {
+    "objectID": "analysis/constraints.html#normal-performance",
+    "href": "analysis/constraints.html#normal-performance",
+    "title": "Constraints vs Performance",
+    "section": "Normal Performance",
+    "text": "Normal Performance\nReplicate a version of Figure 9 from the Safety-II White Paper, with help from https://ggplot2tor.com/tutorials/sampling_distributions:\n\nxmin &lt;- -5\nxmax &lt;- 5\n\nsave_png &lt;- function(filename) {\n  ggsave(\n    filename = path(\"rendered\", filename),\n    width = 16 * 0.6, height = 9 * 0.6, bg = \"white\", create.dir = TRUE\n  )\n}\n\nbackground &lt;- ggplot(data.frame(x = c(xmin, xmax)), aes(x)) +\n  scale_x_continuous(breaks = -3:3, minor_breaks = NULL) +\n  labs(x = NULL, y = NULL) +\n  theme_quo(minor.y = FALSE)\n\nbaseline &lt;- stat_function(fun = dnorm, geom = \"line\")\nbad &lt;- stat_function(fun = dnorm, geom = \"area\", fill = \"red\", xlim = c(xmin, -2))\n\nbackground + bad + baseline\n\n\n\n\n\n\n\nsave_png(\"01-baseline-bad.png\")\n\nThe plot above shows “bad” outcomes in red. Let’s add in “good” outcomes (&gt;1) in green:\n\ngood &lt;- stat_function(fun = dnorm, geom = \"area\", fill = \"green\", xlim = c(1, xmax))\n\nbackground + bad + good + baseline\n\n\n\n\n\n\n\nsave_png(\"02-baseline-bad-good.png\")",
+    "crumbs": [
+      "Changelog",
+      "Constraints vs Performance"
+    ]
+  },
+  {
+    "objectID": "analysis/constraints.html#constrained-performance",
+    "href": "analysis/constraints.html#constrained-performance",
+    "title": "Constraints vs Performance",
+    "section": "Constrained Performance",
+    "text": "Constrained Performance\nOne way of reducing “bad” outcomes is by constraining performance - reducing the standard deviation.\n\nconstrained &lt;- stat_function(fun = dnorm, args = list(sd = 0.7), geom = \"line\", color = \"blue\")\ntaller &lt;- scale_y_continuous(limits = c(0, 0.6))\n\nbackground +\n  stat_function(\n    fun = dnorm, args = list(sd = 0.7), geom = \"area\", fill = \"red\", xlim = c(xmin, -2)\n  ) +\n  stat_function(\n    fun = dnorm, args = list(sd = 0.7), geom = \"area\", fill = \"green\", xlim = c(1, xmax)\n  ) +\n  constrained +\n  taller\n\n\n\n\n\n\n\nsave_png(\"03-constrained.png\")\n\nPlotting both on the same grid shows the reduction in both “bad” and “good” outcomes:\n\nbackground +\n  bad +\n  good +\n  baseline +\n  constrained +\n  taller\n\n\n\n\n\n\n\nsave_png(\"04-baseline-constrained.png\")",
+    "crumbs": [
+      "Changelog",
+      "Constraints vs Performance"
+    ]
+  },
+  {
+    "objectID": "analysis/constraints.html#improved-performance",
+    "href": "analysis/constraints.html#improved-performance",
+    "title": "Constraints vs Performance",
+    "section": "Improved Performance",
+    "text": "Improved Performance\nAnother way of reducing bad outcomes is by improving performance - shifting the mean.\n\nperformance &lt;- stat_function(fun = dnorm, args = list(mean = 1), geom = \"line\", color = \"blue\")\nimproved &lt;- stat_function(\n  fun = dnorm, args = list(mean = 1), geom = \"area\", fill = \"green\", xlim = c(1, xmax)\n)\n\nbackground +\n  stat_function(\n    fun = dnorm, args = list(mean = 1), geom = \"area\", fill = \"red\", xlim = c(xmin, -2)\n  ) +\n  improved +\n  performance\n\n\n\n\n\n\n\nsave_png(\"05-improved.png\")\n\nPlotting both together shows a reduction in “bad” and an increase in “good” outcomes:\n\nbackground +\n  bad +\n  improved +\n  baseline +\n  performance\n\n\n\n\n\n\n\nsave_png(\"06-baseline-improved.png\")\n\nComparing all three:\n\nbackground +\n  bad +\n  improved +\n  baseline +\n  constrained +\n  performance +\n  taller\n\n\n\n\n\n\n\nsave_png(\"07-baseline-constrained-improved.png\")",
+    "crumbs": [
+      "Changelog",
+      "Constraints vs Performance"
+    ]
+  },
+  {
+    "objectID": "analysis/constraints.html#growth-of-controls",
+    "href": "analysis/constraints.html#growth-of-controls",
+    "title": "Constraints vs Performance",
+    "section": "Growth of Controls",
+    "text": "Growth of Controls\nVisualize an example of the growth of controls using the Cyentia/RiskRecon State of Third-Party Risk Management 2020 and 2024 reports (data from 2023).\nSource:\n\n2020 data: https://www.riskrecon.com/state-of-third-party-risk-management-report\n2023 data: https://www.riskrecon.com/state-of-third-party-risk-management-2024\n\n\nquestionnaire &lt;- tribble(\n  ~year, ~questions, ~percent,\n  2020,  \"&gt;400\",     0.041,\n  2020,  \"101-400\",  0.148,\n  2020,  \"11-100\",   0.705,\n  2020,  \"1-10\",     0.107,\n  2023,  \"&gt;400\",     0.02,\n  2023,  \"101-400\",  0.333,\n  2023,  \"11-100\",   0.616,\n  2023,  \"1-10\",     0.030\n) |&gt;\n  mutate(\n    year = as.factor(year),\n    questions = factor(questions, levels = c(\"1-10\", \"11-100\", \"101-400\", \"&gt;400\"))\n  )\n\nggplot(questionnaire, aes(questions, percent, fill = year)) +\n  geom_col(position = \"dodge\") +\n  scale_y_continuous(labels = scales::label_percent()) +\n  scale_fill_manual(values = c(\"steelblue2\", \"steelblue4\")) +\n  labs(x = NULL, y = NULL, fill = \"Year\", title = \"Third-Party Questionnaire Length by Year\") +\n  labs(caption = \"Source: Cyentia/RiskRecon State of Third-Party Risk Management, 2020 and 2024\") +\n  theme_quo()\n\n\n\n\n\n\n\nsave_png(\"08-questionnaire-length.png\")",
+    "crumbs": [
+      "Changelog",
+      "Constraints vs Performance"
+    ]
+  },
+  {
+    "objectID": "analysis/constraints.html#transparent-donut",
+    "href": "analysis/constraints.html#transparent-donut",
+    "title": "Constraints vs Performance",
+    "section": "Transparent Donut",
+    "text": "Transparent Donut\nCreate a transparent donut plot showing an 80% reduction.\n\n# custom function based on ggplot_donut_percent()\ncustom_donut &lt;- function(p, text = \"\", accuracy = NULL, hsize = 4, size = 12, family = \"Lato\") {\n  percent_true &lt;- data.frame(group = c(TRUE, FALSE), n = c(p, 1 - p))\n  label &lt;- paste0(scales::label_percent(accuracy = accuracy)(p), \"\\n\", text)\n\n  ggplot_donut(percent_true, hsize = hsize) +\n    guides(fill = \"none\") +\n    geom_text(x = 0, label = label, size = size, family = family) +\n    scale_fill_grey() +\n    theme(plot.background = element_rect(fill = \"transparent\", color = NA))\n}\n\ncustom_donut(0.8, \"reduction\")\n\n\n\n\n\n\n\nggsave(\"rendered/80-percent-safety.png\")\n\nSaving 8.5 x 5 in image\n\ncustom_donut(0.8, \"reduction?\")\n\n\n\n\n\n\n\nggsave(\"rendered/80-percent-security.png\")\n\nSaving 8.5 x 5 in image",
+    "crumbs": [
+      "Changelog",
+      "Constraints vs Performance"
+    ]
+  },
+  {
+    "objectID": "analysis/visualizing-risk.html",
+    "href": "analysis/visualizing-risk.html",
+    "title": "Visualizing Risk (Draft)",
+    "section": "",
+    "text": "An exploration of different approaches to communicating security breach risk informed by prior work.",
+    "crumbs": [
+      "Changelog",
+      "Visualizing Risk (Draft)"
+    ]
+  },
+  {
+    "objectID": "analysis/visualizing-risk.html#questionstodo",
+    "href": "analysis/visualizing-risk.html#questionstodo",
+    "title": "Visualizing Risk (Draft)",
+    "section": "Questions/TODO",
+    "text": "Questions/TODO\n\nHow should tail risk be visualized?\nHow well do quantile dotplots capture tail risk?\nReview Open Group work on cyber risk\n\nCalculating Reserves for Cyber Risk: Integrating Cyber Risk with Financial Risk\nCalculating Reserves for Cyber Risk: An Open FAIR Approach\n\n\n\n# no libraries",
+    "crumbs": [
+      "Changelog",
+      "Visualizing Risk (Draft)"
+    ]
+  },
+  {
+    "objectID": "analysis/visualizing-risk.html#background",
+    "href": "analysis/visualizing-risk.html#background",
+    "title": "Visualizing Risk (Draft)",
+    "section": "Background",
+    "text": "Background\nThe Risk Value Analysis found that a firm’s executive is unlikely to invest in reducing the risk of a large security breach, suggesting that security spending should be presented differently:\n\nAt the firm level, I think this means that security leaders shouldn’t present security as an investment. As with safety, I think the main argument for better security is a moral or emotional case: we care about security because we care about our customers, partners, and other stakeholders. Also, people are typically loss-averse, so expressing security risk in those terms will better connect with decision makers. Using Tail value at risk or Loss Exceedance Curves express loss in this way - “There’s a 5% chance of cybersecurity losses exceeding $780,000 and a 1% chance of losses exceeding $25,000,000 over the next year.” I also think it means security leaders should be mindful of how they spend their limited funds, by maximizing investments in what works.\n\nThis analysis explores different approaches to communicating that risk with the goal of promoting decisions on security spending so that all participants are satisfied with the outcome, informed by prior work on risk communication and risk perception, including the work of Lace Padilla, and Cyentia’s analysis on tail value at risk.",
+    "crumbs": [
+      "Changelog",
+      "Visualizing Risk (Draft)"
+    ]
+  },
+  {
+    "objectID": "LICENSE.html",
+    "href": "LICENSE.html",
+    "title": "MIT License",
+    "section": "",
+    "text": "MIT License\nCopyright (c) 2026 John Benninghoff\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:\nThe above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\nTHE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
+  },
+  {
+    "objectID": "analysis/breach-rates.html",
+    "href": "analysis/breach-rates.html",
+    "title": "Measuring Changes in Breach Rates",
+    "section": "",
+    "text": "A critical review of using breach frequency as a measure of security success, inspired by Incident Metrics in SRE: Critically Evaluating MTTR and Friends.\nlibrary(poilog)\nlibrary(tibble)\nlibrary(dplyr)",
+    "crumbs": [
+      "Changelog",
+      "Measuring Changes in Breach Rates"
+    ]
+  },
+  {
+    "objectID": "analysis/breach-rates.html#background",
+    "href": "analysis/breach-rates.html#background",
+    "title": "Measuring Changes in Breach Rates",
+    "section": "Background",
+    "text": "Background\nIncident Metrics in SRE: Critically Evaluating MTTR and Friends demonstrated the difficulty at detecting changes in MTTR over time. The paper tests a 10% reduction in MTTR using Monte Carlo simulation, and found:\n\n“Yikes! Even though in the simulation the improvement always worked, 38% of the simulations had the MTTR difference fall below zero for Company A, 40% for Company B, and 20% for Company C. Looking at the absolute change in MTTR, the probability of seeing at least a 15-minute improvement is only 49%, 50%, and 64%, respectively. Even though the product in the scenario worked and shortened incidents, the odds of detecting any improvement at all are well outside the tolerance of 10% random flukes.”\n\nSafety Differently argues that we shouldn’t measure success based on the absence of negative events. We can use real data on data breaches and Monte Carlo simulation to explore the question, “Is an organization’s breach rate a useful metric?”",
+    "crumbs": [
+      "Changelog",
+      "Measuring Changes in Breach Rates"
+    ]
+  },
+  {
+    "objectID": "analysis/breach-rates.html#poisson-log-normal-model",
+    "href": "analysis/breach-rates.html#poisson-log-normal-model",
+    "title": "Measuring Changes in Breach Rates",
+    "section": "Poisson Log-Normal Model",
+    "text": "Poisson Log-Normal Model\nThe 2022 Information Risk Insights Study (IRIS) found that a Poisson log-normal distribution fits the data and provides realistic forecasts for years with multiple breaches, and provides suggested values for mean (\\(\\mu\\)) and standard deviation (\\(\\sigma\\)) in Table 1, along with the likelihood of a breach with models that are adjusted for firm size in Table 2, since larger firms are more likely to experience a breach.\nUsing the provided parameters from Table 1, we get:\n\nbreach_poilog &lt;- function(mu, sig, runs = 1e6) {\n  breaches &lt;- rpoilog(runs, mu, sig)\n  tibble(\n    \"One or more\" = sum(breaches &gt;= 1) / runs,\n    \"Two or more\" = sum(breaches &gt;= 2) / runs,\n    \"Three or more\" = sum(breaches &gt;= 3) / runs\n  )\n}\n\nbreach_poilog(mu = -2.284585, sig = 0.8690759)\n\n# A tibble: 1 × 3\n  `One or more` `Two or more` `Three or more`\n          &lt;dbl&gt;         &lt;dbl&gt;           &lt;dbl&gt;\n1         0.129        0.0165         0.00248\n\n\nThese values are close to the upper bound for a firm in the $100M to $1B range on Table 2.",
+    "crumbs": [
+      "Changelog",
+      "Measuring Changes in Breach Rates"
+    ]
+  },
+  {
+    "objectID": "analysis/breach-rates.html#poisson-model",
+    "href": "analysis/breach-rates.html#poisson-model",
+    "title": "Measuring Changes in Breach Rates",
+    "section": "Poisson Model",
+    "text": "Poisson Model\nIf we were to use the number of breaches a firm has experienced as a useful metric, in the best-case scenario, we would have a high rate of breaches with a significant reduction after implementing a new control. Unfortunately, the IRIS paper doesn’t provide the model parameters for the group with the highest likelihood of a breach, firms with more than $100B in revenue. Additionally, because it is easier to understand and calculate improvements, we’d like to use a plain Poisson distribution, which has a single parameter for average arrival rate, \\(\\lambda\\).\nWe can find a reasonable value for \\(\\lambda\\) using trial and error:\n\nbreach_pois &lt;- function(lambda, runs = 1e6) {\n  breaches &lt;- rpois(runs, lambda)\n  tibble(\n    \"One or more\" = sum(breaches &gt;= 1) / runs,\n    \"Two or more\" = sum(breaches &gt;= 2) / runs,\n    \"Three or more\" = sum(breaches &gt;= 3) / runs\n  )\n}\n\nbase_lambda &lt;- 0.347\nbreach_pois(base_lambda)\n\n# A tibble: 1 × 3\n  `One or more` `Two or more` `Three or more`\n          &lt;dbl&gt;         &lt;dbl&gt;           &lt;dbl&gt;\n1         0.293        0.0479         0.00542\n\n\nA Poisson model with a \\(\\lambda\\) of 0.347 (a little more than once every three years) gives similar results to the Poisson log-normal model for the largest firms for one or more breaches, but underestimates the likelihood for 2+ and 3+.",
+    "crumbs": [
+      "Changelog",
+      "Measuring Changes in Breach Rates"
+    ]
+  },
+  {
+    "objectID": "analysis/breach-rates.html#simulate-improvement",
+    "href": "analysis/breach-rates.html#simulate-improvement",
+    "title": "Measuring Changes in Breach Rates",
+    "section": "Simulate Improvement",
+    "text": "Simulate Improvement\nUsing the Poisson model, it is easy to simulate improvements.\nLet’s assume that the firm implements a new security control that reduces the likelihood of a breach by 25%, and compares the number of breaches in the 5 years before and after implementing that control. We then simulate this scenario 100,000 times:\n\nsimulation &lt;- function(years, reduction, runs = 1e5) {\n  tibble(\n    base = replicate(runs, sum(rpois(years, base_lambda))),\n    new = replicate(runs, sum(rpois(years, base_lambda * (1 - reduction))))\n  ) |&gt;\n    mutate(\n      better = .data$new &lt; .data$base, worse = .data$new &gt; .data$base,\n      same = .data$new == .data$base\n    )\n}\n\nresults &lt;- simulation(5, 0.25)\nhead(results, 10)\n\n# A tibble: 10 × 5\n    base   new better worse same \n   &lt;int&gt; &lt;int&gt; &lt;lgl&gt;  &lt;lgl&gt; &lt;lgl&gt;\n 1     2     2 FALSE  FALSE TRUE \n 2     5     2 TRUE   FALSE FALSE\n 3     0     0 FALSE  FALSE TRUE \n 4     1     3 FALSE  TRUE  FALSE\n 5     2     2 FALSE  FALSE TRUE \n 6     1     0 TRUE   FALSE FALSE\n 7     0     2 FALSE  TRUE  FALSE\n 8     3     0 TRUE   FALSE FALSE\n 9     1     2 FALSE  TRUE  FALSE\n10     2     0 TRUE   FALSE FALSE\n\n\nOK, what are the results?\n\nsummarize_results &lt;- function(data) {\n  data |&gt;\n    summarize(\n      better = sum(.data$better) / n(), worse = sum(.data$worse) / n(),\n      same = sum(.data$same) / n()\n    )\n}\n\nsummarize_results(results)\n\n# A tibble: 1 × 3\n  better worse  same\n   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;\n1  0.477 0.288 0.234\n\n\nFor this scenario, even though the true rate of breaches has been reduced by 25%, the number of breaches in the 5 years after implementing the control is better less than 50% of the time, and is actually worse nearly 30% of the time!",
+    "crumbs": [
+      "Changelog",
+      "Measuring Changes in Breach Rates"
+    ]
+  },
+  {
+    "objectID": "analysis/breach-rates.html#larger-sample",
+    "href": "analysis/breach-rates.html#larger-sample",
+    "title": "Measuring Changes in Breach Rates",
+    "section": "Larger Sample",
+    "text": "Larger Sample\nTo improve the likelihood of detecting the improvement, we can adjust the scenario, taking a larger sample of years before and after implementing the new control. How many years would we need to get a confident measurement of improvement?\n\nsimulation(10, 0.25) |&gt;\n  summarize_results()\n\n# A tibble: 1 × 3\n  better worse  same\n   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;\n1  0.556 0.287 0.157\n\nsimulation(50, 0.25) |&gt;\n  summarize_results()\n\n# A tibble: 1 × 3\n  better worse   same\n   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;\n1  0.756 0.190 0.0546\n\nsimulation(250, 0.25) |&gt;\n  summarize_results()\n\n# A tibble: 1 × 3\n  better  worse    same\n   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;\n1  0.958 0.0352 0.00666\n\n\nOnly the simulation which tests 250 years before and after (a total of 500 years!) gives a somewhat reasonable indication of improvement - and keep in mind that “better” is a reduction of any amount. Running metrics for a period this long at a single firm is impractical, which leads to our conclusion…",
+    "crumbs": [
+      "Changelog",
+      "Measuring Changes in Breach Rates"
+    ]
+  },
+  {
+    "objectID": "analysis/breach-rates.html#conclusion",
+    "href": "analysis/breach-rates.html#conclusion",
+    "title": "Measuring Changes in Breach Rates",
+    "section": "Conclusion",
+    "text": "Conclusion\nEven in a “best case” scenario of a very large firm that is able to measure the number of breaches over a 10 year period, a 25% reduction in breach rate only results in a lower number of actual breaches less than 50% of the time. A sample period of 500 years or more is needed to have confidence that the breach rate has been reduced.\nRealistically, this means that the only way to test the effectiveness of security controls is by sampling across large numbers of firms. A single organization simply won’t have enough data to make reasonable conclusions based on events that happen so infrequently.",
+    "crumbs": [
+      "Changelog",
+      "Measuring Changes in Breach Rates"
+    ]
+  },
+  {
+    "objectID": "analysis/rq-demo.html",
+    "href": "analysis/rq-demo.html",
+    "title": "Risk Quantification Demo",
+    "section": "",
+    "text": "Risk Quantification demonstration for my SIRAcon 2024 talk, “UnFAIR: Simplifying and Expanding Technology Risk Quantification.”\nNote: the functions and report in the demo below have been migrated to a new project, quantrr, that supports both experienced R users with a package / RStudio installation, and novice users with a standalone installation. (I wanted to name it “qrisk”, but that’s already trademarked).",
+    "crumbs": [
+      "Changelog",
+      "Risk Quantification Demo"
+    ]
+  },
+  {
+    "objectID": "analysis/rq-demo.html#questionstodo",
+    "href": "analysis/rq-demo.html#questionstodo",
+    "title": "Risk Quantification Demo",
+    "section": "Questions/TODO",
+    "text": "Questions/TODO\n\nAdd before and after: baseline risk vs after investment, which allows calculation of ROI.\nInvestigate use of mc2d",
+    "crumbs": [
+      "Changelog",
+      "Risk Quantification Demo"
+    ]
+  },
+  {
+    "objectID": "analysis/rq-demo.html#environment-statement",
+    "href": "analysis/rq-demo.html#environment-statement",
+    "title": "Risk Quantification Demo",
+    "section": "Environment Statement",
+    "text": "Environment Statement\nThe widget management system is over 30 years old and its architecture has not changed significantly since the original implementation. Over the years, the widget system has become an integral part of our services in managing widgets for our clients. In reviewing the system, three major risks were identified: First, the age of the technology prevents updating components of the system that no longer meet contemporary cybersecurity standards, which increases the risk of a breach. Second, the system is less reliable and experiences frequent outages, typically about 2 major outages per year, which results in lost revenue, contractual penalties, and overtime pay to recover from the incident. Third, limitations of the widget system have started to affect sales - we have recently lost a customer due to the functional obsolescence of the widget system, and expect to both lose more existing and prospective customers in the future due to increased competition in the widget management market.",
+    "crumbs": [
+      "Changelog",
+      "Risk Quantification Demo"
+    ]
+  },
+  {
+    "objectID": "analysis/rq-demo.html#import",
+    "href": "analysis/rq-demo.html#import",
+    "title": "Risk Quantification Demo",
+    "section": "Import",
+    "text": "Import\nImport and validate data from Excel. The data in demo.xlsx is based on the examples developed here. The data was collected from 3 Technology SMEs, 3 Business SMEs, and one SME with experience in both. Experts were calibrated, informed by historical and industry data, and only gave estimates for areas in which they were confident in answering.",
+    "crumbs": [
+      "Changelog",
+      "Risk Quantification Demo"
+    ]
+  },
+  {
+    "objectID": "analysis/rq-demo.html#risks",
+    "href": "analysis/rq-demo.html#risks",
+    "title": "Risk Quantification Demo",
+    "section": "Risks",
+    "text": "Risks\nRisk descriptions:\n\n\n\n\n\n\nrisk\n\n\ndescription\n\n\n\n\n\n\nCybersecurity Breach\n\n\nRisk of a cybersecurity breach of the inventory system.\n\n\n\n\nTechnology Outage\n\n\nRisk of an inventory system outage.\n\n\n\n\nLoss of Customer\n\n\nRisk of losing and existing customer or failure to acquire a new customer due to functional limitations of the inventory system.",
+    "crumbs": [
+      "Changelog",
+      "Risk Quantification Demo"
+    ]
+  },
+  {
+    "objectID": "analysis/rq-demo.html#forecast",
+    "href": "analysis/rq-demo.html#forecast",
+    "title": "Risk Quantification Demo",
+    "section": "Forecast",
+    "text": "Forecast\nForecast risk using Monte Carlo simulation. The average events and losses for each risk are summarized below:\n\n\n\n\n\n\nrisk\n\n\navg_events\n\n\navg_losses\n\n\n\n\n\n\nCybersecurity Breach\n\n\n0.26212\n\n\n$7,795,932\n\n\n\n\nLoss of Customer\n\n\n2.00380\n\n\n$10,562,081\n\n\n\n\nTechnology Outage\n\n\n1.98676\n\n\n$95,630",
+    "crumbs": [
+      "Changelog",
+      "Risk Quantification Demo"
+    ]
+  },
+  {
+    "objectID": "analysis/rq-demo.html#losses",
+    "href": "analysis/rq-demo.html#losses",
+    "title": "Risk Quantification Demo",
+    "section": "Losses",
+    "text": "Losses\nLosses by risk separately and in aggregate:",
+    "crumbs": [
+      "Changelog",
+      "Risk Quantification Demo"
+    ]
+  },
+  {
+    "objectID": "analysis/rq-demo.html#loss-exceedance-curves",
+    "href": "analysis/rq-demo.html#loss-exceedance-curves",
+    "title": "Risk Quantification Demo",
+    "section": "Loss Exceedance Curves",
+    "text": "Loss Exceedance Curves\nPlot loss exceedance curves for all risks and combined risk.\n\nBy Risk\nPlot loss exceedance curves for each risk:\n\n\n\n\n\n\n\n\n\nInteractive plot:\n\n\n\n\n\n\n\n\nCombined Risk\nPlot loss exceedance curve for combined risk:\n\n\n\n\n\n\n\n\n\nInteractive plot:",
+    "crumbs": [
+      "Changelog",
+      "Risk Quantification Demo"
+    ]
+  },
+  {
+    "objectID": "analysis/rq-demo.html#appendix",
+    "href": "analysis/rq-demo.html#appendix",
+    "title": "Risk Quantification Demo",
+    "section": "Appendix",
+    "text": "Appendix\nAdditional details on the risk quantification analysis.\n\nValidation\nData validation results for Risks tab:\n\n\n\n\n\n\n\n\n\nData validation results for Estimates tab:\n\n\n\n\n\n\n\n\n\n\n\nEstimates\nAll risk estimates:\n\n\n\n\n\n\nrisk\n\n\nexpert\n\n\nlambda\n\n\np05\n\n\np95\n\n\np50\n\n\n\n\n\n\nCybersecurity Breach\n\n\nTechnology Expert 1\n\n\n0.25\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nCybersecurity Breach\n\n\nTechnology Expert 2\n\n\n0.33\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nCybersecurity Breach\n\n\nTechnology Expert 3\n\n\n0.20\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nCybersecurity Breach\n\n\nBusiness Expert 1\n\n\nNA\n\n\n$2,000\n\n\n$45,000,000\n\n\n$300,000\n\n\n\n\nCybersecurity Breach\n\n\nBusiness Expert 2\n\n\nNA\n\n\n$1,400\n\n\n$34,000,000\n\n\n$200,000\n\n\n\n\nCybersecurity Breach\n\n\nBusiness Expert 3\n\n\nNA\n\n\n$2,100\n\n\n$54,000,000\n\n\n$500,000\n\n\n\n\nCybersecurity Breach\n\n\nUnicorn Expert\n\n\n0.25\n\n\n$1,900\n\n\n$44,000,000\n\n\n$275,000\n\n\n\n\nTechnology Outage\n\n\nTechnology Expert 1\n\n\n2.00\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nTechnology Outage\n\n\nTechnology Expert 2\n\n\n3.00\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nTechnology Outage\n\n\nTechnology Expert 3\n\n\n1.00\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nTechnology Outage\n\n\nBusiness Expert 1\n\n\nNA\n\n\n$700\n\n\n$200,000\n\n\n$15,000\n\n\n\n\nTechnology Outage\n\n\nBusiness Expert 2\n\n\nNA\n\n\n$500\n\n\n$150,000\n\n\n$10,000\n\n\n\n\nTechnology Outage\n\n\nBusiness Expert 3\n\n\nNA\n\n\n$675\n\n\n$180,000\n\n\n$11,000\n\n\n\n\nTechnology Outage\n\n\nUnicorn Expert\n\n\n2.00\n\n\n$800\n\n\n$220,000\n\n\n$16,000\n\n\n\n\nLoss of Customer\n\n\nTechnology Expert 1\n\n\nNA\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nLoss of Customer\n\n\nTechnology Expert 2\n\n\nNA\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nLoss of Customer\n\n\nTechnology Expert 3\n\n\nNA\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nLoss of Customer\n\n\nBusiness Expert 1\n\n\n2.00\n\n\n$100,000\n\n\n$20,000,000\n\n\n$1,500,000\n\n\n\n\nLoss of Customer\n\n\nBusiness Expert 2\n\n\n3.00\n\n\n$150,000\n\n\n$30,000,000\n\n\n$2,000,000\n\n\n\n\nLoss of Customer\n\n\nBusiness Expert 3\n\n\n1.00\n\n\n$75,000\n\n\n$15,000,000\n\n\n$1,200,000\n\n\n\n\nLoss of Customer\n\n\nUnicorn Expert\n\n\n2.00\n\n\n$75,000\n\n\n$15,000,000\n\n\n$1,000,000\n\n\n\n\n\n\n\n\nConsensus Estimate\nUsing a simple average of all experts that provided an estimate (not blank/NA), this gives us a consensus estimate for the three risks of:\n\n\n\n\n\n\nrisk\n\n\nlambda\n\n\np05\n\n\np95\n\n\np50\n\n\n\n\n\n\nCybersecurity Breach\n\n\n0.2575\n\n\n$1,850\n\n\n$44,250,000\n\n\n$318,750\n\n\n\n\nLoss of Customer\n\n\n2.0000\n\n\n$100,000\n\n\n$20,000,000\n\n\n$1,425,000\n\n\n\n\nTechnology Outage\n\n\n2.0000\n\n\n$669\n\n\n$187,500\n\n\n$13,000\n\n\n\n\n\n\nThe consensus estimates for p05 and p95 result in the following parameters for log-normal loss magnitude. The p50 estimate is used to calculate the percentage difference from the actual median (mdiff), a measure of estimate accuracy:\n\n\n\n\n\n\nrisk\n\n\nlambda\n\n\np05\n\n\np95\n\n\np50\n\n\nmeanlog\n\n\nsdlog\n\n\nmdiff\n\n\n\n\n\n\nCybersecurity Breach\n\n\n0.2575\n\n\n$1,850\n\n\n$44,250,000\n\n\n$318,750\n\n\n12.564153\n\n\n3.064840\n\n\n11.41%\n\n\n\n\nLoss of Customer\n\n\n2.0000\n\n\n$100,000\n\n\n$20,000,000\n\n\n$1,425,000\n\n\n14.162084\n\n\n1.610574\n\n\n0.76%\n\n\n\n\nTechnology Outage\n\n\n2.0000\n\n\n$669\n\n\n$187,500\n\n\n$13,000\n\n\n9.323472\n\n\n1.713260\n\n\n16.09%\n\n\n\n\n\n\n\n\nForecast Summary\nA summary() of the forecast results.\n\n\n      year              risk           treatment         events     \n Min.   :    1   Length   :75000   Length   :75000   Min.   :0.000  \n 1st Qu.: 6251   N.unique :    3   N.unique :    1   1st Qu.:0.000  \n Median :12500   N.blank  :    0   N.blank  :    0   Median :1.000  \n Mean   :12500   Min.nchar:   16   Min.nchar:    4   Mean   :1.418  \n 3rd Qu.:18750   Max.nchar:   20   Max.nchar:    4   3rd Qu.:2.000  \n Max.   :25000                                       Max.   :9.000  \n     losses         \n Min.   :0.000e+00  \n 1st Qu.:0.000e+00  \n Median :3.606e+04  \n Mean   :6.151e+06  \n 3rd Qu.:1.454e+06  \n Max.   :2.891e+10",
+    "crumbs": [
+      "Changelog",
+      "Risk Quantification Demo"
+    ]
+  },
+  {
+    "objectID": "analysis/rq-demo.html#individual-histograms",
+    "href": "analysis/rq-demo.html#individual-histograms",
+    "title": "Risk Quantification Demo",
+    "section": "Individual Histograms",
+    "text": "Individual Histograms\nPlot Cybersecurity and Outage histograms independently, for a new talk, Is the S in SRE for “Security”?. Not included in the original SIRAcon 2024 talk.",
+    "crumbs": [
+      "Changelog",
+      "Risk Quantification Demo"
+    ]
+  },
+  {
     "objectID": "analysis/rq-prototype.html",
     "href": "analysis/rq-prototype.html",
     "title": "Risk Quantification Prototype",
@@ -426,299 +781,6 @@
     ]
   },
   {
-    "objectID": "analysis/rq-demo.html",
-    "href": "analysis/rq-demo.html",
-    "title": "Risk Quantification Demo",
-    "section": "",
-    "text": "Risk Quantification demonstration for my SIRAcon 2024 talk, “UnFAIR: Simplifying and Expanding Technology Risk Quantification.”\nNote: the functions and report in the demo below have been migrated to a new project, quantrr, that supports both experienced R users with a package / RStudio installation, and novice users with a standalone installation. (I wanted to name it “qrisk”, but that’s already trademarked).",
-    "crumbs": [
-      "Changelog",
-      "Risk Quantification Demo"
-    ]
-  },
-  {
-    "objectID": "analysis/rq-demo.html#questionstodo",
-    "href": "analysis/rq-demo.html#questionstodo",
-    "title": "Risk Quantification Demo",
-    "section": "Questions/TODO",
-    "text": "Questions/TODO\n\nAdd before and after: baseline risk vs after investment, which allows calculation of ROI.\nInvestigate use of mc2d",
-    "crumbs": [
-      "Changelog",
-      "Risk Quantification Demo"
-    ]
-  },
-  {
-    "objectID": "analysis/rq-demo.html#environment-statement",
-    "href": "analysis/rq-demo.html#environment-statement",
-    "title": "Risk Quantification Demo",
-    "section": "Environment Statement",
-    "text": "Environment Statement\nThe widget management system is over 30 years old and its architecture has not changed significantly since the original implementation. Over the years, the widget system has become an integral part of our services in managing widgets for our clients. In reviewing the system, three major risks were identified: First, the age of the technology prevents updating components of the system that no longer meet contemporary cybersecurity standards, which increases the risk of a breach. Second, the system is less reliable and experiences frequent outages, typically about 2 major outages per year, which results in lost revenue, contractual penalties, and overtime pay to recover from the incident. Third, limitations of the widget system have started to affect sales - we have recently lost a customer due to the functional obsolescence of the widget system, and expect to both lose more existing and prospective customers in the future due to increased competition in the widget management market.",
-    "crumbs": [
-      "Changelog",
-      "Risk Quantification Demo"
-    ]
-  },
-  {
-    "objectID": "analysis/rq-demo.html#import",
-    "href": "analysis/rq-demo.html#import",
-    "title": "Risk Quantification Demo",
-    "section": "Import",
-    "text": "Import\nImport and validate data from Excel. The data in demo.xlsx is based on the examples developed here. The data was collected from 3 Technology SMEs, 3 Business SMEs, and one SME with experience in both. Experts were calibrated, informed by historical and industry data, and only gave estimates for areas in which they were confident in answering.",
-    "crumbs": [
-      "Changelog",
-      "Risk Quantification Demo"
-    ]
-  },
-  {
-    "objectID": "analysis/rq-demo.html#risks",
-    "href": "analysis/rq-demo.html#risks",
-    "title": "Risk Quantification Demo",
-    "section": "Risks",
-    "text": "Risks\nRisk descriptions:\n\n\n\n\n\n\nrisk\n\n\ndescription\n\n\n\n\n\n\nCybersecurity Breach\n\n\nRisk of a cybersecurity breach of the inventory system.\n\n\n\n\nTechnology Outage\n\n\nRisk of an inventory system outage.\n\n\n\n\nLoss of Customer\n\n\nRisk of losing and existing customer or failure to acquire a new customer due to functional limitations of the inventory system.",
-    "crumbs": [
-      "Changelog",
-      "Risk Quantification Demo"
-    ]
-  },
-  {
-    "objectID": "analysis/rq-demo.html#forecast",
-    "href": "analysis/rq-demo.html#forecast",
-    "title": "Risk Quantification Demo",
-    "section": "Forecast",
-    "text": "Forecast\nForecast risk using Monte Carlo simulation. The average events and losses for each risk are summarized below:\n\n\n\n\n\n\nrisk\n\n\navg_events\n\n\navg_losses\n\n\n\n\n\n\nCybersecurity Breach\n\n\n0.25524\n\n\n$5,390,523\n\n\n\n\nLoss of Customer\n\n\n2.00340\n\n\n$10,408,488\n\n\n\n\nTechnology Outage\n\n\n2.00708\n\n\n$98,561",
-    "crumbs": [
-      "Changelog",
-      "Risk Quantification Demo"
-    ]
-  },
-  {
-    "objectID": "analysis/rq-demo.html#losses",
-    "href": "analysis/rq-demo.html#losses",
-    "title": "Risk Quantification Demo",
-    "section": "Losses",
-    "text": "Losses\nLosses by risk separately and in aggregate:",
-    "crumbs": [
-      "Changelog",
-      "Risk Quantification Demo"
-    ]
-  },
-  {
-    "objectID": "analysis/rq-demo.html#loss-exceedance-curves",
-    "href": "analysis/rq-demo.html#loss-exceedance-curves",
-    "title": "Risk Quantification Demo",
-    "section": "Loss Exceedance Curves",
-    "text": "Loss Exceedance Curves\nPlot loss exceedance curves for all risks and combined risk.\n\nBy Risk\nPlot loss exceedance curves for each risk:\n\n\n\n\n\n\n\n\n\nInteractive plot:\n\n\n\n\n\n\n\n\nCombined Risk\nPlot loss exceedance curve for combined risk:\n\n\n\n\n\n\n\n\n\nInteractive plot:",
-    "crumbs": [
-      "Changelog",
-      "Risk Quantification Demo"
-    ]
-  },
-  {
-    "objectID": "analysis/rq-demo.html#appendix",
-    "href": "analysis/rq-demo.html#appendix",
-    "title": "Risk Quantification Demo",
-    "section": "Appendix",
-    "text": "Appendix\nAdditional details on the risk quantification analysis.\n\nValidation\nData validation results for Risks tab:\n\n\n\n\n\n\n\n\n\nData validation results for Estimates tab:\n\n\n\n\n\n\n\n\n\n\n\nEstimates\nAll risk estimates:\n\n\n\n\n\n\nrisk\n\n\nexpert\n\n\nlambda\n\n\np05\n\n\np95\n\n\np50\n\n\n\n\n\n\nCybersecurity Breach\n\n\nTechnology Expert 1\n\n\n0.25\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nCybersecurity Breach\n\n\nTechnology Expert 2\n\n\n0.33\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nCybersecurity Breach\n\n\nTechnology Expert 3\n\n\n0.20\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nCybersecurity Breach\n\n\nBusiness Expert 1\n\n\nNA\n\n\n$2,000\n\n\n$45,000,000\n\n\n$300,000\n\n\n\n\nCybersecurity Breach\n\n\nBusiness Expert 2\n\n\nNA\n\n\n$1,400\n\n\n$34,000,000\n\n\n$200,000\n\n\n\n\nCybersecurity Breach\n\n\nBusiness Expert 3\n\n\nNA\n\n\n$2,100\n\n\n$54,000,000\n\n\n$500,000\n\n\n\n\nCybersecurity Breach\n\n\nUnicorn Expert\n\n\n0.25\n\n\n$1,900\n\n\n$44,000,000\n\n\n$275,000\n\n\n\n\nTechnology Outage\n\n\nTechnology Expert 1\n\n\n2.00\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nTechnology Outage\n\n\nTechnology Expert 2\n\n\n3.00\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nTechnology Outage\n\n\nTechnology Expert 3\n\n\n1.00\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nTechnology Outage\n\n\nBusiness Expert 1\n\n\nNA\n\n\n$700\n\n\n$200,000\n\n\n$15,000\n\n\n\n\nTechnology Outage\n\n\nBusiness Expert 2\n\n\nNA\n\n\n$500\n\n\n$150,000\n\n\n$10,000\n\n\n\n\nTechnology Outage\n\n\nBusiness Expert 3\n\n\nNA\n\n\n$675\n\n\n$180,000\n\n\n$11,000\n\n\n\n\nTechnology Outage\n\n\nUnicorn Expert\n\n\n2.00\n\n\n$800\n\n\n$220,000\n\n\n$16,000\n\n\n\n\nLoss of Customer\n\n\nTechnology Expert 1\n\n\nNA\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nLoss of Customer\n\n\nTechnology Expert 2\n\n\nNA\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nLoss of Customer\n\n\nTechnology Expert 3\n\n\nNA\n\n\nNA\n\n\nNA\n\n\nNA\n\n\n\n\nLoss of Customer\n\n\nBusiness Expert 1\n\n\n2.00\n\n\n$100,000\n\n\n$20,000,000\n\n\n$1,500,000\n\n\n\n\nLoss of Customer\n\n\nBusiness Expert 2\n\n\n3.00\n\n\n$150,000\n\n\n$30,000,000\n\n\n$2,000,000\n\n\n\n\nLoss of Customer\n\n\nBusiness Expert 3\n\n\n1.00\n\n\n$75,000\n\n\n$15,000,000\n\n\n$1,200,000\n\n\n\n\nLoss of Customer\n\n\nUnicorn Expert\n\n\n2.00\n\n\n$75,000\n\n\n$15,000,000\n\n\n$1,000,000\n\n\n\n\n\n\n\n\nConsensus Estimate\nUsing a simple average of all experts that provided an estimate (not blank/NA), this gives us a consensus estimate for the three risks of:\n\n\n\n\n\n\nrisk\n\n\nlambda\n\n\np05\n\n\np95\n\n\np50\n\n\n\n\n\n\nCybersecurity Breach\n\n\n0.2575\n\n\n$1,850\n\n\n$44,250,000\n\n\n$318,750\n\n\n\n\nLoss of Customer\n\n\n2.0000\n\n\n$100,000\n\n\n$20,000,000\n\n\n$1,425,000\n\n\n\n\nTechnology Outage\n\n\n2.0000\n\n\n$669\n\n\n$187,500\n\n\n$13,000\n\n\n\n\n\n\nThe consensus estimates for p05 and p95 result in the following parameters for log-normal loss magnitude. The p50 estimate is used to calculate the percentage difference from the actual median (mdiff), a measure of estimate accuracy:\n\n\n\n\n\n\nrisk\n\n\nlambda\n\n\np05\n\n\np95\n\n\np50\n\n\nmeanlog\n\n\nsdlog\n\n\nmdiff\n\n\n\n\n\n\nCybersecurity Breach\n\n\n0.2575\n\n\n$1,850\n\n\n$44,250,000\n\n\n$318,750\n\n\n12.564153\n\n\n3.064840\n\n\n11.41%\n\n\n\n\nLoss of Customer\n\n\n2.0000\n\n\n$100,000\n\n\n$20,000,000\n\n\n$1,425,000\n\n\n14.162084\n\n\n1.610574\n\n\n0.76%\n\n\n\n\nTechnology Outage\n\n\n2.0000\n\n\n$669\n\n\n$187,500\n\n\n$13,000\n\n\n9.323472\n\n\n1.713260\n\n\n16.09%\n\n\n\n\n\n\n\n\nForecast Summary\nA summary() of the forecast results.\n\n\n      year              risk           treatment         events      \n Min.   :    1   Length   :75000   Length   :75000   Min.   : 0.000  \n 1st Qu.: 6251   N.unique :    3   N.unique :    1   1st Qu.: 0.000  \n Median :12500   N.blank  :    0   N.blank  :    0   Median : 1.000  \n Mean   :12500   Min.nchar:   16   Min.nchar:    4   Mean   : 1.422  \n 3rd Qu.:18750   Max.nchar:   20   Max.nchar:    4   3rd Qu.: 2.000  \n Max.   :25000                                       Max.   :11.000  \n     losses         \n Min.   :0.000e+00  \n 1st Qu.:0.000e+00  \n Median :3.610e+04  \n Mean   :5.299e+06  \n 3rd Qu.:1.416e+06  \n Max.   :4.508e+09",
-    "crumbs": [
-      "Changelog",
-      "Risk Quantification Demo"
-    ]
-  },
-  {
-    "objectID": "analysis/rq-demo.html#individual-histograms",
-    "href": "analysis/rq-demo.html#individual-histograms",
-    "title": "Risk Quantification Demo",
-    "section": "Individual Histograms",
-    "text": "Individual Histograms\nPlot Cybersecurity and Outage histograms independently, for a new talk, Is the S in SRE for “Security”?. Not included in the original SIRAcon 2024 talk.",
-    "crumbs": [
-      "Changelog",
-      "Risk Quantification Demo"
-    ]
-  },
-  {
-    "objectID": "analysis/breach-rates.html",
-    "href": "analysis/breach-rates.html",
-    "title": "Measuring Changes in Breach Rates",
-    "section": "",
-    "text": "A critical review of using breach frequency as a measure of security success, inspired by Incident Metrics in SRE: Critically Evaluating MTTR and Friends.\nlibrary(poilog)\nlibrary(tibble)\nlibrary(dplyr)",
-    "crumbs": [
-      "Changelog",
-      "Measuring Changes in Breach Rates"
-    ]
-  },
-  {
-    "objectID": "analysis/breach-rates.html#background",
-    "href": "analysis/breach-rates.html#background",
-    "title": "Measuring Changes in Breach Rates",
-    "section": "Background",
-    "text": "Background\nIncident Metrics in SRE: Critically Evaluating MTTR and Friends demonstrated the difficulty at detecting changes in MTTR over time. The paper tests a 10% reduction in MTTR using Monte Carlo simulation, and found:\n\n“Yikes! Even though in the simulation the improvement always worked, 38% of the simulations had the MTTR difference fall below zero for Company A, 40% for Company B, and 20% for Company C. Looking at the absolute change in MTTR, the probability of seeing at least a 15-minute improvement is only 49%, 50%, and 64%, respectively. Even though the product in the scenario worked and shortened incidents, the odds of detecting any improvement at all are well outside the tolerance of 10% random flukes.”\n\nSafety Differently argues that we shouldn’t measure success based on the absence of negative events. We can use real data on data breaches and Monte Carlo simulation to explore the question, “Is an organization’s breach rate a useful metric?”",
-    "crumbs": [
-      "Changelog",
-      "Measuring Changes in Breach Rates"
-    ]
-  },
-  {
-    "objectID": "analysis/breach-rates.html#poisson-log-normal-model",
-    "href": "analysis/breach-rates.html#poisson-log-normal-model",
-    "title": "Measuring Changes in Breach Rates",
-    "section": "Poisson Log-Normal Model",
-    "text": "Poisson Log-Normal Model\nThe 2022 Information Risk Insights Study (IRIS) found that a Poisson log-normal distribution fits the data and provides realistic forecasts for years with multiple breaches, and provides suggested values for mean (\\(\\mu\\)) and standard deviation (\\(\\sigma\\)) in Table 1, along with the likelihood of a breach with models that are adjusted for firm size in Table 2, since larger firms are more likely to experience a breach.\nUsing the provided parameters from Table 1, we get:\n\nbreach_poilog &lt;- function(mu, sig, runs = 1e6) {\n  breaches &lt;- rpoilog(runs, mu, sig)\n  tibble(\n    \"One or more\" = sum(breaches &gt;= 1) / runs,\n    \"Two or more\" = sum(breaches &gt;= 2) / runs,\n    \"Three or more\" = sum(breaches &gt;= 3) / runs\n  )\n}\n\nbreach_poilog(mu = -2.284585, sig = 0.8690759)\n\n# A tibble: 1 × 3\n  `One or more` `Two or more` `Three or more`\n          &lt;dbl&gt;         &lt;dbl&gt;           &lt;dbl&gt;\n1         0.129        0.0165         0.00248\n\n\nThese values are close to the upper bound for a firm in the $100M to $1B range on Table 2.",
-    "crumbs": [
-      "Changelog",
-      "Measuring Changes in Breach Rates"
-    ]
-  },
-  {
-    "objectID": "analysis/breach-rates.html#poisson-model",
-    "href": "analysis/breach-rates.html#poisson-model",
-    "title": "Measuring Changes in Breach Rates",
-    "section": "Poisson Model",
-    "text": "Poisson Model\nIf we were to use the number of breaches a firm has experienced as a useful metric, in the best-case scenario, we would have a high rate of breaches with a significant reduction after implementing a new control. Unfortunately, the IRIS paper doesn’t provide the model parameters for the group with the highest likelihood of a breach, firms with more than $100B in revenue. Additionally, because it is easier to understand and calculate improvements, we’d like to use a plain Poisson distribution, which has a single parameter for average arrival rate, \\(\\lambda\\).\nWe can find a reasonable value for \\(\\lambda\\) using trial and error:\n\nbreach_pois &lt;- function(lambda, runs = 1e6) {\n  breaches &lt;- rpois(runs, lambda)\n  tibble(\n    \"One or more\" = sum(breaches &gt;= 1) / runs,\n    \"Two or more\" = sum(breaches &gt;= 2) / runs,\n    \"Three or more\" = sum(breaches &gt;= 3) / runs\n  )\n}\n\nbase_lambda &lt;- 0.347\nbreach_pois(base_lambda)\n\n# A tibble: 1 × 3\n  `One or more` `Two or more` `Three or more`\n          &lt;dbl&gt;         &lt;dbl&gt;           &lt;dbl&gt;\n1         0.293        0.0479         0.00542\n\n\nA Poisson model with a \\(\\lambda\\) of 0.347 (a little more than once every three years) gives similar results to the Poisson log-normal model for the largest firms for one or more breaches, but underestimates the likelihood for 2+ and 3+.",
-    "crumbs": [
-      "Changelog",
-      "Measuring Changes in Breach Rates"
-    ]
-  },
-  {
-    "objectID": "analysis/breach-rates.html#simulate-improvement",
-    "href": "analysis/breach-rates.html#simulate-improvement",
-    "title": "Measuring Changes in Breach Rates",
-    "section": "Simulate Improvement",
-    "text": "Simulate Improvement\nUsing the Poisson model, it is easy to simulate improvements.\nLet’s assume that the firm implements a new security control that reduces the likelihood of a breach by 25%, and compares the number of breaches in the 5 years before and after implementing that control. We then simulate this scenario 100,000 times:\n\nsimulation &lt;- function(years, reduction, runs = 1e5) {\n  tibble(\n    base = replicate(runs, sum(rpois(years, base_lambda))),\n    new = replicate(runs, sum(rpois(years, base_lambda * (1 - reduction))))\n  ) |&gt;\n    mutate(\n      better = .data$new &lt; .data$base, worse = .data$new &gt; .data$base,\n      same = .data$new == .data$base\n    )\n}\n\nresults &lt;- simulation(5, 0.25)\nhead(results, 10)\n\n# A tibble: 10 × 5\n    base   new better worse same \n   &lt;int&gt; &lt;int&gt; &lt;lgl&gt;  &lt;lgl&gt; &lt;lgl&gt;\n 1     2     2 FALSE  FALSE TRUE \n 2     5     2 TRUE   FALSE FALSE\n 3     0     0 FALSE  FALSE TRUE \n 4     1     3 FALSE  TRUE  FALSE\n 5     2     2 FALSE  FALSE TRUE \n 6     1     0 TRUE   FALSE FALSE\n 7     0     2 FALSE  TRUE  FALSE\n 8     3     0 TRUE   FALSE FALSE\n 9     1     2 FALSE  TRUE  FALSE\n10     2     0 TRUE   FALSE FALSE\n\n\nOK, what are the results?\n\nsummarize_results &lt;- function(data) {\n  data |&gt;\n    summarize(\n      better = sum(.data$better) / n(), worse = sum(.data$worse) / n(),\n      same = sum(.data$same) / n()\n    )\n}\n\nsummarize_results(results)\n\n# A tibble: 1 × 3\n  better worse  same\n   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;\n1  0.477 0.288 0.234\n\n\nFor this scenario, even though the true rate of breaches has been reduced by 25%, the number of breaches in the 5 years after implementing the control is better less than 50% of the time, and is actually worse nearly 30% of the time!",
-    "crumbs": [
-      "Changelog",
-      "Measuring Changes in Breach Rates"
-    ]
-  },
-  {
-    "objectID": "analysis/breach-rates.html#larger-sample",
-    "href": "analysis/breach-rates.html#larger-sample",
-    "title": "Measuring Changes in Breach Rates",
-    "section": "Larger Sample",
-    "text": "Larger Sample\nTo improve the likelihood of detecting the improvement, we can adjust the scenario, taking a larger sample of years before and after implementing the new control. How many years would we need to get a confident measurement of improvement?\n\nsimulation(10, 0.25) |&gt;\n  summarize_results()\n\n# A tibble: 1 × 3\n  better worse  same\n   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;\n1  0.556 0.287 0.157\n\nsimulation(50, 0.25) |&gt;\n  summarize_results()\n\n# A tibble: 1 × 3\n  better worse   same\n   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;\n1  0.756 0.190 0.0546\n\nsimulation(250, 0.25) |&gt;\n  summarize_results()\n\n# A tibble: 1 × 3\n  better  worse    same\n   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;\n1  0.958 0.0352 0.00666\n\n\nOnly the simulation which tests 250 years before and after (a total of 500 years!) gives a somewhat reasonable indication of improvement - and keep in mind that “better” is a reduction of any amount. Running metrics for a period this long at a single firm is impractical, which leads to our conclusion…",
-    "crumbs": [
-      "Changelog",
-      "Measuring Changes in Breach Rates"
-    ]
-  },
-  {
-    "objectID": "analysis/breach-rates.html#conclusion",
-    "href": "analysis/breach-rates.html#conclusion",
-    "title": "Measuring Changes in Breach Rates",
-    "section": "Conclusion",
-    "text": "Conclusion\nEven in a “best case” scenario of a very large firm that is able to measure the number of breaches over a 10 year period, a 25% reduction in breach rate only results in a lower number of actual breaches less than 50% of the time. A sample period of 500 years or more is needed to have confidence that the breach rate has been reduced.\nRealistically, this means that the only way to test the effectiveness of security controls is by sampling across large numbers of firms. A single organization simply won’t have enough data to make reasonable conclusions based on events that happen so infrequently.",
-    "crumbs": [
-      "Changelog",
-      "Measuring Changes in Breach Rates"
-    ]
-  },
-  {
-    "objectID": "LICENSE.html",
-    "href": "LICENSE.html",
-    "title": "MIT License",
-    "section": "",
-    "text": "MIT License\nCopyright (c) 2026 John Benninghoff\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:\nThe above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\nTHE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
-  },
-  {
-    "objectID": "analysis/visualizing-risk.html",
-    "href": "analysis/visualizing-risk.html",
-    "title": "Visualizing Risk (Draft)",
-    "section": "",
-    "text": "An exploration of different approaches to communicating security breach risk informed by prior work.",
-    "crumbs": [
-      "Changelog",
-      "Visualizing Risk (Draft)"
-    ]
-  },
-  {
-    "objectID": "analysis/visualizing-risk.html#questionstodo",
-    "href": "analysis/visualizing-risk.html#questionstodo",
-    "title": "Visualizing Risk (Draft)",
-    "section": "Questions/TODO",
-    "text": "Questions/TODO\n\nHow should tail risk be visualized?\nHow well do quantile dotplots capture tail risk?\nReview Open Group work on cyber risk\n\nCalculating Reserves for Cyber Risk: Integrating Cyber Risk with Financial Risk\nCalculating Reserves for Cyber Risk: An Open FAIR Approach\n\n\n\n# no libraries",
-    "crumbs": [
-      "Changelog",
-      "Visualizing Risk (Draft)"
-    ]
-  },
-  {
-    "objectID": "analysis/visualizing-risk.html#background",
-    "href": "analysis/visualizing-risk.html#background",
-    "title": "Visualizing Risk (Draft)",
-    "section": "Background",
-    "text": "Background\nThe Risk Value Analysis found that a firm’s executive is unlikely to invest in reducing the risk of a large security breach, suggesting that security spending should be presented differently:\n\nAt the firm level, I think this means that security leaders shouldn’t present security as an investment. As with safety, I think the main argument for better security is a moral or emotional case: we care about security because we care about our customers, partners, and other stakeholders. Also, people are typically loss-averse, so expressing security risk in those terms will better connect with decision makers. Using Tail value at risk or Loss Exceedance Curves express loss in this way - “There’s a 5% chance of cybersecurity losses exceeding $780,000 and a 1% chance of losses exceeding $25,000,000 over the next year.” I also think it means security leaders should be mindful of how they spend their limited funds, by maximizing investments in what works.\n\nThis analysis explores different approaches to communicating that risk with the goal of promoting decisions on security spending so that all participants are satisfied with the outcome, informed by prior work on risk communication and risk perception, including the work of Lace Padilla, and Cyentia’s analysis on tail value at risk.",
-    "crumbs": [
-      "Changelog",
-      "Visualizing Risk (Draft)"
-    ]
-  },
-  {
-    "objectID": "analysis/constraints.html",
-    "href": "analysis/constraints.html",
-    "title": "Constraints vs Performance",
-    "section": "",
-    "text": "Visualizations exploring the use of constraints vs performance improvements in risk management.\nlibrary(ggplot2)\nlibrary(jbplot)\nlibrary(fs)\nlibrary(tibble)\nlibrary(dplyr)",
-    "crumbs": [
-      "Changelog",
-      "Constraints vs Performance"
-    ]
-  },
-  {
-    "objectID": "analysis/constraints.html#normal-performance",
-    "href": "analysis/constraints.html#normal-performance",
-    "title": "Constraints vs Performance",
-    "section": "Normal Performance",
-    "text": "Normal Performance\nReplicate a version of Figure 9 from the Safety-II White Paper, with help from https://ggplot2tor.com/tutorials/sampling_distributions:\n\nxmin &lt;- -5\nxmax &lt;- 5\n\nsave_png &lt;- function(filename) {\n  ggsave(filename = path(\"rendered\", filename), width = 16 * 0.6, height = 9 * 0.6, bg = \"white\")\n}\n\nbackground &lt;- ggplot(data.frame(x = c(xmin, xmax)), aes(x)) +\n  scale_x_continuous(breaks = -3:3, minor_breaks = NULL) +\n  labs(x = NULL, y = NULL) +\n  theme_quo(minor.y = FALSE)\n\nbaseline &lt;- stat_function(fun = dnorm, geom = \"line\")\nbad &lt;- stat_function(fun = dnorm, geom = \"area\", fill = \"red\", xlim = c(xmin, -2))\n\nbackground + bad + baseline\n\n\n\n\n\n\n\nsave_png(\"01-baseline-bad.png\")\n\nThe plot above shows “bad” outcomes in red. Let’s add in “good” outcomes (&gt;1) in green:\n\ngood &lt;- stat_function(fun = dnorm, geom = \"area\", fill = \"green\", xlim = c(1, xmax))\n\nbackground + bad + good + baseline\n\n\n\n\n\n\n\nsave_png(\"02-baseline-bad-good.png\")",
-    "crumbs": [
-      "Changelog",
-      "Constraints vs Performance"
-    ]
-  },
-  {
-    "objectID": "analysis/constraints.html#constrained-performance",
-    "href": "analysis/constraints.html#constrained-performance",
-    "title": "Constraints vs Performance",
-    "section": "Constrained Performance",
-    "text": "Constrained Performance\nOne way of reducing “bad” outcomes is by constraining performance - reducing the standard deviation.\n\nconstrained &lt;- stat_function(fun = dnorm, args = list(sd = 0.7), geom = \"line\", color = \"blue\")\ntaller &lt;- scale_y_continuous(limits = c(0, 0.6))\n\nbackground +\n  stat_function(\n    fun = dnorm, args = list(sd = 0.7), geom = \"area\", fill = \"red\", xlim = c(xmin, -2)\n  ) +\n  stat_function(\n    fun = dnorm, args = list(sd = 0.7), geom = \"area\", fill = \"green\", xlim = c(1, xmax)\n  ) +\n  constrained +\n  taller\n\n\n\n\n\n\n\nsave_png(\"03-constrained.png\")\n\nPlotting both on the same grid shows the reduction in both “bad” and “good” outcomes:\n\nbackground +\n  bad +\n  good +\n  baseline +\n  constrained +\n  taller\n\n\n\n\n\n\n\nsave_png(\"04-baseline-constrained.png\")",
-    "crumbs": [
-      "Changelog",
-      "Constraints vs Performance"
-    ]
-  },
-  {
-    "objectID": "analysis/constraints.html#improved-performance",
-    "href": "analysis/constraints.html#improved-performance",
-    "title": "Constraints vs Performance",
-    "section": "Improved Performance",
-    "text": "Improved Performance\nAnother way of reducing bad outcomes is by improving performance - shifting the mean.\n\nperformance &lt;- stat_function(fun = dnorm, args = list(mean = 1), geom = \"line\", color = \"blue\")\nimproved &lt;- stat_function(\n  fun = dnorm, args = list(mean = 1), geom = \"area\", fill = \"green\", xlim = c(1, xmax)\n)\n\nbackground +\n  stat_function(\n    fun = dnorm, args = list(mean = 1), geom = \"area\", fill = \"red\", xlim = c(xmin, -2)\n  ) +\n  improved +\n  performance\n\n\n\n\n\n\n\nsave_png(\"05-improved.png\")\n\nPlotting both together shows a reduction in “bad” and an increase in “good” outcomes:\n\nbackground +\n  bad +\n  improved +\n  baseline +\n  performance\n\n\n\n\n\n\n\nsave_png(\"06-baseline-improved.png\")\n\nComparing all three:\n\nbackground +\n  bad +\n  improved +\n  baseline +\n  constrained +\n  performance +\n  taller\n\n\n\n\n\n\n\nsave_png(\"07-baseline-constrained-improved.png\")",
-    "crumbs": [
-      "Changelog",
-      "Constraints vs Performance"
-    ]
-  },
-  {
-    "objectID": "analysis/constraints.html#growth-of-controls",
-    "href": "analysis/constraints.html#growth-of-controls",
-    "title": "Constraints vs Performance",
-    "section": "Growth of Controls",
-    "text": "Growth of Controls\nVisualize an example of the growth of controls using the Cyentia/RiskRecon State of Third-Party Risk Management 2020 and 2024 reports (data from 2023).\nSource:\n\n2020 data: https://www.riskrecon.com/state-of-third-party-risk-management-report\n2023 data: https://www.riskrecon.com/state-of-third-party-risk-management-2024\n\n\nquestionnaire &lt;- tribble(\n  ~year, ~questions, ~percent,\n  2020,  \"&gt;400\",     0.041,\n  2020,  \"101-400\",  0.148,\n  2020,  \"11-100\",   0.705,\n  2020,  \"1-10\",     0.107,\n  2023,  \"&gt;400\",     0.02,\n  2023,  \"101-400\",  0.333,\n  2023,  \"11-100\",   0.616,\n  2023,  \"1-10\",     0.030\n) |&gt;\n  mutate(\n    year = as.factor(year),\n    questions = factor(questions, levels = c(\"1-10\", \"11-100\", \"101-400\", \"&gt;400\"))\n  )\n\nggplot(questionnaire, aes(questions, percent, fill = year)) +\n  geom_col(position = \"dodge\") +\n  scale_y_continuous(labels = scales::label_percent()) +\n  scale_fill_manual(values = c(\"steelblue2\", \"steelblue4\")) +\n  labs(x = NULL, y = NULL, fill = \"Year\", title = \"Third-Party Questionnaire Length by Year\") +\n  labs(caption = \"Source: Cyentia/RiskRecon State of Third-Party Risk Management, 2020 and 2024\") +\n  theme_quo()\n\n\n\n\n\n\n\nsave_png(\"08-questionnaire-length.png\")",
-    "crumbs": [
-      "Changelog",
-      "Constraints vs Performance"
-    ]
-  },
-  {
-    "objectID": "analysis/constraints.html#transparent-donut",
-    "href": "analysis/constraints.html#transparent-donut",
-    "title": "Constraints vs Performance",
-    "section": "Transparent Donut",
-    "text": "Transparent Donut\nCreate a transparent donut plot showing an 80% reduction.\n\n# custom function based on ggplot_donut_percent()\ncustom_donut &lt;- function(p, text = \"\", accuracy = NULL, hsize = 4, size = 12, family = \"Lato\") {\n  percent_true &lt;- data.frame(group = c(TRUE, FALSE), n = c(p, 1 - p))\n  label &lt;- paste0(scales::label_percent(accuracy = accuracy)(p), \"\\n\", text)\n\n  ggplot_donut(percent_true, hsize = hsize) +\n    guides(fill = \"none\") +\n    geom_text(x = 0, label = label, size = size, family = family) +\n    scale_fill_grey() +\n    theme(plot.background = element_rect(fill = \"transparent\", color = NA))\n}\n\ncustom_donut(0.8, \"reduction\")\n\n\n\n\n\n\n\nggsave(\"rendered/80-percent-safety.png\")\n\nSaving 8.5 x 5 in image\n\ncustom_donut(0.8, \"reduction?\")\n\n\n\n\n\n\n\nggsave(\"rendered/80-percent-security.png\")\n\nSaving 8.5 x 5 in image",
-    "crumbs": [
-      "Changelog",
-      "Constraints vs Performance"
-    ]
-  },
-  {
     "objectID": "analysis/measuring-incidents.html",
     "href": "analysis/measuring-incidents.html",
     "title": "Measuring Incident Duration",
@@ -776,9 +838,9 @@
   {
     "objectID": "NEWS.html",
     "href": "NEWS.html",
-    "title": "security 1.3.7",
+    "title": "security 1.4.0",
     "section": "",
-    "text": "security 1.3.7\n\n2026-08 Upkeep\n\n\n\nsecurity 1.3.6\n\nAdded alt text to plots in examples and template to improve accessibility\n2026 Upkeep\n\n\n\nsecurity 1.3.5\n\nRisk Value Analysis: update Questions/TODO\nInitial upkeep using use_upkeep_issue()\n\n\n\nsecurity 1.3.4\n\nRisk Value Analysis: Validate approach for 50% impact reduction\n\n\n\nsecurity 1.3.3\n\nCorrected GitHub language stats\n\n\n\nsecurity 1.3.2\n\nUpdated for R 4.5.0\n\n\n\nsecurity 1.3.1\n\nUpdated Measuring Incident Duration: explore the range of observed improvements for a 50% reduction\n\n\n\nsecurity 1.3.0\n\nAdded Measuring Incident Duration: Analysis to determine thresholds of sample size to reliably detect changes in incident impact (duration) using Monte Carlo simulation\n\n\n\nsecurity 1.2.6\n\nUpdated Risk Quantification Demo: add Individual Histograms for SREcon 2025 talk\n\n\n\nsecurity 1.2.5\n\nMinor updates\n\n\n\nsecurity 1.2.4\n\nAdded Visualizing Risk (Draft): An exploration of different approaches to communicating security breach risk informed by prior work\n\n\n\nsecurity 1.2.3\n\nAdded Security Differently branding\n\n\n\nsecurity 1.2.2\n\nUpdated Risk Value Analysis: add counterexample, frequent losses due to malware infection\n\n\n\nsecurity 1.2.1\n\nUpdated Risk Value Analysis: minor content corrections\n\n\n\nsecurity 1.2.0\n\nAdded Risk Value Analysis: An exploration of the value of cybersecurity risk reduction\nUpdated Risk Quantification Prototype: added log scale loss exceedance curves\n\n\n\nsecurity 1.1.5\n\nUpdated links, content, to reference official quantrr version 1.0 release\n\n\n\nsecurity 1.1.4\n\nBug fixes\n\n\n\nsecurity 1.1.3\n\nMigrated lnorm_param() and calc_risk() functions to quantrr, the (future) production version of the Risk Quantification Tool\n\n\n\nsecurity 1.1.2\n\nUpdated Risk Quantification Demo: updated TODO from SIRAcon 2024 session feedback\n\n\n\nsecurity 1.1.1\n\nUpdated Risk Quantification Demo: added Environment Statement\n\n\n\nsecurity 1.1.0\n\nRenamed “Technology Risk Quantification” to “Risk Quantification Prototype”\nAdded Risk Quantification Demo: Risk Quantification demonstration for my SIRAcon 2024 talk, “UnFAIR: Simplifying and Expanding Technology Risk Quantification.”\n\n\n\nsecurity 1.0.7\n\nUpdated Technology Risk Quantification: update TODO\n\n\n\nsecurity 1.0.6\n\nUpdated Technology Risk Quantification: added summary histograms\n\n\n\nsecurity 1.0.5\n\nUpdated Technology Risk Quantification: added loss exceedance plots\n\n\n\nsecurity 1.0.4\n\nUpdated Technology Risk Quantification: added preliminary Forecast section\n\n\n\nsecurity 1.0.3\n\nAdded Technology Risk Quantification: Prototype Risk Quantification tool for my SIRAcon 2024 talk, “UnFAIR: Simplifying and Expanding Technology Risk Quantification”\n\n\n\nsecurity 1.0.2\n\nMinor updates\n\n\n\nsecurity 1.0.1\n\nAdded Measuring Changes in Breach Rates: A critical review of using breach frequency as a measure of security success, inspired by Incident Metrics in SRE: Critically Evaluating MTTR and Friends\n\n\n\nsecurity 1.0.0\nInitial release.\n\nMoved Constraints vs Performance from rtraining: Visualizations exploring the use of constraints vs performance improvements in risk management"
+    "text": "security 1.4.0\n\nAdded MFA Deployment Analysis: Analysis of the impact of Multi-Factor Authentication (MFA) deployment rate on the likelihood of compromise\n\n\n\nsecurity 1.3.7\n\n2026-08 Upkeep\n\n\n\nsecurity 1.3.6\n\nAdded alt text to plots in examples and template to improve accessibility\n2026 Upkeep\n\n\n\nsecurity 1.3.5\n\nRisk Value Analysis: update Questions/TODO\nInitial upkeep using rdev::use_upkeep_issue()\n\n\n\nsecurity 1.3.4\n\nRisk Value Analysis: Validate approach for 50% impact reduction\n\n\n\nsecurity 1.3.3\n\nCorrected GitHub language stats\n\n\n\nsecurity 1.3.2\n\nUpdated for R 4.5.0\n\n\n\nsecurity 1.3.1\n\nUpdated Measuring Incident Duration: explore the range of observed improvements for a 50% reduction\n\n\n\nsecurity 1.3.0\n\nAdded Measuring Incident Duration: Analysis to determine thresholds of sample size to reliably detect changes in incident impact (duration) using Monte Carlo simulation\n\n\n\nsecurity 1.2.6\n\nUpdated Risk Quantification Demo: add Individual Histograms for SREcon 2025 talk\n\n\n\nsecurity 1.2.5\n\nMinor updates\n\n\n\nsecurity 1.2.4\n\nAdded Visualizing Risk (Draft): An exploration of different approaches to communicating security breach risk informed by prior work\n\n\n\nsecurity 1.2.3\n\nAdded Security Differently branding\n\n\n\nsecurity 1.2.2\n\nUpdated Risk Value Analysis: add counterexample, frequent losses due to malware infection\n\n\n\nsecurity 1.2.1\n\nUpdated Risk Value Analysis: minor content corrections\n\n\n\nsecurity 1.2.0\n\nAdded Risk Value Analysis: An exploration of the value of cybersecurity risk reduction\nUpdated Risk Quantification Prototype: added log scale loss exceedance curves\n\n\n\nsecurity 1.1.5\n\nUpdated links, content, to reference official quantrr version 1.0 release\n\n\n\nsecurity 1.1.4\n\nBug fixes\n\n\n\nsecurity 1.1.3\n\nMigrated lnorm_param() and calc_risk() functions to quantrr, the (future) production version of the Risk Quantification Tool\n\n\n\nsecurity 1.1.2\n\nUpdated Risk Quantification Demo: updated TODO from SIRAcon 2024 session feedback\n\n\n\nsecurity 1.1.1\n\nUpdated Risk Quantification Demo: added Environment Statement\n\n\n\nsecurity 1.1.0\n\nRenamed “Technology Risk Quantification” to “Risk Quantification Prototype”\nAdded Risk Quantification Demo: Risk Quantification demonstration for my SIRAcon 2024 talk, “UnFAIR: Simplifying and Expanding Technology Risk Quantification.”\n\n\n\nsecurity 1.0.7\n\nUpdated Technology Risk Quantification: update TODO\n\n\n\nsecurity 1.0.6\n\nUpdated Technology Risk Quantification: added summary histograms\n\n\n\nsecurity 1.0.5\n\nUpdated Technology Risk Quantification: added loss exceedance plots\n\n\n\nsecurity 1.0.4\n\nUpdated Technology Risk Quantification: added preliminary Forecast section\n\n\n\nsecurity 1.0.3\n\nAdded Technology Risk Quantification: Prototype Risk Quantification tool for my SIRAcon 2024 talk, “UnFAIR: Simplifying and Expanding Technology Risk Quantification”\n\n\n\nsecurity 1.0.2\n\nMinor updates\n\n\n\nsecurity 1.0.1\n\nAdded Measuring Changes in Breach Rates: A critical review of using breach frequency as a measure of security success, inspired by Incident Metrics in SRE: Critically Evaluating MTTR and Friends\n\n\n\nsecurity 1.0.0\nInitial release.\n\nMoved Constraints vs Performance from rtraining: Visualizations exploring the use of constraints vs performance improvements in risk management"
   },
   {
     "objectID": "index.html",
