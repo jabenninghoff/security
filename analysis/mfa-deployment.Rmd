@@ -207,8 +207,9 @@ ggsave("rendered/mfa-deployment-rate.png", width = 16 * 0.6, height = 9 * 0.6)
 
 This plot more clearly explains the effect of deployment rate on how often attacks succeed; at 50%
 deployment, the attack succeeds about every 2 tries. At a deployment rate of 91%, the attack
-succeeds every 10 tries. A 100% deployment rate (every 100 days) is about twice as effective as a
-99% deployment rate (every 50 days) - this is true on both plots, but easier to see with the second.
+succeeds every 10 tries. A 100% deployment rate (every 100 tries) is about twice as effective as a
+99% deployment rate (every 50 tries) - this is true on both plots, but easier to see with the
+second.
 
 # Discussion
 
