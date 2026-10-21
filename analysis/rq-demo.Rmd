@@ -348,7 +348,10 @@ Plot Cybersecurity and Outage histograms independently, for a new talk, [Is the 
 #|   - "A histogram showing number of losses by dollar value on a log10 scale. The curve is roughly
 #|     normally shaped with a mean near $100K."
 save_png <- function(filename) {
-  ggsave(filename = path("rendered", filename), width = 16 * 0.6, height = 9 * 0.6, bg = "white")
+  ggsave(
+    filename = path("rendered", filename),
+    width = 16 * 0.6, height = 9 * 0.6, bg = "white", create.dir = TRUE
+  )
 }
 
 forecast |>

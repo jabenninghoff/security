@@ -163,7 +163,7 @@ reduction (76%) and an optimistic reduction (99%):
 load("objects/mfa-exports.RData")
 risk_le
 
-ggsave("rendered/mfa-loss-exceedance.png", width = 16 * 0.6, height = 9 * 0.6)
+ggsave("rendered/mfa-loss-exceedance.png", width = 16 * 0.6, height = 9 * 0.6, create.dir = TRUE)
 ```
 
 Interactive plot:
