@@ -45,7 +45,10 @@ xmin <- -5
 xmax <- 5
 
 save_png <- function(filename) {
-  ggsave(filename = path("rendered", filename), width = 16 * 0.6, height = 9 * 0.6, bg = "white")
+  ggsave(
+    filename = path("rendered", filename),
+    width = 16 * 0.6, height = 9 * 0.6, bg = "white", create.dir = TRUE
+  )
 }
 
 background <- ggplot(data.frame(x = c(xmin, xmax)), aes(x)) +
