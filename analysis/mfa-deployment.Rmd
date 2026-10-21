@@ -2,7 +2,7 @@
 title: "MFA Deployment Analysis"
 author: "John Benninghoff"
 date: '2026-09-11'
-date-modified: '2026-09-11'
+date-modified: '2026-10-21'
 categories: [risk quantification, security differently]
 order: 108
 output:
@@ -22,7 +22,8 @@ Analysis of the impact of Multi-Factor Authentication (MFA) deployment rate on t
 
 # Questions/TODO
 
-- [ ] Questions/TODO list here
+- [ ] Compare the effectiveness of control coverage compare vs defense-in-depth. How do two
+      partially deployed controls compare to a single widely deployed control?
 
 ```{r}
 #| label: setup
@@ -161,6 +162,8 @@ reduction (76%) and an optimistic reduction (99%):
 #|          comparing treatments."
 load("objects/mfa-exports.RData")
 risk_le
+
+ggsave("rendered/mfa-loss-exceedance.png", width = 16 * 0.6, height = 9 * 0.6)
 ```
 
 Interactive plot:
@@ -198,6 +201,8 @@ frequency_plot <- deployment_success |>
   theme_quo()
 
 ggplotly(frequency_plot)
+
+ggsave("rendered/mfa-deployment-rate.png", width = 16 * 0.6, height = 9 * 0.6)
 ```
 
 This plot more clearly explains the effect of deployment rate on how often attacks succeed; at 50%
@@ -205,14 +210,7 @@ deployment, the attack succeeds about every 2 tries. At a deployment rate of 91%
 succeeds every 10 tries. A 100% deployment rate (every 100 days) is about twice as effective as a
 99% deployment rate (every 50 days) - this is true on both plots, but easier to see with the second.
 
-<!--
-Also look at the effectiveness of control coverage vs defense-in-depth. How do two partially
-deployed controls compare to a single widely deployed control?
--->
-
 # Discussion
 
-<!--
-Discuss how this could be done with probability math, how use of Monte Carlo helps, importance of
-intuitive visualizations in understanding risk (rate vs frequency).
--->
+While this analysis could have been easily accomplished with probability math, I have found that
+using models and Monte Carlo simulations helps me understand the results.
